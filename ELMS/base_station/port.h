@@ -10,7 +10,8 @@
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
 #include <windows.h>
-#include <stdio.h>
+#include <iostream>
+#include <string>
 
 
 class Port
@@ -26,22 +27,16 @@ class Port
         const int STOP_BITS = ONESTOPBIT;
         const int PARITY = PARITY;
         HANDLE hSerial;
-        LPCSTR portname;
-        int stopbits;
-        int parity;
-        char* buffer;
-        char* data;
-
 
     public:
         Port(LPCSTR portname, int baudrate, int stopbits, int parity);
         Port();
         ~Port();
-        HANDLE openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity); 
+        void openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity); 
         DWORD readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize); // 
         DWORD writeToSerialPort(HANDLE hSerial, char* data, int length);
         void closeSerialPort(HANDLE hSerial);
-        HANDLE detectHandle();
+        HANDLE detectPort();
 
 };
 #endif

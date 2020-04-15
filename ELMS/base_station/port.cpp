@@ -20,22 +20,15 @@ returns the handle of the port
 =============
 
 */
-HANDLE Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity)
+void Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity)
 {
-    DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
-    HANDLE hSerial = CreateFile(portname,
-        accessdirection,
-        0,
-        0,
-        OPEN_EXISTING,
-        0,
-        0);
+    hSerial = detectPort(); // get the port
+    
     if (hSerial == INVALID_HANDLE_VALUE)
     {
-        perror("CreateFile ");
-        DWORD dw = GetLastError();
-        ExitProcess(dw);
+        // do something
     }
+
     DCB dcbSerialParams = { 0 };
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
     if (!GetCommState(hSerial, &dcbSerialParams))
@@ -64,7 +57,6 @@ HANDLE Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int par
         DWORD dw = GetLastError();
         ExitProcess(dw);
     }
-    return hSerial;
 }
 
 
@@ -108,6 +100,7 @@ DWORD Port::writeToSerialPort(HANDLE hSerial, char* data, int length)
     }
     return dwBytesRead;
 }
+
 /*
 =============
 closeSerialPort
@@ -123,15 +116,29 @@ void Port::closeSerialPort(HANDLE hSerial)
 detectHandle
 =============
 */
-HANDLE Port::detectHandle()
+HANDLE Port::detectPort()
 {
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
-    HANDLE handle = CreateFile(portname,
-        accessdirection,
-        0,
-        0,
-        OPEN_EXISTING,
-        0,
-        0);
-    return handle;
+    HANDLE hSerial;
+    std::string name;
+    LPCSTR portname;
+
+    for (int x = 1; x <= 10; x++)
+    {
+        name = "COM" + std::to_string(x);
+        portname = name.c_str();
+        hSerial = CreateFile(portname,
+            accessdirection,
+            0,
+            0,
+            OPEN_EXISTING,
+            0,
+            0);
+
+        if (hSerial != INVALID_HANDLE_VALUE) // check if opening the serial port does not cause an error
+        {
+            break;
+        }
+    }
+    return hSerial; 
 }
