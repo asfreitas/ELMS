@@ -25,18 +25,19 @@ class Port
         const int WRITE_CONSTANT = 50;
         const int baudrate = 9600;
         const int STOP_BITS = ONESTOPBIT;
-        const int PARITY = PARITY;
+        const int PARITY = NOPARITY;
         HANDLE hSerial;
 
     public:
-        Port(LPCSTR portname, int baudrate, int stopbits, int parity);
+        Port(LPCSTR portname);
         Port();
         ~Port();
-        void openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity); 
-        DWORD readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize); // 
+        void openSerialPort(LPCSTR portname); 
+        DWORD readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize);
         DWORD writeToSerialPort(HANDLE hSerial, char* data, int length);
         void closeSerialPort(HANDLE hSerial);
-        HANDLE detectPort();
+        HANDLE setupPort(LPCSTR portname);
+        HANDLE createPort(LPCSTR portname);
 
 };
 #endif

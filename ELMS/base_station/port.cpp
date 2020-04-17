@@ -20,9 +20,10 @@ returns the handle of the port
 =============
 
 */
-void Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parity)
+void Port::openSerialPort(LPCSTR portname)
 {
-    hSerial = detectPort(); // get the port
+
+    hSerial = setupPort(portname); // get the port
     
     if (hSerial == INVALID_HANDLE_VALUE)
     {
@@ -39,8 +40,8 @@ void Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parit
     }
     dcbSerialParams.BaudRate = baudrate;
     dcbSerialParams.ByteSize = BYTE_SIZE;
-    dcbSerialParams.StopBits = stopbits;
-    dcbSerialParams.Parity = parity;
+    dcbSerialParams.StopBits = STOP_BITS;
+    dcbSerialParams.Parity = PARITY;
     if (!SetCommState(hSerial, &dcbSerialParams)) {
         perror("SetCommState ");
         DWORD dw = GetLastError();
@@ -58,7 +59,6 @@ void Port::openSerialPort(LPCSTR portname, int baudrate, int stopbits, int parit
         ExitProcess(dw);
     }
 }
-
 
 /*
 =============
@@ -79,6 +79,7 @@ DWORD Port::readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize)
     }
     return dwBytesRead;
 }
+
 
 /*
 =============
@@ -114,31 +115,85 @@ void Port::closeSerialPort(HANDLE hSerial)
 /*
 =============
 detectHandle
+
+Check for a handle until we find one that doesn't return an error
 =============
 */
-HANDLE Port::detectPort()
+HANDLE Port::setupPort(LPCSTR portname)
 {
-    DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
     HANDLE hSerial;
     std::string name;
-    LPCSTR portname;
 
-    for (int x = 1; x <= 10; x++)
+    if (portname == NULL)
     {
-        name = "COM" + std::to_string(x);
-        portname = name.c_str();
-        hSerial = CreateFile(portname,
-            accessdirection,
-            0,
-            0,
-            OPEN_EXISTING,
-            0,
-            0);
-
-        if (hSerial != INVALID_HANDLE_VALUE) // check if opening the serial port does not cause an error
+        for (int x = 1; x <= 10; x++)
         {
-            break;
+            name = "COM" + std::to_string(x);
+            portname = name.c_str();
+            hSerial = createPort(portname);
+
+            if (hSerial != INVALID_HANDLE_VALUE) 
+            {
+                return hSerial; // open the port if we find one that doesn't return an eror
+            }
         }
     }
+    else
+    {
+        hSerial = createPort(portname); // if we know the port go ahead and open it
+    }
+
     return hSerial; 
+}
+
+/*
+=============
+testPort
+
+Attempts to open a port with a particular portname
+=============
+*/
+HANDLE Port::createPort(LPCSTR portname)
+{
+    HANDLE hSerial;
+    DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
+
+   return hSerial = CreateFile(portname, 
+       accessdirection, 0, 0, OPEN_EXISTING ,0, 0);
+}
+
+/*
+=============
+Contructor - No Parameters
+
+Opens a new port and attempts to find the port automatically 
+=============
+*/
+Port::Port()
+{
+    setupPort(NULL);
+}
+
+/*
+=============
+Contructor - Portname provided
+
+Opens a new port and attempts to open the port passed into the constructor
+=============
+*/
+Port::Port(LPCSTR portname)
+{
+    setupPort(portname);
+}
+
+/*
+=============
+Destructor
+
+Opens a new port and attempts to open the port passed into the constructor
+=============
+*/
+Port::~Port()
+{
+    closeSerialPort(hSerial);
 }
