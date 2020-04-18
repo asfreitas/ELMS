@@ -32,6 +32,7 @@ void Port::openSerialPort(LPCSTR portname)
 
     DCB dcbSerialParams = { 0 };
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    
     if (!GetCommState(hSerial, &dcbSerialParams))
     {
         perror("GetCommState ");
@@ -68,7 +69,7 @@ hSerial		File HANDLE to the serial port
 returns the amount of data that was read
 =============
 */
-DWORD Port::readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize)
+DWORD Port::readFromSerialPort(char* buffer, int buffersize)
 {
     DWORD dwBytesRead = 0;
     if (!ReadFile(hSerial, buffer, buffersize, &dwBytesRead, NULL))
@@ -90,7 +91,7 @@ length is for how much data is going to be written
 returns the amount of data that was written
 =============
 */
-DWORD Port::writeToSerialPort(HANDLE hSerial, char* data, int length)
+DWORD Port::writeToSerialPort(char* data, int length)
 {
     DWORD dwBytesRead = 0;
     if (!WriteFile(hSerial, data, length, &dwBytesRead, NULL))
@@ -171,7 +172,7 @@ Opens a new port and attempts to find the port automatically
 */
 Port::Port()
 {
-    setupPort(NULL);
+    openSerialPort(NULL);
 }
 
 /*
@@ -183,7 +184,7 @@ Opens a new port and attempts to open the port passed into the constructor
 */
 Port::Port(LPCSTR portname)
 {
-    setupPort(portname);
+    openSerialPort(portname);
 }
 
 /*
@@ -197,3 +198,70 @@ Port::~Port()
 {
     closeSerialPort(hSerial);
 }
+
+/*
+=============
+getHandle
+=============
+*/
+HANDLE Port::getHandle()
+{
+    return hSerial;
+}
+
+/*
+=============
+addToMessageBuffer
+=============
+*/
+void Port::addToMessageBuffer(std::string message)
+{
+    buffer.push(message);
+}
+
+/*
+=============
+removeTopMessage
+
+Removes the top message from the buffer and returns it
+=============
+*/
+std::string Port::removeNextMessage()
+{
+    std::string message = buffer.front();
+    buffer.pop();
+    return message;
+}
+
+/*
+=============
+removeTopMessage
+=============
+*/
+void Port::receiveMessage()
+{
+    char newMessage[messageSize];
+    memset(newMessage, 0, messageSize);
+    char extra[2];
+
+    readFromSerialPort(newMessage, messageSize - 15); // read in most of the message to ensure we don't bleed into next message
+    std::string finalMessage(newMessage);
+    while (finalMessage[finalMessage.size() - 1] != '*') // finish combining the message
+    {
+        memset(extra, 0, 2);
+        readFromSerialPort(extra, 1);
+        finalMessage += std::string(extra); // to do: reduce the amount of casting necessary
+    }
+    addToMessageBuffer(finalMessage);
+}
+
+/*
+=============
+isBufferEmpty
+=============
+*/
+bool Port::isBufferEmpty()
+{
+    return buffer.empty();
+}
+

@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <queue>
 
 
 class Port
@@ -26,18 +27,25 @@ class Port
         const int baudrate = 9600;
         const int STOP_BITS = ONESTOPBIT;
         const int PARITY = NOPARITY;
+        static const int messageSize = 50;
         HANDLE hSerial;
+        std::queue<std::string> buffer;
 
     public:
         Port(LPCSTR portname);
         Port();
         ~Port();
-        void openSerialPort(LPCSTR portname); 
-        DWORD readFromSerialPort(HANDLE hSerial, char* buffer, int buffersize);
-        DWORD writeToSerialPort(HANDLE hSerial, char* data, int length);
-        void closeSerialPort(HANDLE hSerial);
-        HANDLE setupPort(LPCSTR portname);
-        HANDLE createPort(LPCSTR portname);
+        void openSerialPort(LPCSTR); 
+        DWORD readFromSerialPort(char*, int);
+        DWORD writeToSerialPort(char*, int);
+        void closeSerialPort(HANDLE);
+        HANDLE setupPort(LPCSTR);
+        HANDLE createPort(LPCSTR);
+        HANDLE getHandle();
+        void addToMessageBuffer(std::string);
+        std::string removeNextMessage();
+        bool isBufferEmpty();
+        void receiveMessage();
 
 };
 #endif
