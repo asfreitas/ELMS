@@ -1,45 +1,130 @@
 /*
-* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+References:
+ * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API
+ * https://github.com/xanthium-enterpreises/Serial-Programming-Win32API-C
+ * https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/strtok-s-strtok-s-l-wcstok-s-wcstok-s-l-mbstok-s-mbstok-s-l?view=vs-2019
+ * Reference used to get the current time and date to name the files
+ * https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 */
 
-#include <iostream>
-#include <string>
 #include <Windows.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "serialport.hpp"
+#include <vector>
+#include "base_unit.h"
+#include <iostream>
+#include <fstream>
+# include <string>
+#include <ctime>
+#include <time.h>
+#include "port.h"
+using std::cout;
+using std::endl;
+using std::ofstream;
+using std::ios;
 using std::string;
 
-/* Reference for this code is stack overflow
- * https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows/
- */
 
-bool SelectComPort() //added function to find the present serial 
-{
-    char lpTargetPath[5000]; // buffer to store the path of the COMPORTS
-    bool gotPort = false; // in case the port is not found
+/* reference for the following -- this was an issue if you are using Visual Studio
+ * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711       */
 
-    for (int i = 0; i < 255; i++) // checking ports from COM0 to COM255
-    {
-        std::string str = "COM" + std::to_string(i); // converting to COM0, COM1, COM2
-        DWORD test = QueryDosDevice(str.c_str(), lpTargetPath, 5000);
+//#ifdef _MSC_VER
+//#define strtok_r strtok_s
+//#endif
 
-        // Test the return value and error if any
-        if (test != 0) //QueryDosDevice returns zero if it didn't find an object
-        {
-            std::cout << str << ": " << lpTargetPath << std::endl;
-            gotPort = true;
-        }
+ /* A note about how to compile this program using a makefile in mingw
+  * change directory to your files. Then run: mingw32-make all
+  * to clean: mingw32-make clean */
 
-        if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-        {
-        }
-    }
-
-    return gotPort;
-}
 
 int main()
 {
-    bool found = SelectComPort();
+	// declare a base class object
+	Base_Unit b;
+    
+	string fileName;
+	string message;
+	string path = b.getPathToLogs();
 
+	//This function is called to create the log directories that will be 
+	// used in the program...if they do not already exist. 
+	b.createFolder(path);
 
-    return 0;
-}
+	// this function call assigns a file name based on the date and time and
+	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
+	// 3 = misc errors
+	b.createFileName(&fileName, 0);
+	
+	//concatenate the path to the message to the front of your file name. 
+	// this ensures that the log file (whatever type) will be stored in the
+	// correct folder. 
+	fileName = b.getPathToMessages() + fileName;
+
+	//declare an outfile and open it using the name created above
+	ofstream file;
+	file.open(fileName, std::ios::out | std::ios::app);
+
+	//declare iterators that will be used
+	//int i, j;
+
+	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
+	DWORD dwEventMask = 0;                   /*Event mask that will be triggered */
+	Port p(portname);
+	bool startNewLog = false;
+
+	/* SetCommMask sets the event that will cause a notification
+	 * in this case, we use EV_RXCHAR which means that a new character was
+	 * received a put in the input buffer
+	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN */
+
+	if (!SetCommMask(p.getHandle(), EV_RXCHAR))
+	{
+		perror("Error in setting CommMask ");
+	}
+
+	else
+	{
+		//cout << endl;
+		//cout << "CommMask was successfully set." << endl;
+	}
+
+	//start an endless loop
+	while (1)
+	{
+		/* Set WaitCommEvent */
+
+        cout << "Waiting to receive data..." << endl;
+
+        if (!WaitCommEvent(p.getHandle(), &dwEventMask, NULL))
+		{
+			perror("Error in setting WaitCommEvent ");
+		}
+		// we process the data
+		else
+		{
+			p.receiveMessage();
+		}
+
+		if (!p.isBufferEmpty())
+		{
+			message = p.removeNextMessage();
+			startNewLog = b.logFile(file, &message, 0);
+			if (startNewLog)
+            {
+				b.createFileName(&fileName, 0);
+				fileName = b.getPathToMessages() + fileName;
+	            file.open(fileName, std::ios::out | std::ios::app);
+            }
+		}
+
+		cout << "_________________________________________________________" << endl;
+
+	} /* end while loop */
+
+	/* close the serial port */
+	p.closeSerialPort(p.getHandle());
+
+	return 0;
+} // end of program
