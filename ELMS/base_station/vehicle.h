@@ -2,13 +2,13 @@
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
 
-#include <queue>
+//#include <queue>
 #include <vector>
 
 #ifndef VEHICLE_HPP
 #define VEHICLE_HPP
 
-using std::priority_queue;
+//using std::priority_queue;
 using std::vector;
 
 class Vehicle
@@ -21,8 +21,9 @@ class Vehicle
         double velocity;
         double bearing;
         vector<Vehicle> vectorVehicles;
-        
+
     public:
+        
         //create default constructor
         Vehicle();
 
