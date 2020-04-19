@@ -13,13 +13,15 @@
 #include <iostream>
 #include <string>
 #include <queue>
+#include <thread>
+#include <mutex>
 
 
 class Port
 {
     private:
         const int BYTE_SIZE = 8;
-        const int READ_INTERVAL_TIMEOUT = 0;
+        const int READ_INTERVAL_TIMEOUT = 0; // TODO: figure out what values work best for the program
         const int READ_MULTIPLIER = 10;
         const int READ_CONSTANT = 50;
         const int WRITE_MULTIPLIER = 10;
@@ -30,6 +32,11 @@ class Port
         static const int messageSize = 50;
         HANDLE hSerial;
         std::queue<std::string> buffer;
+        std::mutex mutex;
+        std::thread portThread;
+        std::thread messageThread;
+        bool stillReceiving = true;
+        
 
     public:
         Port(LPCSTR portname);
@@ -43,9 +50,12 @@ class Port
         HANDLE createPort(LPCSTR);
         HANDLE getHandle();
         void addToMessageBuffer(std::string);
-        std::string removeNextMessage();
+        void removeMessageFromBuffer(std::string*);
         bool isBufferEmpty();
         void receiveMessage();
-
+        void startPortThread();
+        std::string getNextMessage();
+        std::queue<std::string> getQueue() { return buffer; }
+        void getPortThread(){ stillReceiving = false; }
 };
 #endif

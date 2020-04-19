@@ -7,7 +7,15 @@
   /* Reference for this code and serialport.hpp is https://github.com/waynix/SPinGW */
   /********************************************************************************
    * Helpful reference to understand the Win32 API is:
-   * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API */
+   * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API 
+   *
+   */
+
+
+/************************************
+USAGE: In order to get messages from the buffer
+you must call the "getNextMessage" function
+*********************************/
 
 
 
@@ -173,6 +181,7 @@ Opens a new port and attempts to find the port automatically
 Port::Port()
 {
     openSerialPort(NULL);
+    startPortThread();
 }
 
 /*
@@ -185,6 +194,7 @@ Opens a new port and attempts to open the port passed into the constructor
 Port::Port(LPCSTR portname)
 {
     openSerialPort(portname);
+    startPortThread();
 }
 
 /*
@@ -196,6 +206,11 @@ Opens a new port and attempts to open the port passed into the constructor
 */
 Port::~Port()
 {
+    stillReceiving = false;
+    if (messageThread.joinable())
+        messageThread.join();
+    if (portThread.joinable())
+        portThread.join();
     closeSerialPort(hSerial);
 }
 
@@ -216,6 +231,8 @@ addToMessageBuffer
 */
 void Port::addToMessageBuffer(std::string message)
 {
+    std::lock_guard<std::mutex> receiveLock(mutex); // lock data for when it is being put into buffer
+
     buffer.push(message);
 }
 
@@ -226,11 +243,14 @@ removeTopMessage
 Removes the top message from the buffer and returns it
 =============
 */
-std::string Port::removeNextMessage()
+void Port::removeMessageFromBuffer(std::string *mystring)
 {
+    std::lock_guard<std::mutex> messageLock(mutex); // lock data for when it is being put into buffer
+
     std::string message = buffer.front();
     buffer.pop();
-    return message;
+    *mystring = message;
+    //return message;
 }
 
 /*
@@ -240,19 +260,26 @@ removeTopMessage
 */
 void Port::receiveMessage()
 {
-    char newMessage[messageSize];
-    memset(newMessage, 0, messageSize);
-    char extra[2];
-
-    readFromSerialPort(newMessage, messageSize - 15); // read in most of the message to ensure we don't bleed into next message
-    std::string finalMessage(newMessage);
-    while (finalMessage[finalMessage.size() - 1] != '*') // finish combining the message
+    while (stillReceiving)
     {
-        memset(extra, 0, 2);
-        readFromSerialPort(extra, 1);
-        finalMessage += std::string(extra); // to do: reduce the amount of casting necessary
+        char newMessage[messageSize];
+        memset(newMessage, 0, messageSize);
+        char extra[2];
+
+        readFromSerialPort(newMessage, messageSize - 15); // read in most of the message to ensure we don't bleed into next message
+        std::string finalMessage(newMessage);
+        if (finalMessage.size() > 1)
+        {
+            while (finalMessage[finalMessage.size() - 1] != '*') // finish combining the message
+            {
+                memset(extra, 0, 2);
+                readFromSerialPort(extra, 1);
+                finalMessage += std::string(extra); // to do: reduce the amount of casting necessary
+            }
+            addToMessageBuffer(finalMessage);
+
+        }
     }
-    addToMessageBuffer(finalMessage);
 }
 
 /*
@@ -265,3 +292,27 @@ bool Port::isBufferEmpty()
     return buffer.empty();
 }
 
+/*
+=============
+receiveDataFromSerialPort
+
+Starts up the main thread that will continuously receive data from serial port
+=============
+*/
+void Port::startPortThread()
+{
+    portThread = std::thread(&Port::receiveMessage, this);
+}
+
+/*
+=============
+startMessageThread
+=============
+*/
+std::string Port::getNextMessage()
+{
+    std::string mystring;
+    messageThread = std::thread(&Port::removeMessageFromBuffer, this, &mystring);
+    messageThread.join();
+    return mystring;
+}
