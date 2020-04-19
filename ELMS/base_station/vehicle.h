@@ -1,25 +1,62 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
-#include <iostream>
-#include <fstream>
-#include <istream>
+
+#include <queue>
+#include <vector>
+
+#ifndef VEHICLE_HPP
+#define VEHICLE_HPP
+
+using std::priority_queue;
+using std::vector;
+
 class Vehicle
 {
-    // using a static variable will be the same value for all class objects. 
-    static int messageCount;
-    static bool fileOpen;
-    bool checkMessageCount();
-    void logFile(std::fstream  *logFile, char * inputMessage);
-    void lockCloseFile(std::fstream *logFile);
-    void lockWriteFile(std::fstream* logFile, char* inputMessage);
-    int getMessageCount();
-    void resetMessageCount();
-    bool getFileOpen();
-    void setFileOpen();
+    private:
+        int unit;
+        int time;
+        double latitude;
+        double longitude;
+        double velocity;
+        double bearing;
+        vector<Vehicle> vectorVehicles;
+        
+    public:
+        //create default constructor
+        Vehicle();
 
+        //Create constructor
+        Vehicle(int unit, int time, double latitude, double longitude, double velocity, double bearing);
+        //create destructor
+        ~Vehicle();
 
+        //create setter functions
+        void setUnit(int);
+        void setTime(int);
+        void setLatitude(double);
+        void setLongitude(double);
+        void setVelocity(double);
+        void setBearing(double);
+
+        //create getter functions
+        int getUnit();
+        int getTime();
+        double getLatitude();
+        double getLongitude();
+        double getVelocity();
+        double getBearing();
+        vector<Vehicle> getVehicleVector();
+
+        //regular functions
+
+        //Sort the vehicle vector
+        void sortVehicleVector();
+        //add a vehicle to the vector
+        void addVehicleVector(Vehicle, int);
+        //check if a vehicle is in the vector
+        bool checkVehicleVector(int);
+        
 };
 
-int Vehicle::messageCount = 0;
-bool Vehicle::fileOpen = false;
+#endif
