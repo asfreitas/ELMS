@@ -38,8 +38,5 @@ bool SelectComPort() //added function to find the present serial
 
 int main()
 {
-    bool found = SelectComPort();
-
-
-    return 0;
-}
+	return 0;
+} 
