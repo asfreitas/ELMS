@@ -8,6 +8,7 @@
 #include <ctime>
 #include <cstdio>
 #include <cstring>
+#include <time.h>
 
 using std::thread;
 using std::cout;
@@ -222,7 +223,7 @@ void Base_Unit::incMessageCount(int type)
     }
 }
 
-/* Function creates a file name based on the time by year, month, day, hour, 
+/* Function creates a file name based on the UTC time by year, month, day, hour, 
  * min, and second.  It also adds the type of message that it is. 
  * type = 0 = I means that it is an incoming message
  * type = 1 = A means that it is an alert being sent to a vehicle
@@ -230,6 +231,8 @@ void Base_Unit::incMessageCount(int type)
  * type = 3 = M means that it is a miscellaneous error. 
  * .txt is also appended as the extention for the files. 
  * Reference: https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
+
+ * https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/3stkd9be(v=vs.120)
 */
 void Base_Unit::createFileName(string *fileName, int type)
 {
@@ -242,17 +245,22 @@ void Base_Unit::createFileName(string *fileName, int type)
         type_of_message = "N";
     else
         type_of_message = "M";
+ 
+    //get the current time
+    time_t now = time(0);
 
-    time_t current_time;
-    struct tm local_time;
-    time(&current_time);
-    localtime_s(&local_time, &current_time);
-    int year = local_time.tm_year + 1900;
-    int month = local_time.tm_mon + 1;
-    int day = local_time.tm_mday;
-    int hour = local_time.tm_hour;
-    int min = local_time.tm_hour;
-    int sec = local_time.tm_sec;
+    //declare a time structure
+    struct tm gmtm;
+
+    //use a thread safe call to get the current UTC time
+    gmtime_s(&gmtm, &now);
+
+    int year = gmtm.tm_year + 1900;
+    int month = gmtm.tm_mon + 1;
+    int day = gmtm.tm_mday;
+    int hour = gmtm.tm_hour;
+    int min = gmtm.tm_min;
+    int sec = gmtm.tm_sec;
 
     //build the string needed for the name of the file. 
     string tempName = std::to_string(year) + '_' + std::to_string(month) + '_' + std::to_string(day) + '_' +
@@ -297,6 +305,7 @@ void Base_Unit::resetMessageCount(int type)
 // https://www.youtube.com/watch?v=B999K9yztnI
 void Base_Unit::createFolder(string& pathToCreate)
 {
+    static int count = 0;
     bool exists = false;
     exists = directoryExists(pathToCreate);
     int bDir;
@@ -311,7 +320,18 @@ void Base_Unit::createFolder(string& pathToCreate)
         }
         else
         {
-            cout << "Directory logs\\incoming_message was successfully completed" << endl;
+            if (count == 0)
+                cout << "Directory C:\\logs\\ was successfully created" << endl;
+            else if (count == 1)
+                cout << "Sub-directory C:\\logs\\incoming_messages was successfully created" << endl;
+            else if (count == 2)
+                cout << "Sub-directory C:\\logs\\alerts was successfully created" << endl;
+            else if (count == 3)
+                cout << "Sub-directory C:\\logs\\network_failure was successfully created" << endl;
+            else
+                cout << "Sub-directory C:\\logs\\misc_errors was successfully created" << endl <<endl;
+
+            count++;
         }
         string incomingMessage = pathToLogs + "\\incoming_messages";
         string alertsMessages = pathToLogs + "\\alerts";
@@ -440,7 +460,3 @@ void Base_Unit::setFileName(int type)
         miscErrorFile = tempName;
     }
 }
-
-
-
-
