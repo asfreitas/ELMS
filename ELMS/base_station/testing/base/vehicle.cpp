@@ -1,94 +1,142 @@
-#include <iostream>
-#include "vehicle.hpp"
-/* class definitions with getters and setters */
-Vehicle::Vehicle()
-{
-    unit_id = 0;
-    latitude = 0.0;
-    longitude = 0.0;
-    time_stamp = 0;
-    velocity = 0;
-    bearing = 0;
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*/
+
+#include "vehicle.h"
+using std::vector;
+
+//initialize class
+Vehicle::Vehicle(){
+    unit = -1;
+    time = -1;
+    latitude = -1;
+    longitude = -1;
+    velocity = -1;
+    bearing =-1;
+    vectorVehicles.clear();
 }
 
-Vehicle::Vehicle(int id, int time, double lat, double height , int vel, int heading)
-{
-    unit_id = id;
-    latitude = lat;
-    longitude = height;
-    time_stamp = time;
-    velocity = vel;
-    bearing = heading;
+//construct vehicle
+Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude, double vehicleVelocity, double vehicleBearing){
+    unit = vehicleUnit;
+    time = vehicleTime;
+    latitude = vehicleLatitude;
+    longitude = vehicleLongitude;
+    velocity = vehicleVelocity;
+    bearing = vehicleBearing;
 }
 
-Vehicle::~Vehicle()
-{
-	
-	//std::cout << "Object is being deleted" << std::endl;
-	
+//desctructor
+Vehicle::~Vehicle(){
+
 }
 
-int Vehicle::get_id()
-{
-    return unit_id;
+/*
+=============
+set...()
+
+Below are setter functions for setting vehicle object members
+=============
+*/
+void Vehicle::setUnit(int vehicleUnit){
+    unit = vehicleUnit;
 }
 
-double Vehicle::get_latitude()
-{
+void Vehicle::setTime(int vehicleTime){
+    time = vehicleTime;
+}
+
+void Vehicle::setLatitude(double vehicleLatitude){
+    latitude = vehicleLatitude;
+}
+
+void Vehicle::setLongitude(double vehicleLongitude){
+    longitude = vehicleLongitude;
+}
+
+void Vehicle::setVelocity(double vehicleVelocity){
+    velocity = vehicleVelocity;
+}
+
+void Vehicle::setBearing(double vehicleBearing){
+    bearing = vehicleBearing;
+}
+
+/*
+=============
+get...()
+
+Below are getter functions for getting vehicle object members
+=============
+*/
+int Vehicle::getUnit(){
+    return unit;
+}
+
+int Vehicle::getTime(){
+    return time;
+}
+
+double Vehicle::getLatitude(){
     return latitude;
 }
 
-double Vehicle::get_longitude()
-{
+double Vehicle::getLongitude(){
     return longitude;
 }
 
-int Vehicle::get_time_stamp()
-{
-    return time_stamp;
-}
-
-int Vehicle::get_velocity()
-{
+double Vehicle::getVelocity(){
     return velocity;
 }
 
-int Vehicle::get_bearing()
-{
+double Vehicle::getBearing(){
     return bearing;
 }
 
-void Vehicle::set_latitude(double lat)
-{
-    latitude = lat;
+vector<Vehicle> Vehicle::getVehicleVector(){
+    return vectorVehicles;
 }
 
-void Vehicle::set_longitude(double height)
-{
-    longitude = height;
+/*
+=============
+sorVehicleVector
+
+Uses merge sort to sort current list of vector vehicles
+by calculating the distance from this vehicle object to 
+each of the vehicle objects in the vector. This will use
+the haversine calculations.
+=============
+*/
+void Vehicle::sortVehicleVector(){
+
+    
+
 }
 
-void Vehicle::set_time(int time)
-{
-    time_stamp = time;
+/*
+=============
+addVehicleVector
+vehicleUnit		Vehicle object we want to add
+position        Position we want to insert the new vehicle before
+
+Adds the vehicle unit to the vehicle vector list at specified position
+=============
+*/
+void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position){
+    //create iterator for vector position
+    auto it = vectorVehicles.begin() + position;
+    vectorVehicles.insert(it, vehicleUnit);
 }
 
-void Vehicle::set_velocity(int vel)
-{
-    velocity = vel;
+//check to see if vehicle exists in vector
+bool Vehicle::checkVehicleVector(int vehicleUnit){
+    int i = 0;
+    //search vector for unit, if find, send unit number
+    for(i; i < vectorVehicles.size(); i++){
+        if(vectorVehicles[i].unit == vehicleUnit){
+            return true;
+        }
+    }
+    //If not found, return -1;
+    return false;
 }
-
-void Vehicle::set_bearing(int heading)
-{
-    bearing = heading;
-}
-void Vehicle::set_id(int id)
-{
-    unit_id = id;
-}
-
-
-		
-
-
-
