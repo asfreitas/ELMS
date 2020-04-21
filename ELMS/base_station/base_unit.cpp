@@ -70,6 +70,8 @@ bool Base_Unit::checkMessageCount(int type)
  * may need to change this is Zulu time later)
  * References: https://www.cplusplus.com/reference/mutex/mutex/lock/
  * https://cplusplus.com/forum/general/194132
+ * Important to use a reference wrapper when passing in threads.
+ * https://stackoverflow.com/questions/34078208/passing-object-by-reference-to-stdthread-in-c11
 
  * type = 0 means that it is an incoming message
  * type = 1 means that it is an alert being sent to a vehicle
@@ -301,61 +303,78 @@ void Base_Unit::resetMessageCount(int type)
 
 /*This function first checks to see if a directory exists, then it creates the
  * logs directory and the 4 subfolders (1) incoming_messages (2) alerts (3) network_failure
- * (4) misc_errors. It will create the main logs file in whatever  */
+ * (4) misc_errors. It will create the main logs file in the location that the user
+ * specified. */
 // https://www.youtube.com/watch?v=B999K9yztnI
 void Base_Unit::createFolder(string& pathToCreate)
 {
-    static int count = 0;
+    // bool used to see if a directory exists
     bool exists = false;
+
+    // a string used for the path to directories
+    string msg;
+
+    // check to see if the directory exists
     exists = directoryExists(pathToCreate);
-    int bDir;
+    int directory;
+
+    // if the exists is false, then create the directory
     if (!exists)
     {
-        bDir = CreateDirectory(
-            pathToCreate.c_str(),
-            NULL);
-        if (bDir == 0)
+        directory = CreateDirectory(pathToCreate.c_str(), NULL);
+
+        // if an error occurs creating the directory then notify the user
+        if (directory == 0)
         {
-            cout << " CreateDirectory Failed & Error No - " << GetLastError() << endl;
+            //To DO -- use the FormatMessageA function call from Wim32 API to get the 
+            // string of what the actual error is. 
+            cout << " CreateDirectory failed. The error number is:  " << GetLastError() << endl;
         }
+
+        // otherwise let the user know the directory was successfully made.
         else
         {
-            if (count == 0)
+            if (pathToLogs.compare(pathToCreate) == 0)
                 cout << "Directory C:\\logs\\ was successfully created" << endl;
-            else if (count == 1)
+            else if (getPathToMessages().compare(pathToCreate) == 0)
                 cout << "Sub-directory C:\\logs\\incoming_messages was successfully created" << endl;
-            else if (count == 2)
+            else if (getPathToAlerts().compare(pathToCreate) == 0)
                 cout << "Sub-directory C:\\logs\\alerts was successfully created" << endl;
-            else if (count == 3)
+            else if (getPathToNetWorkFailure().compare(pathToCreate) == 0)
                 cout << "Sub-directory C:\\logs\\network_failure was successfully created" << endl;
             else
-                cout << "Sub-directory C:\\logs\\misc_errors was successfully created" << endl <<endl;
-
-            count++;
+                cout << "Sub-directory C:\\logs\\misc_errors was successfully created" << endl;
         }
-        string incomingMessage = pathToLogs + "\\incoming_messages";
-        string alertsMessages = pathToLogs + "\\alerts";
-        string miscErrors = pathToLogs + "\\misc_errors";
-        string networkFailure = pathToLogs + "\\network_failure";
-        createFolder(incomingMessage);
-        createFolder(alertsMessages);
-        createFolder(miscErrors);
-        createFolder(networkFailure);
+        // These are recursive function calls to create the sub-folders
+        createFolder(msg = getPathToMessages());
+        createFolder(msg = getPathToAlerts());
+        createFolder(msg = getPathToMiscErrors());
+        createFolder(msg = getPathToNetWorkFailure());
     }
 }
 
-/*This function first checks to see if the directories exist before creating them*/
+/*This function first checks to see if the directories exist before creating them
+ * The GetFileAttributesA function returns attributes for specific file or
+ * directory. If the call is successful, then the attribute is returned.
+ * In this case we are looking for it to return "ERROR_PATH_NOT_FOUND" ,
+ * "ERROR_FILE_NOT_FOUND", "ERROR_INVALID_NAME", or "ERROR_BAD_NETPATH" in order
+ * to know that the file does not exist. */
 // reference
 // https://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
 //https://www.youtube.com/watch?v=B999K9yztnI
+//https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesa
 bool Base_Unit::directoryExists(const std::string& directoryName)
 {
-    DWORD ftyp = GetFileAttributesA(directoryName.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    DWORD directory_attribute = GetFileAttributesA(directoryName.c_str());
+    if (directory_attribute == INVALID_FILE_ATTRIBUTES)
     {
+        //option to use GetLastError(), format it and determine what the actual
+        // error is. 
         return false;
     }
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+    //if the directory attribute returns > 0, then this means the directory
+    // exists and we return true. 
+    if (directory_attribute & FILE_ATTRIBUTE_DIRECTORY)
     {
         return true;
     }
@@ -379,21 +398,21 @@ string Base_Unit::getPathToLogs()
 /*This function gets the path to the logs/incoming_messages directory*/
 string Base_Unit::getPathToMessages()
 {
-    string messages = getPathToLogs() + "\\incoming_messages\\";
+    string messages = getPathToLogs() + "\\incoming_messages";
     return messages;
 }
 
 /* This function gets the path to the logs/alerts directory*/
 string Base_Unit::getPathToAlerts()
 {
-    string messages = getPathToLogs() + "\\alerts\\";
+    string messages = getPathToLogs() + "\\alerts";
     return messages;
 }
 
 /* This function gets the path to the logs/network_failure directory*/
 string Base_Unit::getPathToNetWorkFailure()
 {
-    string messages = getPathToLogs() + "\\network_failure\\";
+    string messages = getPathToLogs() + "\\network_failure";
     return messages;
     
 }
@@ -401,7 +420,7 @@ string Base_Unit::getPathToNetWorkFailure()
 /* This functions gets the path to the logs/misc_errors directory*/
 string Base_Unit::getPathToMiscErrors()
 {
-    string messages = getPathToLogs() + "\\misc_errors\\";
+    string messages = getPathToLogs() + "\\misc_errors";
     return messages;
 }
 
@@ -460,3 +479,6 @@ void Base_Unit::setFileName(int type)
         miscErrorFile = tempName;
     }
 }
+
+
+
