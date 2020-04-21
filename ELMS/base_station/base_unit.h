@@ -10,7 +10,9 @@
 #include <istream>
 #include <string>
 #include <Windows.h>
+#include <vector>
 using std::string;
+using std::vector;
 
 //this is how many messages will be in each log file before it is close. 
 // this is easily changed and we can make any number we want. 
@@ -40,7 +42,7 @@ public:
     void resetMessageCount(int type);
     void incMessageCount(int type);
     void createFileName(string* fileName, int type);
-    void createFolder(string& pathToCreate);
+    void createFolder();
     bool directoryExists(const std::string& directoryName);
     void setPathToLogs(string& path);
     string getPathToLogs();

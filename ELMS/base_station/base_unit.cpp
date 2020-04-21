@@ -306,7 +306,7 @@ void Base_Unit::resetMessageCount(int type)
  * (4) misc_errors. It will create the main logs file in the location that the user
  * specified. */
 // https://www.youtube.com/watch?v=B999K9yztnI
-void Base_Unit::createFolder(string& pathToCreate)
+void Base_Unit::createFolder()
 {
     // bool used to see if a directory exists
     bool exists = false;
@@ -314,42 +314,48 @@ void Base_Unit::createFolder(string& pathToCreate)
     // a string used for the path to directories
     string msg;
 
-    // check to see if the directory exists
-    exists = directoryExists(pathToCreate);
-    int directory;
+    //create a vector that holds the paths to the directories that we need
+    // to create and then iterate thru them. Create the directories that do
+    // not exist. 
+    vector<string>messages;
+    messages.push_back(msg = getPathToLogs());
+    messages.push_back(msg = getPathToMessages());
+    messages.push_back(msg = getPathToAlerts());
+    messages.push_back(msg = getPathToMiscErrors());
+    messages.push_back(msg = getPathToNetWorkFailure());
 
-    // if the exists is false, then create the directory
-    if (!exists)
+    // 
+    for (size_t i = 0; i < messages.size(); i++)
     {
-        directory = CreateDirectory(pathToCreate.c_str(), NULL);
+        exists = directoryExists(messages[i]);
+        int directory;
 
-        // if an error occurs creating the directory then notify the user
-        if (directory == 0)
+        // if the exists is false, then create the directory
+        if (!exists)
         {
-            //To DO -- use the FormatMessageA function call from Wim32 API to get the 
-            // string of what the actual error is. 
-            cout << " CreateDirectory failed. The error number is:  " << GetLastError() << endl;
-        }
+            directory = CreateDirectory(messages[i].c_str(), NULL);
 
-        // otherwise let the user know the directory was successfully made.
-        else
-        {
-            if (pathToLogs.compare(pathToCreate) == 0)
-                cout << "Directory C:\\logs\\ was successfully created" << endl;
-            else if (getPathToMessages().compare(pathToCreate) == 0)
-                cout << "Sub-directory C:\\logs\\incoming_messages was successfully created" << endl;
-            else if (getPathToAlerts().compare(pathToCreate) == 0)
-                cout << "Sub-directory C:\\logs\\alerts was successfully created" << endl;
-            else if (getPathToNetWorkFailure().compare(pathToCreate) == 0)
-                cout << "Sub-directory C:\\logs\\network_failure was successfully created" << endl;
+            // if an error occurs creating the directory then notify the user
+            if (directory == 0)
+            {
+                cout << " CreateDirectory Failed. The error number is:  " << GetLastError() << endl;
+            }
+
+            // otherwise let the user know the directory was successfully made.
             else
-                cout << "Sub-directory C:\\logs\\misc_errors was successfully created" << endl;
+            {
+                if (pathToLogs.compare(messages[i]) == 0)
+                    cout << "Directory C:\\logs\\ was successfully created" << endl;
+                else if (getPathToMessages().compare(messages[i]) == 0)
+                    cout << "Sub-directory C:\\logs\\incoming_messages was successfully created" << endl;
+                else if (getPathToAlerts().compare(messages[i]) == 0)
+                    cout << "Sub-directory C:\\logs\\alerts was successfully created" << endl;
+                else if (getPathToNetWorkFailure().compare(messages[i]) == 0)
+                    cout << "Sub-directory C:\\logs\\network_failure was successfully created" << endl;
+                else
+                    cout << "Sub-directory C:\\logs\\misc_errors was successfully created" << endl;
+            }
         }
-        // These are recursive function calls to create the sub-folders
-        createFolder(msg = getPathToMessages());
-        createFolder(msg = getPathToAlerts());
-        createFolder(msg = getPathToMiscErrors());
-        createFolder(msg = getPathToNetWorkFailure());
     }
 }
 
@@ -398,21 +404,21 @@ string Base_Unit::getPathToLogs()
 /*This function gets the path to the logs/incoming_messages directory*/
 string Base_Unit::getPathToMessages()
 {
-    string messages = getPathToLogs() + "\\incoming_messages";
+    string messages = getPathToLogs() + "\\incoming_messages\\";
     return messages;
 }
 
 /* This function gets the path to the logs/alerts directory*/
 string Base_Unit::getPathToAlerts()
 {
-    string messages = getPathToLogs() + "\\alerts";
+    string messages = getPathToLogs() + "\\alerts\\";
     return messages;
 }
 
 /* This function gets the path to the logs/network_failure directory*/
 string Base_Unit::getPathToNetWorkFailure()
 {
-    string messages = getPathToLogs() + "\\network_failure";
+    string messages = getPathToLogs() + "\\network_failure\\";
     return messages;
     
 }
@@ -420,7 +426,7 @@ string Base_Unit::getPathToNetWorkFailure()
 /* This functions gets the path to the logs/misc_errors directory*/
 string Base_Unit::getPathToMiscErrors()
 {
-    string messages = getPathToLogs() + "\\misc_errors";
+    string messages = getPathToLogs() + "\\misc_errors\\";
     return messages;
 }
 
@@ -479,6 +485,3 @@ void Base_Unit::setFileName(int type)
         miscErrorFile = tempName;
     }
 }
-
-
-

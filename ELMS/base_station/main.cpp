@@ -50,7 +50,7 @@ int main()
 
 	//This function is called to create the log directories that will be 
 	// used in the program...if they do not already exist. 
-	b.createFolder(path);
+	b.createFolder();
 
 	// this function call assigns a file name based on the date and time and
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
@@ -110,11 +110,13 @@ int main()
 		if (!p.isBufferEmpty())
 		{
 			message = p.removeNextMessage();
+			cout << message << endl;
 			startNewLog = b.logFile(file, &message, 0);
 			if (startNewLog)
             {
 				b.createFileName(&fileName, 0);
 				fileName = b.getPathToMessages() + fileName;
+				cout << "Here is the file name: " << fileName << endl;
 	            file.open(fileName, std::ios::out | std::ios::app);
             }
 		}
