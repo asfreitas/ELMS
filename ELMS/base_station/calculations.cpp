@@ -1,6 +1,6 @@
-#include <cmath>
-#include <cstdio>
-#include <string>
+
+#include "calculations.h"
+
 
 double knots_to_mps(int knots){
 
@@ -15,7 +15,7 @@ double knots_to_mps(int knots){
 
 double degrees_to_radians(double degreeMinutes){
 
-	int degrees = degreeMinutes / 100;
+	double degrees = degreeMinutes / 100;
 
 	printf("degree is %d\n", degrees);	
 
@@ -34,18 +34,20 @@ double degrees_to_radians(double degreeMinutes){
 	double radians = degreesDecimal * (M_PI/180);
 
 	printf("Radians is %.4f\n", radians);
+	return 0;
 	
 }
 
+//double getDegrees()
 
 //haversine calculation
 double haversine(double latitude1, double longitude1, double latitude2, double longitude2){
 
 	
-	
+	return 0;
 }
 
-
+/*
 int main(){
 
 	int testKnots = 2;
@@ -61,3 +63,4 @@ int main(){
 	return 0;
 
 }
+*/

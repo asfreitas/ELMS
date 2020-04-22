@@ -3,13 +3,12 @@
 */
 
 #include <iostream>
-#include <string>
 #include <cstdio>
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include "utilities.h"
 
-using std::string;
 using std::stringstream;
 using std::cout;
 using std::endl;
@@ -18,46 +17,62 @@ using std::stoi;
 using std::stof;
 using std::vector;
 using std::replace;
-using std::exception;
 
+struct message {
+	int vehicle;
+	int time;
+	double latitude;
+	double longitude;
+	int velocity;
+	int bearing;
+
+};
 
 
 void storeMessage(const char* fileName, const char* message){
-	FILE *inputFile;
-	inputFile = fopen(fileName, "a");
+	//FILE *inputFile;
+	//inputFile = fopen(fileName, "a");
 
-	fprintf(inputFile, "%s\n", message);	
+	//fprintf(inputFile, "%s\n", message);	
 
-	fclose(inputFile);
+	//fclose(inputFile);
 
 }
 
+message* createNewMessage(string incomingMessage)
+{
+	message* newMessage = new message; // create new message
 
-int stringToInt(string str){
-	int integer = -1;
+	string temp;	// setup tokenizer
+	char delim = ',';
 
-	try{
-		integer = stoi(str);
-	}catch(exception& ex){
-		cout << "ERROR: " << ex.what() << endl;
+	incomingMessage = incomingMessage.substr(1, incomingMessage.length() - 1); // remove $ and *
+
+	stringstream check1(incomingMessage);
+
+	
+	for (int dataPoint = 0; dataPoint < 6; dataPoint++)
+	{
+		getline(check1, temp, delim);
+
+		switch (dataPoint)
+		{
+		case 0: newMessage->vehicle = stringToInt(temp); break;
+		case 1: newMessage->time = stringToInt(temp); break;
+		case 2: newMessage->latitude = stringToDouble(temp); break;
+		case 3: newMessage->longitude = stringToDouble(temp); break;
+		case 4: newMessage->velocity = stringToInt(temp); break;
+		case 5: newMessage->bearing = stringToInt(temp); break;
+		default: break;
+		}
 	}
+	return newMessage;
 
-	return integer;
 }
 
 
-double stringToDouble(string str){
-	double number = -1;
-	//size_t sz;
-	try{
-		number = stof(str);
-	}catch(exception& ex){
-		cout << "ERROR: " << ex.what() << endl;
-	}
 
-	return number;
-}
-
+/*
 int main(){
 
 	//opens error_log.txt and points stderr to point to it when printing
@@ -128,3 +143,4 @@ int main(){
 
 	return 0;
 }
+*/
