@@ -9,18 +9,30 @@
 #include <fstream>
 #include <istream>
 #include <string>
+#include <iomanip>
 #include <Windows.h>
 #include <vector>
+#include "parse_incoming.h"
+#include "outgoing.h"
+#include "utilities.h"
+#include "vehicle.h"
+#include "parse_incoming.h"
 using std::string;
 using std::vector;
+using std::setprecision;
 
 //this is how many messages will be in each log file before it is close. 
 // this is easily changed and we can make any number we want. 
 #define MESSAGE_LIMIT 5
 
+static vector<Vehicle>mine_vehicles;
 class Base_Unit
 {
-    // using a static variable will be the same value for all class objects. 
+    // using static variables will be the same value for all class objects.
+
+    //The vector of Vehicles functions as a "master list" of all the vehicles
+    // that are currently in the mine
+    //static vector<Vehicle>mine_vehicles;
     static int messageCount;
     static int alertCount;
     static int networkCount;
@@ -35,9 +47,8 @@ class Base_Unit
     string pathToLogs = "C:\\logs";
 public:
     bool checkMessageCount(int type);
-    bool logFile(std::ofstream &logFile, string* inputMessage, int type);
-    void lockCloseFile(std::ofstream& logFile, int type);
-    void lockWriteFile(std::ofstream& logFile, string* inputMessage);
+    void logFile(string & fileName, string* inputMessage, int type);
+    void lockWriteFile(string & filePath, string* inputMessage);
     int getMessageCount(int type);
     void resetMessageCount(int type);
     void incMessageCount(int type);
@@ -52,6 +63,13 @@ public:
     string getPathToMiscErrors();
     string getCurrentFileName(int type);
     void setFileName(int type);
+    void getFilePath(string& fileName, int type);
+    void addToMineVehicles(Vehicle v);
+    void print_vector(vector<Vehicle>& v);
+    vector<Vehicle>getMineVehicles();
+    void input_data(struct message *ptr, Vehicle &v, vector<Vehicle>&mineVehicles);
+    int get_size(vector<Vehicle>& v);
+    int contains_id_number(vector<Vehicle>& v, int id);
 
 
 };
