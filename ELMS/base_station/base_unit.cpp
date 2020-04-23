@@ -77,9 +77,12 @@ bool Base_Unit::checkMessageCount(int type)
  * type = 1 means that it is an alert being sent to a vehicle
  * type = 2 means that it is a network failure message
  * type = 3 means that it is a miscellaneous error.
+ * 
+ * string fileName is created by using b.getFileName(&fileName, 0); where b 
+ * is a Base_Unit object and the second parameter is the message type
 */
 
-bool Base_Unit::logFile(std::ofstream& logFile, string* inputMessage, int type)
+void Base_Unit::logFile(string & fileName, string* inputMessage, int type)
 {
     bool needNewFile = false;
 
@@ -97,15 +100,11 @@ bool Base_Unit::logFile(std::ofstream& logFile, string* inputMessage, int type)
     while (messageCountAtLimit && done == false)
     {
         //declare a thread that will write this last message to the log file
-        thread t1 = std::thread(&Base_Unit::lockWriteFile, this, std::ref(logFile), inputMessage);
+        thread t1 = std::thread(&Base_Unit::lockWriteFile, this, std::ref(fileName), inputMessage);
 
         // have the thread join
         t1.join();
-        // declare a thread and call the function to lock writing to the log file
-        thread t2 = std::thread(&Base_Unit::lockCloseFile, this,  std::ref(logFile), type);
 
-        //have the thread join again
-        t2.join();
         done = true;
 
         //set the bool to true that a new file is needed
@@ -119,7 +118,7 @@ bool Base_Unit::logFile(std::ofstream& logFile, string* inputMessage, int type)
         bool d = false;
         while (!d)
         {
-            thread t1 = std::thread(&Base_Unit::lockWriteFile, this, std::ref(logFile), inputMessage);
+            thread t1 = std::thread(&Base_Unit::lockWriteFile, this, std::ref(fileName), inputMessage);
 
             // have the thread join again
             t1.join();
@@ -127,8 +126,12 @@ bool Base_Unit::logFile(std::ofstream& logFile, string* inputMessage, int type)
         }
         
     }
-    //return the bool that represents if a new file is needed or not. 
-    return needNewFile;
+    // if needNewFile is true, then get a new fileName 
+    if(needNewFile)
+    {
+        getFilePath(fileName, type);
+            
+    }
 }
 
 /* Function lockCloseFile
@@ -139,31 +142,15 @@ bool Base_Unit::logFile(std::ofstream& logFile, string* inputMessage, int type)
  * type = 3 means that it is a miscellaneous error.
  * Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
  */
-void Base_Unit::lockCloseFile(std::ofstream& logFile, int type)
-{
-    std::lock_guard<std::mutex> lck{ mtx_close };
-    logFile.close();
-
-    // reset the messageCounter for the particular type to 1;
-    resetMessageCount(type);
-
-    //don't need to unlock because using lock_guard
-
-    return;
-}
 
 /* Function lockWriteFile locks any other part of the program writing to
  * log files while another process is writing to it. */
-void Base_Unit::lockWriteFile(std::ofstream& logFile, string* inputMessage)
+void Base_Unit::lockWriteFile(string &filePath, string* inputMessage)
 {
     //lock writing to a log file
     mtx_write.lock();
 
-    // if the log file is open, then write to it. 
-    if (logFile.is_open())
-    {
-        logFile << *inputMessage;
-    }
+    storeMessage(filePath, *inputMessage);
  
     //open the lock
     mtx_write.unlock();
@@ -238,6 +225,9 @@ void Base_Unit::incMessageCount(int type)
 */
 void Base_Unit::createFileName(string *fileName, int type)
 {
+    // we are creating a new FileName which means we need to reset the count
+    resetMessageCount(type);
+
     string type_of_message;
     if (type == 0)
         type_of_message = "I";
@@ -338,6 +328,8 @@ void Base_Unit::createFolder()
             // if an error occurs creating the directory then notify the user
             if (directory == 0)
             {
+                //TO DO: use GetLastError(), format it and determine what the actual
+               // error is. 
                 cout << " CreateDirectory Failed. The error number is:  " << GetLastError() << endl;
             }
 
@@ -485,3 +477,128 @@ void Base_Unit::setFileName(int type)
         miscErrorFile = tempName;
     }
 }
+
+void Base_Unit::getFilePath(string& fileName, int type)
+{
+    createFileName(&fileName, type);
+    if (type == 0)
+    {
+        fileName = getPathToMessages() + fileName;
+    }
+    else if (type == 1)
+    {
+        fileName = getPathToAlerts() + fileName;
+    }
+    else if (type == 2)
+    {
+        fileName = getPathToNetWorkFailure() + fileName;
+    }
+    else
+    {
+        fileName = getPathToMiscErrors() + fileName;
+    }
+}
+
+void Base_Unit::addToMineVehicles(Vehicle v)
+{
+    mine_vehicles.push_back(v);
+}
+
+/* prints the contents held in the mine_vehicle vector*/
+void Base_Unit::print_vector(vector<Vehicle>& v)
+{
+    cout << "The size of the vector in print function is: " << v.size() << endl;
+    cout << "**********************************" << endl << endl;
+
+    for (auto itr : v)
+    {
+        cout << "*****VEHICLE " << itr.getUnit() << " *****" << endl;
+        cout << std::fixed;
+        cout << std::setprecision(5);
+        cout << "latitude: " << itr.getLatitude() << endl;
+        cout << "longitude: " << itr.getLongitude() << endl;
+        cout << std::fixed;
+        cout << std::setprecision(0);
+        cout << "time_stamp: " << itr.getTime() << endl;
+        cout << "velocity: " << itr.getVelocity() << endl;
+        cout << "bearing: " << itr.getBearing() << endl << endl;
+    }
+    cout << "***************************************" << endl << endl;
+
+}
+
+vector<Vehicle> Base_Unit::getMineVehicles()
+{
+    return mine_vehicles;
+}
+
+void Base_Unit::input_data(struct message *ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
+{
+    int size = -1;
+    int duplicate;
+    mineVehicles = getMineVehicles();
+
+    size = get_size(mineVehicles);
+    //if the size of the vector is 0, then we know we need to add the 
+    // vehicle to the vector
+    if (size == 0)
+    {
+        /* we create a Vehicle object and add it to our vector mine_vehicles */
+        v.setBearing(ptr->bearing);
+        v.setLatitude(ptr->latitude);
+        v.setLongitude(ptr->longitude);
+        v.setTime(ptr->time);
+        v.setUnit(ptr->vehicle);
+        v.setVelocity(ptr->velocity);
+        // push the new vehicle into the mine_vehicles vector
+        addToMineVehicles(v);
+    }
+    // otherwise, we check to see if the vehicle id already exists
+    else
+    {
+        duplicate = contains_id_number(mineVehicles, ptr->vehicle);
+        cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
+        //if the id number is not a duplicate, then create a new
+        //vehicle object and add it to the vector.
+        if (duplicate == 0)
+        {
+            v.setBearing(ptr->bearing);
+            v.setLatitude(ptr->latitude);
+            v.setLongitude(ptr->longitude);
+            v.setTime(ptr->time);
+            v.setUnit(ptr->vehicle);
+            v.setVelocity(ptr->velocity);
+            addToMineVehicles(v);
+        }
+        //otherwise, this is a duplicate id and we need to update
+        // the Vehicle objects location data
+        else
+        {
+            //To do: update Vehice objects data
+            std::cout << "Duplicate id number: " << v.getUnit() << std::endl;
+
+
+        }
+    }
+
+}
+// returns the size of the vector
+int Base_Unit::get_size(vector<Vehicle>& v)
+{
+    return v.size();
+}
+
+//check to see if vector contains a specific id number
+int Base_Unit::contains_id_number(vector<Vehicle>& v, int id)
+{
+    for (auto itr : v)
+    {
+        if (itr.getUnit() == id)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
