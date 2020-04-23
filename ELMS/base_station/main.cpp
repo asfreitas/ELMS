@@ -20,12 +20,13 @@ References:
 #include <ctime>
 #include <time.h>
 #include "port.h"
+#include <omp.h>
+#include "parse_incoming.h"
 using std::cout;
 using std::endl;
 using std::ofstream;
 using std::ios;
 using std::string;
-
 
 /* reference for the following -- this was an issue if you are using Visual Studio
  * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711       */
@@ -46,25 +47,22 @@ int main()
     
 	string fileName;
 	string message;
+	string data;
 	string path = b.getPathToLogs();
+
+	//declare the vector that will contain all of the vehicles in the mine
+	vector<Vehicle>vehicles_in_mine;
 
 	//This function is called to create the log directories that will be 
 	// used in the program...if they do not already exist. 
 	b.createFolder();
 
-	// this function call assigns a file name based on the date and time and
+	// this function call creates the name of the file and the path to it. 
+	// this will be used to open the files and write to them. 
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
-	b.createFileName(&fileName, 0);
+	b.getFilePath(fileName, 0);
 	
-	//concatenate the path to the message to the front of your file name. 
-	// this ensures that the log file (whatever type) will be stored in the
-	// correct folder. 
-	fileName = b.getPathToMessages() + fileName;
-
-	//declare an outfile and open it using the name created above
-	ofstream file;
-	file.open(fileName, std::ios::out | std::ios::app);
 
 	//declare iterators that will be used
 	//int i, j;
@@ -110,23 +108,38 @@ int main()
 		if (!p.isBufferEmpty())
 		{
 			message = p.removeNextMessage();
-			cout << message << endl;
-			startNewLog = b.logFile(file, &message, 0);
-			if (startNewLog)
-            {
-				b.createFileName(&fileName, 0);
-				fileName = b.getPathToMessages() + fileName;
-				cout << "Here is the file name: " << fileName << endl;
-	            file.open(fileName, std::ios::out | std::ios::app);
-            }
-		}
+			//make a copy of message that we will use to parse
+			data = message;
 
+            #pragma omp parallel sections
+			{
+                #pragma omp section
+				{
+					cout << message << endl;
+					b.logFile(fileName, &message, 0);
+				}
+
+				#pragma omp section
+				{
+					// declare a pointer to a message struct
+					struct message * ptr = createNewMessage(data);
+					//declare a vehicle object that will either be added to
+					// the master list or will have their vehicle updated.
+					Vehicle vehicle = Vehicle();
+					//this function is going to have a mutex and lock within the input_data function
+					b.input_data(ptr, vehicle, vehicles_in_mine);
+					
+					delete ptr;
+					
+				}				
+			}
+		}
+		b.print_vector(vehicles_in_mine);
 		cout << "_________________________________________________________" << endl;
 
 	} /* end while loop */
 
 	/* close the serial port */
 	p.closeSerialPort(p.getHandle());
-
 	return 0;
 } // end of program
