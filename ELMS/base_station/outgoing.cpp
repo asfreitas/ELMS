@@ -5,14 +5,14 @@
 //and store in alert file
 void outgoing_message(const char* fileName, int unit1, int unit2, int messageTime, int velocity, int distance, int bearing){
 
-	FILE *alertFile;
-	alertFile = fopen(fileName, "a");
+	//FILE *alertFile;
+	//alertFile = fopen(fileName, "a");
 
-	fprintf(alertFile, "$%d->%d, %d, %d, %d, %d*\n", unit1, unit2, messageTime, velocity, distance, bearing);
+	//fprintf(alertFile, "$%d->%d, %d, %d, %d, %d*\n", unit1, unit2, messageTime, velocity, distance, bearing);
 
-	fclose(alertFile);
+	//fclose(alertFile);
 }
-
+/*
 int main(){
 
 
@@ -29,3 +29,4 @@ int main(){
 
 	return 0;
 }
+*/

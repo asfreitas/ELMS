@@ -6,6 +6,28 @@
 #include <iostream>
 #include <string>
 #include "utilities.h"
+#include "vehicle.h"
 
 
-const int EARTH_RADIUS = 6371;
+const double EARTH_RADIUS = 6371;
+
+#ifndef CALCULATIONS_H
+#define CALCULATIONS_H
+
+class Calculations
+{
+    private:
+
+
+
+    public:
+        double degrees_to_radians(double degreeMinutes);
+        double knots_to_mps(int knots);
+        double haversine(Vehicle* vehicle1, Vehicle* vehicle2);
+        void updateVehicle(Vehicle* vehicle1, Vehicle* vehicle2);
+        
+
+};
+
+
+#endif

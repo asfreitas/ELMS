@@ -130,7 +130,7 @@ void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position){
 
 //check to see if vehicle exists in vector
 bool Vehicle::checkVehicleVector(int vehicleUnit){
-    int i = 0;
+    unsigned i = 0;
     //search vector for unit, if find, send unit number
     for(i; i < vectorVehicles.size(); i++){
         if(vectorVehicles[i].unit == vehicleUnit){
