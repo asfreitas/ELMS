@@ -2,61 +2,50 @@
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
 
+/* This is from https://github.com/waynix/SPinGW
+ * The original code had enums to define baudrates, stopbits, and parity.
+ * I removed them because Visual Studio required enum classes since
+ * it is felt that enums can lead to "surprises" or bugs versus an
+ * enum class. */
+#ifndef PORT_HPP
+#define PORT_HPP
+#include <windows.h>
+#include <iostream>
+#include <string>
 #include <queue>
-#include <vector>
 
-#ifndef VEHICLE_HPP
-#define VEHICLE_HPP
 
-using std::priority_queue;
-using std::vector;
-
-class Vehicle
+class Port
 {
-    private:
-        int unit;
-        int time;
-        double latitude;
-        double longitude;
-        double velocity;
-        double bearing;
-        vector<Vehicle> vectorVehicles;
-        
-    public:
-        //create default constructor
-        Vehicle();
+private:
+    const int BYTE_SIZE = 8;
+    const int READ_INTERVAL_TIMEOUT = 0;
+    const int READ_MULTIPLIER = 10;
+    const int READ_CONSTANT = 50;
+    const int WRITE_MULTIPLIER = 10;
+    const int WRITE_CONSTANT = 50;
+    const int baudrate = 9600;
+    const int STOP_BITS = ONESTOPBIT;
+    const int PARITY = NOPARITY;
+    static const int messageSize = 50;
+    HANDLE hSerial;
+    std::queue<std::string> buffer;
 
-        //Create constructor
-        Vehicle(int unit, int time, double latitude, double longitude, double velocity, double bearing);
-        //create destructor
-        ~Vehicle();
+public:
+    Port(LPCSTR portname);
+    Port();
+    ~Port();
+    void openSerialPort(LPCSTR);
+    DWORD readFromSerialPort(char*, int);
+    DWORD writeToSerialPort(char*, int);
+    void closeSerialPort(HANDLE);
+    HANDLE setupPort(LPCSTR);
+    HANDLE createPort(LPCSTR);
+    HANDLE getHandle();
+    void addToMessageBuffer(std::string);
+    std::string removeNextMessage();
+    bool isBufferEmpty();
+    void receiveMessage();
 
-        //create setter functions
-        void setUnit(int);
-        void setTime(int);
-        void setLatitude(double);
-        void setLongitude(double);
-        void setVelocity(double);
-        void setBearing(double);
-
-        //create getter functions
-        int getUnit();
-        int getTime();
-        double getLatitude();
-        double getLongitude();
-        double getVelocity();
-        double getBearing();
-        vector<Vehicle> getVehicleVector();
-
-        //regular functions
-
-        //Sort the vehicle vector
-        void sortVehicleVector();
-        //add a vehicle to the vector
-        void addVehicleVector(Vehicle, int);
-        //check if a vehicle is in the vector
-        bool checkVehicleVector(int);
-        
 };
-
 #endif
