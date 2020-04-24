@@ -8,6 +8,8 @@ References:
 */
 
 #include <Windows.h>
+#include <mutex>
+#include <thread>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,35 +24,48 @@ References:
 #include "port.h"
 #include <omp.h>
 #include "parse_incoming.h"
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 using std::cout;
 using std::endl;
 using std::ofstream;
 using std::ios;
 using std::string;
+using std::thread;
 
 /* reference for the following -- this was an issue if you are using Visual Studio
- * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711       */
+ * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711
+ * reference for how to look for memory leaks in windows.
+ * Youtube video. https://www.youtube.com/watch?v=t1wqj6J6Vhs
+ */
 
-//#ifdef _MSC_VER
-//#define strtok_r strtok_s
-//#endif
+ //#ifdef _MSC_VER
+ //#define strtok_r strtok_s
+ //#endif
 
- /* A note about how to compile this program using a makefile in mingw
-  * change directory to your files. Then run: mingw32-make all
-  * to clean: mingw32-make clean */
+  /* A note about how to compile this program using a makefile in mingw
+   * change directory to your files. Then run: mingw32-make all
+   * to clean: mingw32-make clean */
 
 
 int main()
 {
+	//used to check for memory leak
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
 	Base_Unit b;
-    
+
 	string fileName;
-	string message;
+	string incomingMessage;
 	string data;
 	string path = b.getPathToLogs();
 
-	//declare the vector that will contain all of the vehicles in the mine
+	/* reference I used for how to create and return a smart pointer
+	 * https://www.cplusplus.com/forum/beginner/237243/
+	 */
+	 //unique_ptr<struct message> ptr(new struct message);
+
+	 //declare the vector that will contain all of the vehicles in the mine
 	vector<Vehicle>vehicles_in_mine;
 
 	//This function is called to create the log directories that will be 
@@ -62,11 +77,6 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	
-
-	//declare iterators that will be used
-	//int i, j;
-
 	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
 	DWORD dwEventMask = 0;                   /*Event mask that will be triggered */
 	Port p(portname);
@@ -77,6 +87,9 @@ int main()
 	 * received a put in the input buffer
 	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN */
 
+	// for some reason, this particular if/else statement is causing a thread exit
+	// with other than 0 when debugging.  Not sure what this means.  But the
+	// plan is to replace this in the Port Class so maybe that will fix this issue. 
 	if (!SetCommMask(p.getHandle(), EV_RXCHAR))
 	{
 		perror("Error in setting CommMask ");
@@ -84,18 +97,18 @@ int main()
 
 	else
 	{
-		//cout << endl;
-		//cout << "CommMask was successfully set." << endl;
+		cout << endl;
+		cout << "CommMask was successfully set." << endl;
 	}
-
+	int count = 0;
 	//start an endless loop
-	while (1)
+	while (count < 13)
 	{
 		/* Set WaitCommEvent */
 
-        cout << "Waiting to receive data..." << endl;
+		cout << "Waiting to receive data..." << endl;
 
-        if (!WaitCommEvent(p.getHandle(), &dwEventMask, NULL))
+		if (!WaitCommEvent(p.getHandle(), &dwEventMask, NULL))
 		{
 			perror("Error in setting WaitCommEvent ");
 		}
@@ -107,39 +120,47 @@ int main()
 
 		if (!p.isBufferEmpty())
 		{
-			message = p.removeNextMessage();
+			incomingMessage = p.removeNextMessage();
 			//make a copy of message that we will use to parse
-			data = message;
+			data = incomingMessage;
 
             #pragma omp parallel sections
 			{
                 #pragma omp section
 				{
-					cout << message << endl;
-					b.logFile(fileName, &message, 0);
+					cout << incomingMessage << endl;
+					b.logFile(fileName, &incomingMessage, 0);
 				}
 
-				#pragma omp section
+                #pragma omp section
 				{
 					// declare a pointer to a message struct
-					struct message * ptr = createNewMessage(data);
+					struct message* ptr = createNewMessage(data);
 					//declare a vehicle object that will either be added to
 					// the master list or will have their vehicle updated.
 					Vehicle vehicle = Vehicle();
 					//this function is going to have a mutex and lock within the input_data function
+					/*This reference tells how to pass a smart pointer by reference. Only one smart
+					 * pointer was created and we are changing the state of what it points to everytime
+					 * we called createNewMessage. The smart pointer is passed by reference to
+					 * input_data.
+					 * https://stackoverflow.com/questions/12519812/how-do-i-pass-smart-pointers-into-functions
+					 */
 					b.input_data(ptr, vehicle, vehicles_in_mine);
-					
+
 					delete ptr;
-					
-				}				
+
+				}
 			}
 		}
 		b.print_vector(vehicles_in_mine);
 		cout << "_________________________________________________________" << endl;
+		count++;
 
 	} /* end while loop */
 
-	/* close the serial port */
-	p.closeSerialPort(p.getHandle());
-	return 0;
-} // end of program
+	/* No need to close the serial port because the class destructor automatically
+	 * does this */
+
+    return 0;
+}
