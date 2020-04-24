@@ -17,6 +17,7 @@
 #include "utilities.h"
 #include "vehicle.h"
 #include "parse_incoming.h"
+//#include <iterator>
 using std::string;
 using std::vector;
 using std::setprecision;
@@ -64,12 +65,14 @@ public:
     string getCurrentFileName(int type);
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
-    void addToMineVehicles(Vehicle v);
+    void addToMineVehicles(Vehicle &v);
     void print_vector(vector<Vehicle>& v);
     vector<Vehicle>getMineVehicles();
-    void input_data(struct message *ptr, Vehicle &v, vector<Vehicle>&mineVehicles);
+    //void input_data(unique_ptr<message> &ptr, Vehicle &v, vector<Vehicle>&mineVehicles);
+    void input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles);
+    void update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles);
     int get_size(vector<Vehicle>& v);
-    int contains_id_number(vector<Vehicle>& v, int id);
+    int contains_id_number(vector<Vehicle>& v, int id, int &index);
 
 
 };
