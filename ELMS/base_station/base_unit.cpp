@@ -17,6 +17,7 @@ using std::endl;
 // declare a mutex that locks when the program is writing to a log file
 std::mutex mtx_close;
 std::mutex mtx_write;
+std::mutex mtx_update;
 
 /* Static members must be initialized outside of the class
  * Since it is a static member, it must be initialized outside of the class
@@ -499,7 +500,7 @@ void Base_Unit::getFilePath(string& fileName, int type)
     }
 }
 
-void Base_Unit::addToMineVehicles(Vehicle v)
+void Base_Unit::addToMineVehicles(Vehicle &v)
 {
     mine_vehicles.push_back(v);
 }
@@ -532,10 +533,10 @@ vector<Vehicle> Base_Unit::getMineVehicles()
     return mine_vehicles;
 }
 
-void Base_Unit::input_data(struct message *ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
+//void Base_Unit::input_data(unique_ptr<struct message>& ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
+void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles)
 {
     int size = -1;
-    int duplicate;
     mineVehicles = getMineVehicles();
 
     size = get_size(mineVehicles);
@@ -550,36 +551,66 @@ void Base_Unit::input_data(struct message *ptr, Vehicle& v, vector<Vehicle>&mine
         v.setTime(ptr->time);
         v.setUnit(ptr->vehicle);
         v.setVelocity(ptr->velocity);
+
+        //call the vehicle function that will check the distance that it is
+        // from the other vehicles that are currently in the vehicles_in_mine
+        // vector. This function should then update the vehicles priority number.
+        // These functions should in turn call the Vehicles priority queue.
+        // ultimately, this 
         // push the new vehicle into the mine_vehicles vector
         addToMineVehicles(v);
+
+        //the newly added 
+ 
     }
     // otherwise, we check to see if the vehicle id already exists
     else
     {
-        duplicate = contains_id_number(mineVehicles, ptr->vehicle);
-        cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
-        //if the id number is not a duplicate, then create a new
-        //vehicle object and add it to the vector.
-        if (duplicate == 0)
-        {
-            v.setBearing(ptr->bearing);
-            v.setLatitude(ptr->latitude);
-            v.setLongitude(ptr->longitude);
-            v.setTime(ptr->time);
-            v.setUnit(ptr->vehicle);
-            v.setVelocity(ptr->velocity);
-            addToMineVehicles(v);
-        }
-        //otherwise, this is a duplicate id and we need to update
-        // the Vehicle objects location data
-        else
-        {
-            //To do: update Vehice objects data
-            std::cout << "Duplicate id number: " << v.getUnit() << std::endl;
+        // call update_data
+        thread t1 = std::thread(&Base_Unit::update_data, this, ptr, std::ref(v), std::ref(mineVehicles));
 
-
-        }
+        // have the thread join again
+        t1.join();
     }
+  
+}
+//void Base_Unit::input_data(unique_ptr<struct message>& ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
+void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles)
+{
+    mtx_update.lock();
+    int duplicate;
+    mineVehicles = getMineVehicles();
+    int index;
+
+    duplicate = contains_id_number(mineVehicles, ptr->vehicle, index);
+    cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
+    //if the id number is not a duplicate, then create a new
+    //vehicle object and add it to the vector.
+    if (duplicate == 0)
+    {
+        v.setBearing(ptr->bearing);
+        v.setLatitude(ptr->latitude);
+        v.setLongitude(ptr->longitude);
+        v.setTime(ptr->time);
+        v.setUnit(ptr->vehicle);
+        v.setVelocity(ptr->velocity);
+        addToMineVehicles(v);
+    }
+    //otherwise, this is a duplicate id and we need to update
+    // the Vehicle objects location data
+    else
+    {
+        //To do: update Vehice objects data
+        std::cout << "Duplicate id number: " << ptr->vehicle << std::endl;
+        //update the vehicle's data
+        mineVehicles.at(index).setBearing(ptr->bearing);
+        mineVehicles.at(index).setLatitude(ptr->latitude);
+        mineVehicles.at(index).setLongitude(ptr->longitude);
+        mineVehicles.at(index).setTime(ptr->time);
+        mineVehicles.at(index).setVelocity(ptr->velocity);
+
+    }
+    mtx_update.unlock();
 
 }
 // returns the size of the vector
@@ -589,12 +620,14 @@ int Base_Unit::get_size(vector<Vehicle>& v)
 }
 
 //check to see if vector contains a specific id number
-int Base_Unit::contains_id_number(vector<Vehicle>& v, int id)
+int Base_Unit::contains_id_number(vector<Vehicle>& v, int id, int &index)
 {
-    for (auto itr : v)
+    for (size_t i = 0; i < v.size(); i++)
     {
-        if (itr.getUnit() == id)
+        if (v.at(i).getUnit() == id)
         {
+            index = i;
+            cout << "the index is: " << index << endl;
             return 1;
         }
     }
