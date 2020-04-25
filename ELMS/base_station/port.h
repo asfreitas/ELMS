@@ -7,15 +7,17 @@
  * I removed them because Visual Studio required enum classes since
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
-#ifndef SERIALPORT_HPP
-#define SERIALPORT_HPP
+
 #include <windows.h>
 #include <iostream>
 #include <string>
 #include <queue>
 #include <thread>
 #include <mutex>
-
+#include <chrono>
+#include "timer.h"
+#ifndef SERIALPORT_HPP
+#define SERIALPORT_HPP
 
 class Port
 {
@@ -36,6 +38,8 @@ class Port
         std::thread portThread;
         std::thread messageThread;
         bool stillReceiving = true;
+        bool networkFailure = false;
+        Timer t;
         
 
     public:
@@ -56,6 +60,7 @@ class Port
         void startPortThread();
         std::string getNextMessage();
         std::queue<std::string> getQueue() { return buffer; }
-        void getPortThread(){ stillReceiving = false; }
+        void startTimer(int);
+        void netFailureCheck(int);
 };
 #endif

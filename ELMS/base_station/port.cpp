@@ -195,6 +195,7 @@ Port::Port(LPCSTR portname)
 {
     openSerialPort(portname);
     startPortThread();
+    startTimer(5);
 }
 
 /*
@@ -279,6 +280,10 @@ void Port::receiveMessage()
             addToMessageBuffer(finalMessage);
 
         }
+        if (networkFailure == true)
+        {
+            std::cout << "network failure here";
+        }
     }
 }
 
@@ -315,4 +320,46 @@ std::string Port::getNextMessage()
     messageThread = std::thread(&Port::removeMessageFromBuffer, this, &mystring);
     messageThread.join();
     return mystring;
+}
+
+/*
+=============
+startMessageThread
+=============
+*/
+void Port::startTimer(int numSeconds)
+{
+    std::thread netFailure = std::thread(&Port::netFailureCheck, this, numSeconds);
+    netFailure.detach();
+}
+
+void Port::netFailureCheck(int numSeconds)
+{
+    bool timesUp;
+    bool currentNetworkFailure;
+    while (stillReceiving)
+    {
+        auto start = std::chrono::system_clock::now();
+        timesUp = false;
+        currentNetworkFailure = true;
+        while (!timesUp && currentNetworkFailure)
+        {
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff = end - start;
+
+            if (diff.count() > numSeconds)
+            {
+                networkFailure = true;
+                timesUp = true;
+            }
+
+            if (!isBufferEmpty())
+            {
+                currentNetworkFailure = false;
+            }
+
+
+        }
+
+    }
 }
