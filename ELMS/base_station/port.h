@@ -7,8 +7,9 @@
  * I removed them because Visual Studio required enum classes since
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
-#ifndef SERIALPORT_HPP
-#define SERIALPORT_HPP
+
+#ifndef PORT_H
+#define PORT_H
 #include <windows.h>
 #include <iostream>
 #include <string>
