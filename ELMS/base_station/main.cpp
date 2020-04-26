@@ -116,12 +116,14 @@ int main()
 		// we process the data
 		else
 		{
+			cout << "entered else loop to receive next message" << endl;
 			p.receiveMessage();
 		}
 
 		if (!p.isBufferEmpty())
 		{
-			p.removeMessageFromBuffer(&incomingMessage);
+			cout << "Buffer is not empty" << endl;
+			incomingMessage = p.getNextMessage();
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
 
@@ -153,10 +155,15 @@ int main()
 
 				}
 			}
+			count++;
+
+		}
+		else
+		{
+			cout << "The buffer is empty" << endl;
 		}
 		b.print_vector(vehicles_in_mine);
 		cout << "_________________________________________________________" << endl;
-		count++;
 
 	} /* end while loop */
 

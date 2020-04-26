@@ -206,12 +206,14 @@ Opens a new port and attempts to open the port passed into the constructor
 */
 Port::~Port()
 {
+    std::cout << "I am in the port destructor" << std::endl;
     stillReceiving = false;
     if (messageThread.joinable())
         messageThread.join();
     if (portThread.joinable())
         portThread.join();
     closeSerialPort(hSerial);
+    
 }
 
 /*
@@ -260,8 +262,6 @@ removeTopMessage
 */
 void Port::receiveMessage()
 {
-    while (stillReceiving)
-    {
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
@@ -279,7 +279,6 @@ void Port::receiveMessage()
             addToMessageBuffer(finalMessage);
 
         }
-    }
 }
 
 /*
