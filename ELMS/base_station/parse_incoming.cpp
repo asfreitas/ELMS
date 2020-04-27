@@ -8,6 +8,7 @@
 #include <sstream>
 #include <algorithm>
 #include "utilities.h"
+#include "parse_incoming.h"
 
 using std::stringstream;
 using std::cout;
@@ -18,15 +19,6 @@ using std::stof;
 using std::vector;
 using std::replace;
 
-struct message {
-	int vehicle;
-	int time;
-	double latitude;
-	double longitude;
-	int velocity;
-	int bearing;
-
-};
 
 
 void storeMessage(const char* fileName, const char* message){
@@ -45,6 +37,8 @@ message* createNewMessage(string incomingMessage)
 
 	string temp;	// setup tokenizer
 	char delim = ',';
+
+	incomingMessage.erase(remove_if(incomingMessage.begin(), incomingMessage.end(), isspace), incomingMessage.end());
 
 	incomingMessage = incomingMessage.substr(1, incomingMessage.length() - 1); // remove $ and *
 

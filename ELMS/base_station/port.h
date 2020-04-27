@@ -22,15 +22,6 @@
 class Port
 {
     private:
-        const int BYTE_SIZE = 8;
-        const int READ_INTERVAL_TIMEOUT = 0; // TODO: figure out what values work best for the program
-        const int READ_MULTIPLIER = 10;
-        const int READ_CONSTANT = 50;
-        const int WRITE_MULTIPLIER = 10;
-        const int WRITE_CONSTANT = 50;
-        const int baudrate = 9600;
-        const int STOP_BITS = ONESTOPBIT;
-        const int PARITY = NOPARITY;
         static const int messageSize = 50;
         HANDLE hSerial;
         std::queue<std::string> buffer;
@@ -62,5 +53,7 @@ class Port
         std::queue<std::string> getQueue() { return buffer; }
         void startTimer(int);
         void netFailureCheck(int);
+        void setCommMask(DWORD);
+        bool waitCommMask(DWORD);
 };
 #endif
