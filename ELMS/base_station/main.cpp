@@ -77,7 +77,7 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
+	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
 	Port p(portname);
 	bool startNewLog = false;
 
@@ -123,7 +123,7 @@ int main()
 					 * input_data.
 					 * https://stackoverflow.com/questions/12519812/how-do-i-pass-smart-pointers-into-functions
 					 */
-					b.input_data(ptr, vehicle, vehicles_in_mine);
+					b.input_data(ptr, vehicle, vehicles_in_mine, p);
 
 					delete ptr;
 
