@@ -21,7 +21,6 @@ References:
 # include <string>
 #include <ctime>
 #include <time.h>
-#include "port.h"
 #include <omp.h>
 #include "parse_incoming.h"
 #define _CRTDBG_MAP_ALLOC
@@ -78,8 +77,7 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
-	DWORD dwEventMask = 0;                   /*Event mask that will be triggered */
+	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
 	Port p(portname);
 	bool startNewLog = false;
 
@@ -91,34 +89,10 @@ int main()
 	// for some reason, this particular if/else statement is causing a thread exit
 	// with other than 0 when debugging.  Not sure what this means.  But the
 	// plan is to replace this in the Port Class so maybe that will fix this issue. 
-	if (!SetCommMask(p.getHandle(), EV_RXCHAR))
-	{
-		perror("Error in setting CommMask ");
-	}
-
-	else
-	{
-		cout << endl;
-		cout << "CommMask was successfully set." << endl;
-	}
 	int count = 0;
 	//start an endless loop
-	while (count < 13)
+	while (p.isPortReady() && count < 13)
 	{
-		/* Set WaitCommEvent */
-
-		cout << "Waiting to receive data..." << endl;
-
-		if (!WaitCommEvent(p.getHandle(), &dwEventMask, NULL))
-		{
-			perror("Error in setting WaitCommEvent ");
-		}
-		// we process the data
-		else
-		{
-			cout << "entered else loop to receive next message" << endl;
-			p.receiveMessage();
-		}
 
 		if (!p.isBufferEmpty())
 		{
@@ -164,7 +138,7 @@ int main()
 		}
 		b.print_vector(vehicles_in_mine);
 		cout << "_________________________________________________________" << endl;
-
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	} /* end while loop */
 
 	/* No need to close the serial port because the class destructor automatically

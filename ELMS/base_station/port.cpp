@@ -205,6 +205,8 @@ Opens a new port and attempts to open the port passed into the constructor
 Port::Port(LPCSTR portname)
 {
     openSerialPort(portname);
+    if (waitCommMask(EV_RXCHAR))
+        portReady = true;
     startPortThread();
     startTimer(5);
 }
@@ -265,7 +267,6 @@ void Port::removeMessageFromBuffer(std::string *mystring)
     std::string message = buffer.front();
     buffer.pop();
     *mystring = message;
-    //return message;
 }
 
 /*
@@ -275,7 +276,6 @@ receiveMessage
 */
 void Port::receiveMessage()
 {
-    waitCommMask(EV_RXCHAR);
     while (stillReceiving)
     {
 

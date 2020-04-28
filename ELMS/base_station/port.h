@@ -8,9 +8,6 @@
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
 
-
-#ifndef PORT_H
-#define PORT_H
 #include <windows.h>
 #include <iostream>
 #include <string>
@@ -19,6 +16,7 @@
 #include <mutex>
 #include <chrono>
 #include "timer.h"
+
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
 
@@ -33,6 +31,7 @@ class Port
         std::thread messageThread;
         bool stillReceiving = true;
         bool networkFailure = false;
+        bool portReady = false;
         Timer t;
         
 
@@ -58,5 +57,7 @@ class Port
         void netFailureCheck(int);
         void setCommMask(DWORD);
         bool waitCommMask(DWORD);
+        bool isPortReady() { return portReady; }
 };
+
 #endif
