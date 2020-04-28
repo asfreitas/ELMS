@@ -33,3 +33,13 @@ double stringToDouble(string str) {
 	return number;
 }
 
+/*Reference https://www.geeksforgeeks.org/convert-string-char-array-cpp*/
+char* stringToCharPointer(string& str, char* fileName)
+{
+	memset(fileName, '\0', 100);
+	for (size_t i = 0; i < str.length() + 1; i++)
+	{
+		fileName[i] = str[i];
+	}
+	return fileName;
+}
