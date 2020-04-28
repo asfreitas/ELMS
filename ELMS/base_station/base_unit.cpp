@@ -17,7 +17,8 @@ using std::endl;
 // declare a mutex that locks when the program is writing to a log file
 std::mutex mtx_close;
 std::mutex mtx_write;
-std::mutex mtx_update;
+std::mutex mtx_update_master;
+std::mutex mtx_udate_vehicle;
 
 /* Static members must be initialized outside of the class
  * Since it is a static member, it must be initialized outside of the class
@@ -33,18 +34,18 @@ string Base_Unit::netFailFile = "";
 string Base_Unit::miscErrorFile = "";
 
 
-  /*
-   * Function: checkMessageCount(int type)
-   * This function takes the message and checks to see if the messages have
-   * reached their limit. 
-   * types are: 
-   * type = 0 means that it is an incoming message
-   * type = 1 means that it is an alert being sent to a vehicle
-   * type = 2 means that it is a network failure message
-   * type = 3 means that it is a miscellaneous error.
-   * If message count is < MESSAGE_LIMIT, increment the message count and return false.
-   * Otherwise, true is returned.
-   */
+/*
+ * Function: checkMessageCount(int type)
+ * This function takes the message and checks to see if the messages have
+ * reached their limit.
+ * types are:
+ * type = 0 means that it is an incoming message
+ * type = 1 means that it is an alert being sent to a vehicle
+ * type = 2 means that it is a network failure message
+ * type = 3 means that it is a miscellaneous error.
+ * If message count is < MESSAGE_LIMIT, increment the message count and return false.
+ * Otherwise, true is returned.
+ */
 bool Base_Unit::checkMessageCount(int type)
 {
     if (getMessageCount(type) < MESSAGE_LIMIT)
@@ -78,12 +79,12 @@ bool Base_Unit::checkMessageCount(int type)
  * type = 1 means that it is an alert being sent to a vehicle
  * type = 2 means that it is a network failure message
  * type = 3 means that it is a miscellaneous error.
- * 
- * string fileName is created by using b.getFileName(&fileName, 0); where b 
+ *
+ * string fileName is created by using b.getFileName(&fileName, 0); where b
  * is a Base_Unit object and the second parameter is the message type
 */
 
-void Base_Unit::logFile(string & fileName, string* inputMessage, int type)
+void Base_Unit::logFile(string& fileName, string* inputMessage, int type)
 {
     bool needNewFile = false;
 
@@ -125,13 +126,13 @@ void Base_Unit::logFile(string & fileName, string* inputMessage, int type)
             t1.join();
             d = true;
         }
-        
+
     }
     // if needNewFile is true, then get a new fileName 
-    if(needNewFile)
+    if (needNewFile)
     {
         getFilePath(fileName, type);
-            
+
     }
 }
 
@@ -144,18 +145,18 @@ void Base_Unit::logFile(string & fileName, string* inputMessage, int type)
  * Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
  */
 
-/* Function lockWriteFile locks any other part of the program writing to
- * log files while another process is writing to it. */
-void Base_Unit::lockWriteFile(string &filePath, string* inputMessage)
+ /* Function lockWriteFile locks any other part of the program writing to
+  * log files while another process is writing to it. */
+void Base_Unit::lockWriteFile(string& filePath, string* inputMessage)
 {
     //lock writing to a log file
     mtx_write.lock();
 
     storeMessage(filePath, *inputMessage);
- 
+
     //open the lock
     mtx_write.unlock();
-    
+
     return;
 
 }
@@ -170,7 +171,7 @@ int Base_Unit::getMessageCount(int type)
 {
     if (type == 0)
     {
-        cout << "The message count is: " << messageCount << endl;
+        //cout << "The message count is: " << messageCount << endl;
         return messageCount;
     }
     else if (type == 1)
@@ -213,18 +214,18 @@ void Base_Unit::incMessageCount(int type)
     }
 }
 
-/* Function creates a file name based on the UTC time by year, month, day, hour, 
- * min, and second.  It also adds the type of message that it is. 
+/* Function creates a file name based on the UTC time by year, month, day, hour,
+ * min, and second.  It also adds the type of message that it is.
  * type = 0 = I means that it is an incoming message
  * type = 1 = A means that it is an alert being sent to a vehicle
  * type = 2 = N means that it is a network failure message
- * type = 3 = M means that it is a miscellaneous error. 
- * .txt is also appended as the extention for the files. 
+ * type = 3 = M means that it is a miscellaneous error.
+ * .txt is also appended as the extention for the files.
  * Reference: https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 
  * https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/3stkd9be(v=vs.120)
 */
-void Base_Unit::createFileName(string *fileName, int type)
+void Base_Unit::createFileName(string* fileName, int type)
 {
     // we are creating a new FileName which means we need to reset the count
     resetMessageCount(type);
@@ -238,7 +239,7 @@ void Base_Unit::createFileName(string *fileName, int type)
         type_of_message = "N";
     else
         type_of_message = "M";
- 
+
     //get the current time
     time_t now = time(0);
 
@@ -296,7 +297,7 @@ void Base_Unit::resetMessageCount(int type)
  * logs directory and the 4 subfolders (1) incoming_messages (2) alerts (3) network_failure
  * (4) misc_errors. It will create the main logs file in the location that the user
  * specified. */
-// https://www.youtube.com/watch?v=B999K9yztnI
+ // https://www.youtube.com/watch?v=B999K9yztnI
 void Base_Unit::createFolder()
 {
     // bool used to see if a directory exists
@@ -358,10 +359,10 @@ void Base_Unit::createFolder()
  * In this case we are looking for it to return "ERROR_PATH_NOT_FOUND" ,
  * "ERROR_FILE_NOT_FOUND", "ERROR_INVALID_NAME", or "ERROR_BAD_NETPATH" in order
  * to know that the file does not exist. */
-// reference
-// https://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
-//https://www.youtube.com/watch?v=B999K9yztnI
-//https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesa
+ // reference
+ // https://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
+ //https://www.youtube.com/watch?v=B999K9yztnI
+ //https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesa
 bool Base_Unit::directoryExists(const std::string& directoryName)
 {
     DWORD directory_attribute = GetFileAttributesA(directoryName.c_str());
@@ -381,7 +382,7 @@ bool Base_Unit::directoryExists(const std::string& directoryName)
 }
 
 /*This function allows the path to a logs directory to be set
- * The default set was C:\\logs 
+ * The default set was C:\\logs
  */
 void Base_Unit::setPathToLogs(string& path)
 {
@@ -413,7 +414,7 @@ string Base_Unit::getPathToNetWorkFailure()
 {
     string messages = getPathToLogs() + "\\network_failure\\";
     return messages;
-    
+
 }
 
 /* This functions gets the path to the logs/misc_errors directory*/
@@ -446,10 +447,10 @@ string Base_Unit::getCurrentFileName(int type)
         return miscErrorFile;
     }
 }
-/* This function sets the file name for a log file when it is newly opened. 
- *  An example of it's use would be if a previous log file was full and 
+/* This function sets the file name for a log file when it is newly opened.
+ *  An example of it's use would be if a previous log file was full and
  * closed and a new name created for a new file, then this function would
- * be called to set the file name for that particular type of log file. 
+ * be called to set the file name for that particular type of log file.
  */
 void Base_Unit::setFileName(int type)
 {
@@ -500,7 +501,7 @@ void Base_Unit::getFilePath(string& fileName, int type)
     }
 }
 
-void Base_Unit::addToMineVehicles(Vehicle &v)
+void Base_Unit::addToMineVehicles(Vehicle& v)
 {
     mine_vehicles.push_back(v);
 }
@@ -508,7 +509,9 @@ void Base_Unit::addToMineVehicles(Vehicle &v)
 /* prints the contents held in the mine_vehicle vector*/
 void Base_Unit::print_vector(vector<Vehicle>& v)
 {
-    cout << "The size of the vector in print function is: " << v.size() << endl;
+    if (v.size() == 0)
+        return;
+    //cout << "The size of the vector in print function is: " << v.size() << endl;
     cout << "**********************************" << endl << endl;
 
     for (auto itr : v)
@@ -522,7 +525,8 @@ void Base_Unit::print_vector(vector<Vehicle>& v)
         cout << std::setprecision(0);
         cout << "time_stamp: " << itr.getTime() << endl;
         cout << "velocity: " << itr.getVelocity() << endl;
-        cout << "bearing: " << itr.getBearing() << endl << endl;
+        cout << "bearing: " << itr.getBearing() << endl;
+        cout << "priority: " << itr.getPriorityNumber() << endl << endl;
     }
     cout << "***************************************" << endl << endl;
 
@@ -533,11 +537,25 @@ vector<Vehicle> Base_Unit::getMineVehicles()
     return mine_vehicles;
 }
 
-//void Base_Unit::input_data(unique_ptr<struct message>& ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
-void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles)
+void Base_Unit::addToPriorityQueue(Vehicle& v)
 {
+    priority_list.push_back(v);
+}
+
+vector<Vehicle> Base_Unit::getPriorityQueue()
+{
+    return priority_list;
+}
+
+
+void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles, Port& p)
+{
+    Calculations calc;
     int size = -1;
     mineVehicles = getMineVehicles();
+    string alertMessage;
+    char fileName[100];
+    double speed, distance;
 
     size = get_size(mineVehicles);
     //if the size of the vector is 0, then we know we need to add the 
@@ -560,8 +578,6 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
         // push the new vehicle into the mine_vehicles vector
         addToMineVehicles(v);
 
-        //the newly added 
- 
     }
     // otherwise, we check to see if the vehicle id already exists
     else
@@ -571,21 +587,56 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
 
         // have the thread join again
         t1.join();
+
+        //now the newly added node or updated node needs to have their distance
+        // checked to all the other nodes. 
+        vector<int>list = checkDistancesInMasterVector(v, distance);
+
+        //next we iterate through the list and send out alerts
+        if (list.size() > 0)
+        {
+            for (size_t i = 0; i < list.size(); i++)
+            {
+                //need to send out an alert message
+                // first calculate the speed which is in meters per second
+                speed = calc.knots_to_mps(v.getVelocity());
+                alertMessage = getPathToAlerts();
+                // still need to input the calculated bearing for the last argument
+                outgoing_message(alertMessage, v.getUnit(), getMineVehicles().at(i).getUnit(), v.getTime(),
+                    distance, speed, 0);
+                //convert the outgoing message to a char * so that it can be transmitted
+                stringToCharPointer(alertMessage, fileName);
+                // send the alerts
+                p.writeToSerialPort(fileName, alertMessage.length() + 1);
+            }
+        }
+        // now we need to update the priority number for the vehicle in the 
+        // master list of vehicles.
+        // call updateMasterPriorityNums
+        updateMasterPriority(v);
+
+        // now we need to sort the mine_vehicles
+        vector<Vehicle> veh = getMineVehicles();
+        v.sortVehicleVector(veh);
+
+        //now we need to add these vehicles to each other's priority queues as well
+        // as add the vehicles to the master unit's priority queue. 
+        addToPriorityQueue(v);
+
     }
-  
+
 }
-//void Base_Unit::input_data(unique_ptr<struct message>& ptr, Vehicle& v, vector<Vehicle>&mineVehicles)
+
 void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles)
 {
-    mtx_update.lock();
-    int duplicate;
+    mtx_update_master.lock();
+    int duplicate, index;
     mineVehicles = getMineVehicles();
-    int index;
 
     duplicate = contains_id_number(mineVehicles, ptr->vehicle, index);
-    cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
+    //cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
     //if the id number is not a duplicate, then create a new
-    //vehicle object and add it to the vector.
+    //vehicle object and add it to the master vector.
     if (duplicate == 0)
     {
         v.setBearing(ptr->bearing);
@@ -608,9 +659,8 @@ void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mi
         mineVehicles.at(index).setLongitude(ptr->longitude);
         mineVehicles.at(index).setTime(ptr->time);
         mineVehicles.at(index).setVelocity(ptr->velocity);
-
     }
-    mtx_update.unlock();
+    mtx_update_master.unlock();
 
 }
 // returns the size of the vector
@@ -620,7 +670,7 @@ int Base_Unit::get_size(vector<Vehicle>& v)
 }
 
 //check to see if vector contains a specific id number
-int Base_Unit::contains_id_number(vector<Vehicle>& v, int id, int &index)
+int Base_Unit::contains_id_number(vector<Vehicle>& v, int id, int& index)
 {
     for (size_t i = 0; i < v.size(); i++)
     {
@@ -633,4 +683,77 @@ int Base_Unit::contains_id_number(vector<Vehicle>& v, int id, int &index)
     }
     return 0;
 }
+
+/* function iterates through the master list and checks the distance each
+ * vehicle is from the other vehicles, it adds any vehicles that are close to that
+ * input vehicle to a vector that contains ints which represent the index number
+ * in the vector of vehicles where there is risk of collision*/
+vector<int> Base_Unit::checkDistancesInMasterVector(Vehicle& v, double& distance)
+{
+    Calculations c;
+    //This vector stores the vehicle id's that are too close to this vehicle,
+    // an alert notice will be sent out
+    vector<int>list;
+    bool set = false;
+    //iterate through the master list of vehicles
+    for (size_t i = 0; i < getMineVehicles().size(); i++)
+    {
+        if (getMineVehicles().at(i).getUnit() != v.getUnit())
+        {
+            distance = c.haversine(&v, &getMineVehicles().at(i));
+            //distance returns as km, need to change to meters so multiply
+            // by 1000
+            distance = 1000 * distance;
+            //if the result is 50 or less than the index of the vehicle in the 
+            // master list is pushed onto the list of vehicles that need notification
+            if (distance <= 50)
+            {
+                list.push_back(i);
+                // we need to update that vehicles priority number to a 0
+                v.setPriority(0);
+
+                // a 0 priority was set, so this needs to remain
+                set = true;
+                //add the vehicle to the current vehicles priority queue
+                //v.addVehicleVector(getMineVehicles().at(list[i]), 0);
+
+            }
+            else if (distance > 50 && distance <= 75 && !set)
+            {
+                v.setPriority(1);
+                set = true;
+
+            }
+            else if (distance > 75 && distance < 100 && !set)
+            {
+                v.setPriority(2);
+                set = true;
+            }
+            else
+            {
+                v.setPriority(3);
+
+            }
+        }
+    }
+    return list;
+}
+
+void Base_Unit::updateMasterPriority(Vehicle& v)
+{
+    vector<Vehicle> vehicle = getMineVehicles();
+    for (size_t i = 0; i < vehicle.size(); i++)
+    {
+        if (vehicle.at(i).getUnit() == v.getUnit())
+        {
+            vehicle.at(i) = v;
+        }
+    }
+}
+
+
+
+
+
+
 
