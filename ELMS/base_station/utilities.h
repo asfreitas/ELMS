@@ -8,4 +8,5 @@ using std::endl;
 using std::exception;
 
 int stringToInt(string str);
+
 double stringToDouble(string str);

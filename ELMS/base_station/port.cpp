@@ -30,12 +30,21 @@ returns the handle of the port
 */
 void Port::openSerialPort(LPCSTR portname)
 {
+    const int BYTE_SIZE = 8;
+    const int READ_INTERVAL_TIMEOUT = 0; // TODO: figure out what values work best for the program
+    const int READ_MULTIPLIER = 10;
+    const int READ_CONSTANT = 50;
+    const int WRITE_MULTIPLIER = 10;
+    const int WRITE_CONSTANT = 50;
+    const int baudrate = 9600;
+    const int STOP_BITS = ONESTOPBIT;
+    const int PARITY = NOPARITY;
 
     hSerial = setupPort(portname); // get the port
     
     if (hSerial == INVALID_HANDLE_VALUE)
     {
-        // do something
+        perror("Error opening serial handle\n");
     }
 
     DCB dcbSerialParams = { 0 };
@@ -182,6 +191,8 @@ Port::Port()
 {
     openSerialPort(NULL);
     startPortThread();
+    startTimer(5);
+
 }
 
 /*
@@ -195,13 +206,14 @@ Port::Port(LPCSTR portname)
 {
     openSerialPort(portname);
     startPortThread();
+    startTimer(5);
 }
 
 /*
 =============
 Destructor
 
-Opens a new port and attempts to open the port passed into the constructor
+Shuts down the port and makes sure all data has been sent before closing
 =============
 */
 Port::~Port()
@@ -212,6 +224,7 @@ Port::~Port()
         messageThread.join();
     if (portThread.joinable())
         portThread.join();
+    waitCommMask(EV_TXEMPTY); // make sure that there is nothing left to send before closing
     closeSerialPort(hSerial);
     
 }
@@ -257,11 +270,15 @@ void Port::removeMessageFromBuffer(std::string *mystring)
 
 /*
 =============
-removeTopMessage
+receiveMessage
 =============
 */
 void Port::receiveMessage()
 {
+    waitCommMask(EV_RXCHAR);
+    while (stillReceiving)
+    {
+
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
@@ -279,6 +296,12 @@ void Port::receiveMessage()
             addToMessageBuffer(finalMessage);
 
         }
+        if (networkFailure == true)
+        {
+            std::cout << "Network Failure\n";
+        }
+    }
+
 }
 
 /*
@@ -314,4 +337,103 @@ std::string Port::getNextMessage()
     messageThread = std::thread(&Port::removeMessageFromBuffer, this, &mystring);
     messageThread.join();
     return mystring;
+}
+
+/*
+=============
+startMessageThread
+=============
+*/
+void Port::startTimer(int numSeconds)
+{
+    std::thread netFailure = std::thread(&Port::netFailureCheck, this, numSeconds);
+    netFailure.detach();
+}
+
+/*
+=============
+netFailureCheck
+
+Check for network failure and set the networkFailure variable
+=============
+*/
+void Port::netFailureCheck(int numSeconds)
+{
+    bool timesUp;
+    bool currentNetworkFailure;
+    while (stillReceiving)
+    {
+        auto start = std::chrono::system_clock::now();
+        timesUp = false;
+        currentNetworkFailure = true;
+        while (!timesUp && currentNetworkFailure)
+        {
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff = end - start;
+
+            if (diff.count() > numSeconds)
+            {
+                networkFailure = true;
+                timesUp = true;
+            }
+
+            if (!isBufferEmpty())
+            {
+                networkFailure = false;
+                currentNetworkFailure = false;
+            }
+        }
+
+    }
+}
+
+/*
+=============
+setCommMask
+
+// https://docs.microsoft.com/en-us/windows/win32/devio/monitoring-communications-events
+=============
+*/
+void Port::setCommMask(DWORD mask)
+{
+    bool setMask;
+    setMask = SetCommMask(hSerial, mask);
+
+    OVERLAPPED o;
+
+    o.hEvent = CreateEvent(
+        NULL,   // default security attributes 
+        TRUE,   // manual-reset event 
+        FALSE,  // not signaled 
+        NULL    // no name
+    );
+
+
+    // Initialize the rest of the OVERLAPPED structure to zero.
+    o.Internal = 0;
+    o.InternalHigh = 0;
+    o.Offset = 0;
+    o.OffsetHigh = 0;
+
+    if (!setMask)
+    {
+        // Handle the error. 
+        printf("SetCommMask failed with error %d.\n", GetLastError());
+        return;
+    }
+}
+
+/*
+=============
+waitCommMask
+
+Wait for a particular mask 
+=============
+*/
+bool Port::waitCommMask(DWORD mask)
+{
+    DWORD status, dwEventMask;
+    setCommMask(mask);
+    status = WaitCommEvent(hSerial, &dwEventMask, NULL);
+    return dwEventMask;
 }

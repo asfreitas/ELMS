@@ -8,6 +8,7 @@
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
 
+
 #ifndef PORT_H
 #define PORT_H
 #include <windows.h>
@@ -16,20 +17,14 @@
 #include <queue>
 #include <thread>
 #include <mutex>
-
+#include <chrono>
+#include "timer.h"
+#ifndef SERIALPORT_HPP
+#define SERIALPORT_HPP
 
 class Port
 {
     private:
-        const int BYTE_SIZE = 8;
-        const int READ_INTERVAL_TIMEOUT = 0; // TODO: figure out what values work best for the program
-        const int READ_MULTIPLIER = 10;
-        const int READ_CONSTANT = 50;
-        const int WRITE_MULTIPLIER = 10;
-        const int WRITE_CONSTANT = 50;
-        const int baudrate = 9600;
-        const int STOP_BITS = ONESTOPBIT;
-        const int PARITY = NOPARITY;
         static const int messageSize = 50;
         HANDLE hSerial;
         std::queue<std::string> buffer;
@@ -37,6 +32,8 @@ class Port
         std::thread portThread;
         std::thread messageThread;
         bool stillReceiving = true;
+        bool networkFailure = false;
+        Timer t;
         
 
     public:
@@ -57,6 +54,9 @@ class Port
         void startPortThread();
         std::string getNextMessage();
         std::queue<std::string> getQueue() { return buffer; }
-        void getPortThread(){ stillReceiving = false; }
+        void startTimer(int);
+        void netFailureCheck(int);
+        void setCommMask(DWORD);
+        bool waitCommMask(DWORD);
 };
 #endif
