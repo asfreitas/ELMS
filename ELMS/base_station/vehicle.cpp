@@ -69,6 +69,11 @@ void Vehicle::setBearing(double vehicleBearing) {
     bearing = vehicleBearing;
 }
 
+void Vehicle::setPriority(int p)
+{
+    priority = p;
+}
+
 /*
 =============
 get...()
@@ -99,22 +104,25 @@ double Vehicle::getBearing() {
     return bearing;
 }
 
+int Vehicle::getPriorityNumber()
+{
+    return priority;
+}
+
 vector<Vehicle> Vehicle::getVehicleVector() {
     return vectorVehicles;
 }
 
 /*
 =============
-sorVehicleVector
-Uses merge sort to sort current list of vector vehicles
-by calculating the distance from this vehicle object to
-each of the vehicle objects in the vector. This will use
-the haversine calculations.
+sortVehicleVector
+This sorts a vector of Vehicles by their priority number.
+It uses a bool operator defined in the class public members
 =============
 */
-void Vehicle::sortVehicleVector() {
+void Vehicle::sortVehicleVector(vector<Vehicle> &v) {
 
-
+    sort(v.begin(), v.end());
 
 }
 
