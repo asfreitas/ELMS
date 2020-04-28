@@ -17,6 +17,9 @@
 #include "utilities.h"
 #include "vehicle.h"
 #include "parse_incoming.h"
+#include "calculations.h"
+#include "port.h"
+#include <algorithm>
 //#include <iterator>
 using std::string;
 using std::vector;
@@ -27,6 +30,7 @@ using std::setprecision;
 #define MESSAGE_LIMIT 5
 
 static vector<Vehicle>mine_vehicles;
+static vector<Vehicle>priority_list;
 class Base_Unit
 {
     // using static variables will be the same value for all class objects.
@@ -48,8 +52,8 @@ class Base_Unit
     string pathToLogs = "C:\\logs";
 public:
     bool checkMessageCount(int type);
-    void logFile(string & fileName, string* inputMessage, int type);
-    void lockWriteFile(string & filePath, string* inputMessage);
+    void logFile(string& fileName, string* inputMessage, int type);
+    void lockWriteFile(string& filePath, string* inputMessage);
     int getMessageCount(int type);
     void resetMessageCount(int type);
     void incMessageCount(int type);
@@ -65,16 +69,17 @@ public:
     string getCurrentFileName(int type);
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
-    void addToMineVehicles(Vehicle &v);
+    void addToMineVehicles(Vehicle& v);
     void print_vector(vector<Vehicle>& v);
     vector<Vehicle>getMineVehicles();
-    //void input_data(unique_ptr<message> &ptr, Vehicle &v, vector<Vehicle>&mineVehicles);
-    void input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles);
+    void addToPriorityQueue(Vehicle& v);
+    vector<Vehicle>getPriorityQueue();
+    void input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles, Port& p);
     void update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles);
     int get_size(vector<Vehicle>& v);
-    int contains_id_number(vector<Vehicle>& v, int id, int &index);
-
-
+    int contains_id_number(vector<Vehicle>& v, int id, int& index);
+    vector<int> checkDistancesInMasterVector(Vehicle& v, double& d);
+    void updateMasterPriority(Vehicle& v);
 };
 
 #endif // !BASE_UNIT_H
