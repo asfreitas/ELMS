@@ -15,7 +15,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include "timer.h"
+//#include "timer.h"
 
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
@@ -32,7 +32,7 @@ class Port
         bool stillReceiving = true;
         bool networkFailure = false;
         bool portReady = false;
-        Timer t;
+        //Timer t;
         
 
     public:
