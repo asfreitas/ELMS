@@ -5,111 +5,116 @@
 #include "vehicle.h"
 using std::vector;
 
-//initialize class
-Vehicle::Vehicle(){
+/* initialize class
+ * priority 0 = vehicle is 50 meters or less to another vehicle
+ * priority 1 = vehicle is 51 - 75 meters away from another vehicle
+ * priority 2 = vehicle 76 - 100 meters away from another vehicle
+ * priority 3 = vehicle is greater than 100 meters away from another vehicle
+ * priority 4 = the distance to any other vehicles has not been set yet */
+Vehicle::Vehicle() {
     unit = -1;
     time = -1;
     latitude = -1;
     longitude = -1;
     velocity = -1;
-    bearing =-1;
+    bearing = -1;
+    priority = 4; //initialize the priority to 4
     vectorVehicles.clear();
 }
 
 //construct vehicle
-Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude, double vehicleVelocity, double vehicleBearing){
+Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude, double vehicleVelocity, double vehicleBearing, int priorityNum) {
     unit = vehicleUnit;
     time = vehicleTime;
     latitude = vehicleLatitude;
     longitude = vehicleLongitude;
     velocity = vehicleVelocity;
     bearing = vehicleBearing;
+    priority = priorityNum;
 }
 
 //desctructor
-Vehicle::~Vehicle(){
+Vehicle::~Vehicle() {
+    std::cout << "Vehicle destructor called " << std::endl;
 
 }
 
 /*
 =============
 set...()
-
 Below are setter functions for setting vehicle object members
 =============
 */
-void Vehicle::setUnit(int vehicleUnit){
+void Vehicle::setUnit(int vehicleUnit) {
     unit = vehicleUnit;
 }
 
-void Vehicle::setTime(int vehicleTime){
+void Vehicle::setTime(int vehicleTime) {
     time = vehicleTime;
 }
 
-void Vehicle::setLatitude(double vehicleLatitude){
+void Vehicle::setLatitude(double vehicleLatitude) {
     latitude = vehicleLatitude;
 }
 
-void Vehicle::setLongitude(double vehicleLongitude){
+void Vehicle::setLongitude(double vehicleLongitude) {
     longitude = vehicleLongitude;
 }
 
-void Vehicle::setVelocity(double vehicleVelocity){
+void Vehicle::setVelocity(double vehicleVelocity) {
     velocity = vehicleVelocity;
 }
 
-void Vehicle::setBearing(double vehicleBearing){
+void Vehicle::setBearing(double vehicleBearing) {
     bearing = vehicleBearing;
 }
 
 /*
 =============
 get...()
-
 Below are getter functions for getting vehicle object members
 =============
 */
-int Vehicle::getUnit(){
+int Vehicle::getUnit() {
     return unit;
 }
 
-int Vehicle::getTime(){
+int Vehicle::getTime() {
     return time;
 }
 
-double Vehicle::getLatitude(){
+double Vehicle::getLatitude() {
     return latitude;
 }
 
-double Vehicle::getLongitude(){
+double Vehicle::getLongitude() {
     return longitude;
 }
 
-double Vehicle::getVelocity(){
+double Vehicle::getVelocity() {
     return velocity;
 }
 
-double Vehicle::getBearing(){
+double Vehicle::getBearing() {
     return bearing;
 }
 
-vector<Vehicle> Vehicle::getVehicleVector(){
+vector<Vehicle> Vehicle::getVehicleVector() {
     return vectorVehicles;
 }
 
 /*
 =============
 sorVehicleVector
-
 Uses merge sort to sort current list of vector vehicles
-by calculating the distance from this vehicle object to 
+by calculating the distance from this vehicle object to
 each of the vehicle objects in the vector. This will use
 the haversine calculations.
 =============
 */
-void Vehicle::sortVehicleVector(){
+void Vehicle::sortVehicleVector() {
 
-    
+
 
 }
 
@@ -118,11 +123,10 @@ void Vehicle::sortVehicleVector(){
 addVehicleVector
 vehicleUnit		Vehicle object we want to add
 position        Position we want to insert the new vehicle before
-
 Adds the vehicle unit to the vehicle vector list at specified position
 =============
 */
-void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position){
+void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position) {
     //create iterator for vector position
     auto it = vectorVehicles.begin() + position;
     vectorVehicles.insert(it, vehicleUnit);
@@ -131,12 +135,15 @@ void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position){
 //check to see if vehicle exists in vector
 bool Vehicle::checkVehicleVector(int vehicleUnit){
     unsigned i = 0;
+
     //search vector for unit, if find, send unit number
-    for(i; i < vectorVehicles.size(); i++){
-        if(vectorVehicles[i].unit == vehicleUnit){
+    for (i; i < vectorVehicles.size(); i++) {
+        if (vectorVehicles[i].unit == vehicleUnit) {
             return true;
         }
     }
     //If not found, return -1;
     return false;
+
 }
+

@@ -9,6 +9,9 @@
 #define VEHICLE_HPP
 
 //using std::priority_queue;
+#include <iostream>
+using std::cout;
+using std::endl;
 using std::vector;
 
 class Vehicle
@@ -20,6 +23,7 @@ class Vehicle
         double longitude;
         double velocity;
         double bearing;
+        int priority;
         vector<Vehicle> vectorVehicles;
 
     public:
@@ -28,7 +32,7 @@ class Vehicle
         Vehicle();
 
         //Create constructor
-        Vehicle(int unit, int time, double latitude, double longitude, double velocity, double bearing);
+        Vehicle(int unit, int time, double latitude, double longitude, double velocity, double bearing, int priority);
         //create destructor
         ~Vehicle();
 

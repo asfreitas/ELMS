@@ -1,36 +1,40 @@
 /*
- * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar 
+ * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
-
 #include <iostream>
 #include <cstdio>
-#include <vector>
 #include <sstream>
 #include <algorithm>
-#include "utilities.h"
 #include "parse_incoming.h"
 
-using std::stringstream;
 using std::cout;
 using std::endl;
 using std::cerr;
 using std::stoi;
 using std::stof;
-using std::vector;
 using std::replace;
+using std::exception;
+using std::stringstream;
+using std::remove_if;
 
 
+/* This function take the file path and message and opens the file and appends
+ *  the current message. Once it is finished it closes the file. */
+void storeMessage(string & filePath, string &message) {
+	ofstream inputFile;
+	inputFile.open(filePath, std::ios::out | std::ios::app);
 
-void storeMessage(const char* fileName, const char* message){
-	//FILE *inputFile;
-	//inputFile = fopen(fileName, "a");
-
-	//fprintf(inputFile, "%s\n", message);	
-
-	//fclose(inputFile);
-
+	// if the log file is open, then write to it. 
+	if (inputFile.is_open())
+	{
+		inputFile << message;
+	}
+	inputFile.close();
 }
 
+/* Reference for how to remove blank spaces in a string
+ * https://stackoverflow.com/questions/83439/remove-spaces-from-stdstring-in-c
+ */
 message* createNewMessage(string incomingMessage)
 {
 	message* newMessage = new message; // create new message
@@ -38,13 +42,14 @@ message* createNewMessage(string incomingMessage)
 	string temp;	// setup tokenizer
 	char delim = ',';
 
+	// this removes any blank spaces that may be in the message before parsing
 	incomingMessage.erase(remove_if(incomingMessage.begin(), incomingMessage.end(), isspace), incomingMessage.end());
 
 	incomingMessage = incomingMessage.substr(1, incomingMessage.length() - 1); // remove $ and *
 
 	stringstream check1(incomingMessage);
 
-	
+
 	for (int dataPoint = 0; dataPoint < 6; dataPoint++)
 	{
 		getline(check1, temp, delim);

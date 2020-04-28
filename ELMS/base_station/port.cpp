@@ -218,6 +218,7 @@ Shuts down the port and makes sure all data has been sent before closing
 */
 Port::~Port()
 {
+    std::cout << "I am in the port destructor" << std::endl;
     stillReceiving = false;
     if (messageThread.joinable())
         messageThread.join();
@@ -225,6 +226,7 @@ Port::~Port()
         portThread.join();
     waitCommMask(EV_TXEMPTY); // make sure that there is nothing left to send before closing
     closeSerialPort(hSerial);
+    
 }
 
 /*
@@ -276,6 +278,7 @@ void Port::receiveMessage()
     waitCommMask(EV_RXCHAR);
     while (stillReceiving)
     {
+
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
@@ -298,6 +301,7 @@ void Port::receiveMessage()
             std::cout << "Network Failure\n";
         }
     }
+
 }
 
 /*

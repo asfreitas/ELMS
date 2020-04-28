@@ -8,6 +8,9 @@
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
 
+
+#ifndef PORT_H
+#define PORT_H
 #include <windows.h>
 #include <iostream>
 #include <string>
