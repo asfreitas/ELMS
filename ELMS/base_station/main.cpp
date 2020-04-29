@@ -58,6 +58,7 @@ int main()
 	string incomingMessage;
 	string data;
 	string path = b.getPathToLogs();
+	int index;
 
 
 	/* reference I used for how to create and return a smart pointer
@@ -77,7 +78,7 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
+	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
 	Port p(portname);
 	bool startNewLog = false;
 
@@ -86,9 +87,7 @@ int main()
 	 * received a put in the input buffer
 	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN */
 
-	// for some reason, this particular if/else statement is causing a thread exit
-	// with other than 0 when debugging.  Not sure what this means.  But the
-	// plan is to replace this in the Port Class so maybe that will fix this issue. 
+    // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
 	while (p.isPortReady() && count < 20)
@@ -96,11 +95,12 @@ int main()
 
 		if (!p.isBufferEmpty())
 		{
-			cout << "Buffer is not empty" << endl;
+			//cout << "Buffer is not empty" << endl;
 			incomingMessage = p.getNextMessage();
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
 
+			omp_set_num_threads(2);
             #pragma omp parallel sections
 			{
                 #pragma omp section
@@ -116,15 +116,11 @@ int main()
 					//declare a vehicle object that will either be added to
 					// the master list or will have their vehicle updated.
 					Vehicle vehicle = Vehicle();
+					index = b.getMineVehicles().size();
+					b.addToMineVehicles(vehicle);
 					//this function is going to have a mutex and lock within the input_data function
-					/*This reference tells how to pass a smart pointer by reference. Only one smart
-					 * pointer was created and we are changing the state of what it points to everytime
-					 * we called createNewMessage. The smart pointer is passed by reference to
-					 * input_data.
-					 * https://stackoverflow.com/questions/12519812/how-do-i-pass-smart-pointers-into-functions
-					 */
 					HANDLE h = p.getHandle();
-					b.input_data(ptr, vehicle, p, h);
+					b.input_data(index, ptr, p, h);
 
 					delete ptr;
 
@@ -135,11 +131,11 @@ int main()
 		}
 		else
 		{
-			cout << "The buffer is empty" << endl;
+			//cout << "The buffer is empty" << endl;
 		}
 		vehicles_in_mine = b.getMineVehicles();
 		b.print_vector(vehicles_in_mine);
-		cout << "_________________________________________________________" << endl;
+		//cout << "_________________________________________________________" << endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	} /* end while loop */
 
