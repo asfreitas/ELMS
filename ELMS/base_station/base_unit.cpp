@@ -32,6 +32,7 @@ string Base_Unit::logFileName = "";
 string Base_Unit::alertFile = "";
 string Base_Unit::netFailFile = "";
 string Base_Unit::miscErrorFile = "";
+vector<Vehicle> Base_Unit::mine_vehicles;
 
 
 /*
@@ -548,14 +549,17 @@ vector<Vehicle> Base_Unit::getPriorityQueue()
 }
 
 
-void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles, Port& p)
+void Base_Unit::input_data(struct message* ptr, Vehicle& v, Port& p, HANDLE &h)
 {
     Calculations calc;
     int size = -1;
-    mineVehicles = getMineVehicles();
+    vector<Vehicle> mineVehicles = getMineVehicles();
     string alertMessage;
+    string alertLogMessage;
+    string alertFileName;
     char fileName[100];
-    double speed, distance;
+    double speed, distance = 0, bearing;
+    int index = 0;
 
     size = get_size(mineVehicles);
     //if the size of the vector is 0, then we know we need to add the 
@@ -590,8 +594,8 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
 
         //now the newly added node or updated node needs to have their distance
         // checked to all the other nodes. 
-        vector<int>list = checkDistancesInMasterVector(v, distance);
-
+        vector<int>list = checkDistancesInMasterVector(v, distance, mineVehicles);
+        
         //next we iterate through the list and send out alerts
         if (list.size() > 0)
         {
@@ -600,14 +604,34 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
                 //need to send out an alert message
                 // first calculate the speed which is in meters per second
                 speed = calc.knots_to_mps(v.getVelocity());
-                alertMessage = getPathToAlerts();
-                // still need to input the calculated bearing for the last argument
-                outgoing_message(alertMessage, v.getUnit(), getMineVehicles().at(i).getUnit(), v.getTime(),
-                    distance, speed, 0);
+
+                //The list contains the index in the master list of vehicles that is
+                // in immediate danger of collision. Set the second vehicle to this
+                // index
+                Vehicle v1 = getMineVehicles().at(list[i]);
+                
+
+                // now we get the bearing
+                bearing = calc.getBearing(&v, &v1);
+                // we create the outgoing message;
+                outgoing_message(alertMessage, v.getUnit(), v1.getUnit(), v.getTime(),
+                    distance, speed, bearing);
+
+                //copy the message to use to create the log file for the alert
+                alertLogMessage = alertMessage;
+
                 //convert the outgoing message to a char * so that it can be transmitted
                 stringToCharPointer(alertMessage, fileName);
                 // send the alerts
-                p.writeToSerialPort(fileName, alertMessage.length() + 1);
+                DWORD test = p.writeToSerialPort(fileName, alertMessage.length() + 1, h);
+                
+                //we also need to create the alert message
+                // remove the \n from the end of the message
+                alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
+                //get the file path
+                getFilePath(alertFileName, 1);
+                // call logFile to create the log file
+                logFile(alertFileName, &alertLogMessage, 1);
             }
         }
         // now we need to update the priority number for the vehicle in the 
@@ -615,9 +639,9 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
         // call updateMasterPriorityNums
         updateMasterPriority(v);
 
-        // now we need to sort the mine_vehicles
-        vector<Vehicle> veh = getMineVehicles();
-        v.sortVehicleVector(veh);
+        // now we need to sort the mine_vehicles  -- putting this on hold for right now
+        //vector<Vehicle> veh = getMineVehicles();
+        //v.sortVehicleVector(veh);
 
         //now we need to add these vehicles to each other's priority queues as well
         // as add the vehicles to the master unit's priority queue. 
@@ -627,14 +651,14 @@ void Base_Unit::input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& min
 
 }
 
-void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles)
+void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mine)
 {
     mtx_update_master.lock();
     int duplicate, index;
-    mineVehicles = getMineVehicles();
-
-    duplicate = contains_id_number(mineVehicles, ptr->vehicle, index);
-    //cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
+    duplicate = contains_id_number(mine, ptr->vehicle, index);
+    //duplicate = contains_id_number(mine, v.getUnit(), index);
+    cout << "Here is the index from update_data from checking the duplicate: " << index << endl;
+    cout << "Here is the value of duplicate: " << duplicate << " and here is the unit id: " << ptr->vehicle << endl;
     //if the id number is not a duplicate, then create a new
     //vehicle object and add it to the master vector.
     if (duplicate == 0)
@@ -652,13 +676,8 @@ void Base_Unit::update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mi
     else
     {
         //To do: update Vehice objects data
-        std::cout << "Duplicate id number: " << ptr->vehicle << std::endl;
-        //update the vehicle's data
-        mineVehicles.at(index).setBearing(ptr->bearing);
-        mineVehicles.at(index).setLatitude(ptr->latitude);
-        mineVehicles.at(index).setLongitude(ptr->longitude);
-        mineVehicles.at(index).setTime(ptr->time);
-        mineVehicles.at(index).setVelocity(ptr->velocity);
+        std::cout << "Duplicate id number: " << ptr->vehicle << " and here is the index in the mine_vehicle " << index << std::endl;
+        setVehicleInMineVehicles(index, ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
     }
     mtx_update_master.unlock();
 
@@ -688,51 +707,63 @@ int Base_Unit::contains_id_number(vector<Vehicle>& v, int id, int& index)
  * vehicle is from the other vehicles, it adds any vehicles that are close to that
  * input vehicle to a vector that contains ints which represent the index number
  * in the vector of vehicles where there is risk of collision*/
-vector<int> Base_Unit::checkDistancesInMasterVector(Vehicle& v, double& distance)
+vector<int> Base_Unit::checkDistancesInMasterVector(Vehicle& v, double& distance, vector<Vehicle> & mine)
 {
     Calculations c;
-    //This vector stores the vehicle id's that are too close to this vehicle,
+    //This vector stores the vehicle index where they are stored in
+    //that are too close to this vehicle,
     // an alert notice will be sent out
     vector<int>list;
     bool set = false;
+    
     //iterate through the master list of vehicles
-    for (size_t i = 0; i < getMineVehicles().size(); i++)
+    for (size_t i = 0; i < mine.size(); i++)
     {
+        cout << "here is i, v id and second v1 id respsective: " <<i << " and " << v.getUnit() << " and " << mine.at(i).getUnit() << endl;
         if (getMineVehicles().at(i).getUnit() != v.getUnit())
         {
-            distance = c.haversine(&v, &getMineVehicles().at(i));
+            
+            distance = c.haversine(&v, &mine.at(i));
             //distance returns as km, need to change to meters so multiply
             // by 1000
             distance = 1000 * distance;
+            cout << "here is the calculated distance: " << distance << endl;
             //if the result is 50 or less than the index of the vehicle in the 
             // master list is pushed onto the list of vehicles that need notification
             if (distance <= 50)
             {
+
                 list.push_back(i);
+                //cout << "Here is the value of list(i): " << list[i] << endl;
                 // we need to update that vehicles priority number to a 0
-                v.setPriority(0);
+                cout << "Here is the priority value at that index: " << mine.at(i).getPriorityNumber() << endl;
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0);
+                //mining_vehicles.at(index).setPriority(0);
+                cout << "Here is the priority value after setting it at that index: " << mine.at(i).getPriorityNumber() << endl;
 
                 // a 0 priority was set, so this needs to remain
                 set = true;
-                //add the vehicle to the current vehicles priority queue
-                //v.addVehicleVector(getMineVehicles().at(list[i]), 0);
 
             }
             else if (distance > 50 && distance <= 75 && !set)
             {
-                v.setPriority(1);
-                set = true;
+                
+                //mining_vehicles.at(index).setPriority(1);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 1);
+                
 
             }
-            else if (distance > 75 && distance < 100 && !set)
+            else if (distance > 75 && distance < 100 && !set && v.getPriorityNumber()>2)
             {
-                v.setPriority(2);
-                set = true;
+                //mining_vehicles.at(index).setPriority(2);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 2);
+                
             }
-            else
+            else if (distance >= 100 && !set && v.getPriorityNumber() > 3)
             {
-                v.setPriority(3);
-
+                //mining_vehicles.at(index).setPriority(3);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 3);
+          
             }
         }
     }
@@ -748,6 +779,38 @@ void Base_Unit::updateMasterPriority(Vehicle& v)
         {
             vehicle.at(i) = v;
         }
+    }
+}
+
+/* This updates the master vehical vector vehicles at a specific index.  If you only
+ *  want to update one value, set the other inputs to -1 and nothing will be changed. */
+void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, double longitude, double velocity, double bearing, int priority)
+{
+    if (time != -1)
+    {
+        mine_vehicles.at(index).setTime(time);
+    }
+    if (latitude != -1)
+    {
+        mine_vehicles.at(index).setLatitude(latitude);
+    }
+    if (longitude != -1)
+    {
+        mine_vehicles.at(index).setLongitude(longitude);
+    }
+    if (velocity != -1)
+    {
+        mine_vehicles.at(index).setVelocity(velocity);
+    }
+    if (bearing != -1)
+    {
+        mine_vehicles.at(index).setBearing(bearing);
+    }
+    if (priority != -1)
+    {
+        cout << "I reset the priority number here" << endl;
+        cout << "The index is  " << index << " and the priority number I wish to set is: " << priority << endl;
+        mine_vehicles.at(index).setPriority(priority);
     }
 }
 
