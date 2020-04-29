@@ -81,7 +81,7 @@ public:
     int contains_id_number(vector<Vehicle>& v, int id, int& index);
     vector<int> checkDistancesInMasterVector(Vehicle& v, double& d, vector<Vehicle> & veh);
     void updateMasterPriority(Vehicle& v);
-    void setVehicleInMineVehicles(int index, int time, double latitude, double longitude,
+    void setVehicleInMineVehicles(Vehicle &, int time, double latitude, double longitude,
         double velocity, double bearing, int priority);
 };
 

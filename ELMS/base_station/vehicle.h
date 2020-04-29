@@ -63,6 +63,7 @@ class Vehicle
         double getBearing();
         int getPriorityNumber();
         vector<Vehicle> getVehicleVector();
+        int getVehicleID() { return unit; }
 
         //regular functions
 
