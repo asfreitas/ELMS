@@ -16,16 +16,16 @@
  * 6. 
 
  */
-void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTime, int velocity, int distance, int bearing)
+void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTime, double velocity, double distance, double bearing)
 {
     string unit11 = std::to_string(unit1);
     string unit22 = std::to_string(unit2);
     string messageTime1 = std::to_string(messageTime);
-    string velocity1 = std::to_string(velocity);
-    string distance1 = std::to_string(distance);
-    string bearing1 = std::to_string(bearing);
+    string velocity1 = doubleToString(velocity);
+    string distance1 = doubleToString(distance);
+    string bearing1 = doubleToString(bearing);
 	alertMessage = "$" + unit11 + "->" + unit22 + ',' + messageTime1 + ',' + velocity1 + ',' +
-			distance1 + ',' + bearing1 + "*" + "\\n";
+			distance1 + ',' + bearing1 + "*" + "\n";
 }
 
 /*This is a placeholder function that will be used to create network failure messages.*/
