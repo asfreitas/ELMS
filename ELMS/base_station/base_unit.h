@@ -20,16 +20,19 @@
 #include "calculations.h"
 #include "port.h"
 #include <algorithm>
+#include <map>
+#include <iterator>
 //#include <iterator>
 using std::string;
 using std::vector;
+using std::map;
+using std::pair;
 using std::setprecision;
 
 //this is how many messages will be in each log file before it is close. 
 // this is easily changed and we can make any number we want. 
 #define MESSAGE_LIMIT 5
 
-//static vector<Vehicle>mine_vehicles;
 static vector<Vehicle>priority_list;
 class Base_Unit
 {
@@ -75,14 +78,16 @@ public:
     vector<Vehicle>getMineVehicles();
     void addToPriorityQueue(Vehicle& v);
     vector<Vehicle>getPriorityQueue();
-    void input_data(struct message* ptr, Vehicle& v, Port& p, HANDLE &h);
-    void update_data(struct message* ptr, Vehicle& v, vector<Vehicle> & veh);
+    void input_data(int index, struct message* ptr,Port& p, HANDLE& h);
+    void update_data(struct message* ptr, int indice);
     int get_size(vector<Vehicle>& v);
-    int contains_id_number(vector<Vehicle>& v, int id, int& index);
-    vector<int> checkDistancesInMasterVector(Vehicle& v, double& d, vector<Vehicle> & veh);
+    int contains_id_number(int id, int& index);
+    map<int, double> checkDistancesInMasterVector(Vehicle& v);
     void updateMasterPriority(Vehicle& v);
-    void setVehicleInMineVehicles(Vehicle &, int time, double latitude, double longitude,
+    void setVehicleInMineVehicles1(Vehicle &, int time, double latitude, double longitude,
         double velocity, double bearing, int priority);
+    void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
+       double velocity, double bearing, int priority);
 };
 
 #endif // !BASE_UNIT_H
