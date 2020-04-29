@@ -91,7 +91,7 @@ int main()
 	// plan is to replace this in the Port Class so maybe that will fix this issue. 
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 13)
+	while (p.isPortReady() && count < 20)
 	{
 
 		if (!p.isBufferEmpty())
@@ -123,7 +123,8 @@ int main()
 					 * input_data.
 					 * https://stackoverflow.com/questions/12519812/how-do-i-pass-smart-pointers-into-functions
 					 */
-					b.input_data(ptr, vehicle, vehicles_in_mine, p);
+					HANDLE h = p.getHandle();
+					b.input_data(ptr, vehicle, p, h);
 
 					delete ptr;
 
@@ -136,6 +137,7 @@ int main()
 		{
 			cout << "The buffer is empty" << endl;
 		}
+		vehicles_in_mine = b.getMineVehicles();
 		b.print_vector(vehicles_in_mine);
 		cout << "_________________________________________________________" << endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
