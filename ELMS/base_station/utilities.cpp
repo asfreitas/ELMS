@@ -43,3 +43,13 @@ char* stringToCharPointer(string& str, char* fileName)
 	}
 	return fileName;
 }
+
+/* Reference: https://stackoverflow.com/questions/332111/how-do-i-convert-a-double-into-a-string-in-c*/
+string doubleToString(double num)
+{
+	ostringstream str1;
+	str1 << num;
+	string str2 = str1.str();
+	return str2;
+
+}
