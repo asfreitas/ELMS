@@ -19,8 +19,7 @@ struct message {
 };
 
 void storeMessage(string& fileName, string& message);
-int stringToInt(string str);
-double stringToDouble(string str);
+//int stringToInt(string str);
 message* createNewMessage(string incomingMessage);
 
 #endif
