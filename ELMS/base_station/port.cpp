@@ -108,10 +108,10 @@ length is for how much data is going to be written
 returns the amount of data that was written
 =============
 */
-DWORD Port::writeToSerialPort(char* data, int length)
+DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
 {
     DWORD dwBytesRead = 0;
-    if (!WriteFile(hSerial, data, length, &dwBytesRead, NULL))
+    if (!WriteFile(handle, data, length, &dwBytesRead, NULL))
     {
         perror("WriteFile ");
         DWORD dw = GetLastError();
