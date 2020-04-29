@@ -41,7 +41,7 @@ class Port
         ~Port();
         void openSerialPort(LPCSTR); 
         DWORD readFromSerialPort(char*, int);
-        DWORD writeToSerialPort(char*, int);
+        DWORD writeToSerialPort(char*, int, HANDLE);
         void closeSerialPort(HANDLE);
         HANDLE setupPort(LPCSTR);
         HANDLE createPort(LPCSTR);
