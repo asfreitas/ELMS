@@ -29,7 +29,7 @@ using std::setprecision;
 // this is easily changed and we can make any number we want. 
 #define MESSAGE_LIMIT 5
 
-static vector<Vehicle>mine_vehicles;
+//static vector<Vehicle>mine_vehicles;
 static vector<Vehicle>priority_list;
 class Base_Unit
 {
@@ -46,6 +46,7 @@ class Base_Unit
     static string alertFile;
     static string netFailFile;
     static string miscErrorFile;
+    static vector<Vehicle>mine_vehicles;
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
@@ -74,12 +75,14 @@ public:
     vector<Vehicle>getMineVehicles();
     void addToPriorityQueue(Vehicle& v);
     vector<Vehicle>getPriorityQueue();
-    void input_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles, Port& p);
-    void update_data(struct message* ptr, Vehicle& v, vector<Vehicle>& mineVehicles);
+    void input_data(struct message* ptr, Vehicle& v, Port& p, HANDLE &h);
+    void update_data(struct message* ptr, Vehicle& v, vector<Vehicle> & veh);
     int get_size(vector<Vehicle>& v);
     int contains_id_number(vector<Vehicle>& v, int id, int& index);
-    vector<int> checkDistancesInMasterVector(Vehicle& v, double& d);
+    vector<int> checkDistancesInMasterVector(Vehicle& v, double& d, vector<Vehicle> & veh);
     void updateMasterPriority(Vehicle& v);
+    void setVehicleInMineVehicles(int index, int time, double latitude, double longitude,
+        double velocity, double bearing, int priority);
 };
 
 #endif // !BASE_UNIT_H
