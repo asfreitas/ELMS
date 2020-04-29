@@ -81,6 +81,7 @@ haversine
 */
 double Calculations::haversine(Vehicle *vehicle1, Vehicle *vehicle2){
 
+
 	double a, result, phi_1, 
 		phi_2, delta_phi, delta_lambda;
 	
