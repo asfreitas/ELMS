@@ -38,9 +38,14 @@ using std::thread;
  * Youtube video. https://www.youtube.com/watch?v=t1wqj6J6Vhs
  */
 
- //#ifdef _MSC_VER
- //#define strtok_r strtok_s
- //#endif
+ /* To use OpenMP if you are using Visual Studio you may need to change your
+  * configuration Properties-> C/C++ -> Language -> Language -> OpenMP Support
+  * to "Yes(/openmp)".   Reference for this is CS 475 Parallel Programming
+  * Notes OpenMP Lecture Slide 6 written by Professor Bailey */
+
+#ifndef _OPENMP
+void printf_notice();
+#endif
 
   /* A note about how to compile this program using a makefile in mingw
    * change directory to your files. Then run: mingw32-make all
@@ -145,3 +150,7 @@ int main()
     return 0;
 }
 
+void printf_notice()
+{
+	fprintf(stderr, "OpenMP is not supported \n");
+}
