@@ -119,7 +119,7 @@ int main()
 					// added to the vector of mine vehicles
 					vehicle = new Vehicle();
 					//set the index to the size of the mineVehicles
-					index = b.getMineVehicles1().size();
+					index = b.getMineVehicles().size();
 					// add the vehicle pointer to the vector
 					b.addToMineVehicles1(vehicle);
 					//this function is going to have a mutex and lock within the input_data function
@@ -132,8 +132,8 @@ int main()
 			}
 			count++;
 			// only print again if we added or updated vehicles
-			mineVehicles = b.getMineVehicles1();
-			b.print_vector1(mineVehicles);
+			mineVehicles = b.getMineVehicles();
+			b.print_vector(mineVehicles);
 		}
 		else
 		{
@@ -145,8 +145,6 @@ int main()
 
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
-	//call the Base_Unit destructor to free the ptr's in the mineVehicles vector
-	b.~Base_Unit();
     return 0;
 }
 

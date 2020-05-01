@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <map>
 #include <iterator>
-//#include <iterator>
 using std::string;
 using std::vector;
 using std::map;
@@ -49,7 +48,7 @@ class Base_Unit
     static string alertFile;
     static string netFailFile;
     static string miscErrorFile;
-    static vector<Vehicle>mine_vehicles;
+    //static vector<Vehicle>mine_vehicles;
     static vector<Vehicle*>mine_vehicles1;
 
     //this is the path to the folder that stores the logs. It has a set function
@@ -58,6 +57,7 @@ class Base_Unit
 public:
     ~Base_Unit();
 
+    /* Log File Functions*/
     bool checkMessageCount(int type);
     void logFile(string& fileName, string* inputMessage, int type);
     void lockWriteFile(string& filePath, string* inputMessage);
@@ -76,34 +76,30 @@ public:
     string getCurrentFileName(int type);
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
-    void addToMineVehicles(Vehicle& v);
     void addToMineVehicles1(Vehicle *v);
 
-    void print_vector(vector<Vehicle>& v);
-    void print_vector1(vector<Vehicle*> v);
+    /* Print Function*/
+    void print_vector(vector<Vehicle*> v);
 
 
-    vector<Vehicle>getMineVehicles();
-    vector<Vehicle*> getMineVehicles1();
-    void addToPriorityQueue(Vehicle& v);
-    vector<Vehicle>getPriorityQueue();
+    /* Get Functions for the Master Vector Containing Vehicle Objects*/
+    vector<Vehicle*> getMineVehicles();
+    int get_size(vector<Vehicle*>& v);
+
+    /*Set Functions for the Master Vector Containing Vehicle Objects */
+    void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
+        double velocity, double bearing, int priority);
+    void setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude,
+        double velocity, double bearing, int priority);
+    
+    /* Functions to input, update, check for vehicle id's and distances from
+     * other vehicles */
     void input_data(int index, struct message* ptr,Port& p, HANDLE& h);
 
     void update_data(struct message* ptr, int indice);
-    int get_size(vector<Vehicle>& v);
-    int get_size1(vector<Vehicle*>& v);
 
-    int contains_id_number(int id, int& index);
     int contains_id_number1(int id, int& index);
-    map<int, double> checkDistancesInMasterVector(Vehicle& v);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
-    void updateMasterPriority(Vehicle& v);
-    void setVehicleInMineVehicles1(Vehicle &, int time, double latitude, double longitude,
-        double velocity, double bearing, int priority);
-    void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
-       double velocity, double bearing, int priority);
-    void setVehicleInMineVehicles2(Vehicle *v, int time, double latitude, double longitude,
-        double velocity, double bearing, int priority);
 };
 
 #endif // !BASE_UNIT_H
