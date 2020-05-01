@@ -11,9 +11,14 @@
 //using std::priority_queue;
 #include <iostream>
 #include <algorithm>
+#include <map>
+#include <iterator>
 using std::cout;
 using std::endl;
 using std::vector;
+using std::map;
+using std::pair;
+using std::iterator;
 
 class Vehicle
 {
@@ -26,17 +31,11 @@ class Vehicle
         double bearing;
         int priority;
         vector<Vehicle> vectorVehicles;
+        // this map holds the unit number of another vehicle and the distance
+        // it is away from this vehicle object
+        map<int, double>distance_to_other_vehicles;
 
-    public:
-
-        // declare a bool operator so that we can sort any vector of vehicles
-        // by priority number. Reference:
-        // https://stackoverflow.com/questions/16507717/sorting-a-vector-in-c-by-accessing-a-private-member
-        bool operator<(const Vehicle& other)const
-        {
-            return priority < other.priority;
-        }
-        
+    public:     
         //create default constructor
         Vehicle();
 
@@ -62,17 +61,26 @@ class Vehicle
         double getVelocity();
         double getBearing();
         int getPriorityNumber();
-        vector<Vehicle> getVehicleVector();
+        map<int, double>* getMapOfVehicles();
+        int getMapSize(Vehicle& v);
         int getVehicleID() { return unit; }
 
         //regular functions
 
         //Sort a vector of Vehicles by priority number
-        void sortVehicleVector(vector<Vehicle>&);
+        void sortVehicleVector1(vector<Vehicle*>);
         //add a vehicle to the vector
         void addVehicleVector(Vehicle, int);
         //check if a vehicle is in the vector
         bool checkVehicleVector(int);
+        void updateVehicleMap(Vehicle &v, int vehicle_id, double distance);
+        void updateVehicleMap1(Vehicle* v, int vehicle_id, double distance);
+        /* https://stackoverflow.com/questions/16366978/stdsort-on-a-vector-of-class-pointers*/
+        static bool compById(const Vehicle* a, const Vehicle* b)
+        {
+            return a->priority < b->priority;
+        }
+
         
 };
 
