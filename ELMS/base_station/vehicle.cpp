@@ -127,60 +127,14 @@ This sorts a vector of Vehicles by their priority number.
 It uses a bool operator defined in the class public members
 =============
 */
-void Vehicle::sortVehicleVector1(vector<Vehicle*>v)
+void Vehicle::sortVehicleVector(vector<Vehicle*>v)
 {
-    //std::sort(v.begin(), v.end(), [](Vehicle* a, Vehicle* b) {return a->getPriorityNumber() < b->getPriorityNumber(); });
+
     sort(v.begin(), v.end(), compById);
 }
 
-/*
-=============
-addVehicleVector
-vehicleUnit		Vehicle object we want to add
-position        Position we want to insert the new vehicle before
-Adds the vehicle unit to the vehicle vector list at specified position
-=============
-*/
-void Vehicle::addVehicleVector(Vehicle vehicleUnit, int position) {
-    //create iterator for vector position
-    auto it = vectorVehicles.begin() + position;
-    vectorVehicles.insert(it, vehicleUnit);
-}
 
-//check to see if vehicle exists in vector
-bool Vehicle::checkVehicleVector(int vehicleUnit){
-    unsigned i = 0;
-
-    //search vector for unit, if find, send unit number
-    for (i; i < vectorVehicles.size(); i++) {
-        if (vectorVehicles[i].unit == vehicleUnit) {
-            return true;
-        }
-    }
-    //If not found, return -1;
-    return false;
-
-}
-
-void Vehicle::updateVehicleMap(Vehicle & v, int vehicle_id, double distance)
-{    
-    bool found = false;
-    //while (itr != distance_to_other_vehicles.end()) {
-    for(auto itr:*v.getMapOfVehicles())
-    {
-        if (itr.first == vehicle_id)
-        {
-            itr.second = distance;
-        }
-
-    }
-    if (found == false)
-    {
-        v.getMapOfVehicles()->insert(std::make_pair(vehicle_id, distance));
-    }
-}
-
-void Vehicle::updateVehicleMap1(Vehicle* v, int vehicle_id, double distance)
+void Vehicle::updateVehicleMap(Vehicle* v, int vehicle_id, double distance)
 {
     bool found = false;
     for (auto itr : *v->getMapOfVehicles())

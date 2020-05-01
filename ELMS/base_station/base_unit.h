@@ -49,7 +49,7 @@ class Base_Unit
     static string netFailFile;
     static string miscErrorFile;
     //static vector<Vehicle>mine_vehicles;
-    static vector<Vehicle*>mine_vehicles1;
+    static vector<Vehicle*>mine_vehicles;
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
@@ -98,7 +98,7 @@ public:
 
     void update_data(struct message* ptr, int indice);
 
-    int contains_id_number1(int id, int& index);
+    int contains_id_number(int id, int& index);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
 };
 

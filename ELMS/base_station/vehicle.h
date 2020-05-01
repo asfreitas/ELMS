@@ -30,7 +30,6 @@ class Vehicle
         double velocity;
         double bearing;
         int priority;
-        vector<Vehicle> vectorVehicles;
         // this map holds the unit number of another vehicle and the distance
         // it is away from this vehicle object
         map<int, double>distance_to_other_vehicles;
@@ -68,13 +67,14 @@ class Vehicle
         //regular functions
 
         //Sort a vector of Vehicles by priority number
-        void sortVehicleVector1(vector<Vehicle*>);
-        //add a vehicle to the vector
-        void addVehicleVector(Vehicle, int);
-        //check if a vehicle is in the vector
-        bool checkVehicleVector(int);
-        void updateVehicleMap(Vehicle &v, int vehicle_id, double distance);
-        void updateVehicleMap1(Vehicle* v, int vehicle_id, double distance);
+        void sortVehicleVector(vector<Vehicle*>);
+
+        //update the Vehicle map by either adding to it or updating current
+        // information. 
+        void updateVehicleMap(Vehicle* v, int vehicle_id, double distance);
+
+        /*This defined a bool operator which is used to sort a vector of vehicles
+         * This is used to sort the mine_vehicles vector./
         /* https://stackoverflow.com/questions/16366978/stdsort-on-a-vector-of-class-pointers*/
         static bool compById(const Vehicle* a, const Vehicle* b)
         {
