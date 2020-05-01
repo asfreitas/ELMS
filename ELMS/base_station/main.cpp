@@ -65,14 +65,8 @@ int main()
 	string path = b.getPathToLogs();
 	int index;
 
-
-	/* reference I used for how to create and return a smart pointer
-	 * https://www.cplusplus.com/forum/beginner/237243/
-	 */
-	 //unique_ptr<struct message> ptr(new struct message);
-
 	 //declare the vector that will contain all of the vehicles in the mine
-	vector<Vehicle>vehicles_in_mine;
+	vector<Vehicle*>mineVehicles;
 
 	//This function is called to create the log directories that will be 
 	// used in the program...if they do not already exist. 
@@ -87,6 +81,9 @@ int main()
 	Port p(portname);
 	bool startNewLog = false;
 
+	//declare a pointer to a Vehicle v
+	Vehicle* vehicle;
+
 	/* SetCommMask sets the event that will cause a notification
 	 * in this case, we use EV_RXCHAR which means that a new character was
 	 * received a put in the input buffer
@@ -95,7 +92,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 20)
+	while (p.isPortReady() && count < 10)
 	{
 
 		if (!p.isBufferEmpty())
@@ -118,35 +115,38 @@ int main()
 				{
 					// declare a pointer to a message struct
 					struct message* ptr = createNewMessage(data);
-					//declare a vehicle object that will either be added to
-					// the master list or will have their vehicle updated.
-					Vehicle vehicle = Vehicle();
-					index = b.getMineVehicles().size();
-					b.addToMineVehicles(vehicle);
+					//declare a pointer to a vehicle object that will either be
+					// added to the vector of mine vehicles
+					vehicle = new Vehicle();
+					//set the index to the size of the mineVehicles
+					index = b.getMineVehicles1().size();
+					// add the vehicle pointer to the vector
+					b.addToMineVehicles1(vehicle);
 					//this function is going to have a mutex and lock within the input_data function
 					HANDLE h = p.getHandle();
 					b.input_data(index, ptr, p, h);
-
+					// free the ptr memory
 					delete ptr;
 
 				}
 			}
 			count++;
-
+			// only print again if we added or updated vehicles
+			mineVehicles = b.getMineVehicles1();
+			b.print_vector1(mineVehicles);
 		}
 		else
 		{
 			//cout << "The buffer is empty" << endl;
 		}
-		vehicles_in_mine = b.getMineVehicles();
-		b.print_vector(vehicles_in_mine);
-		//cout << "_________________________________________________________" << endl;
+
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	} /* end while loop */
 
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
-
+	//call the Base_Unit destructor to free the ptr's in the mineVehicles vector
+	b.~Base_Unit();
     return 0;
 }
 
