@@ -226,7 +226,7 @@ Port::~Port()
         messageThread.join();
     if (portThread.joinable())
         portThread.join();
-    waitCommMask(EV_TXEMPTY); // make sure that there is nothing left to send before closing
+   // waitCommMask(EV_TXEMPTY); // make sure that there is nothing left to send before closing
     closeSerialPort(hSerial);
     
 }
