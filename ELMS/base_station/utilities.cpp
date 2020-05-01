@@ -53,3 +53,45 @@ string doubleToString(double num)
 	return str2;
 
 }
+/* Reference for this is: https://thispointer.com/how-to-sort-a-map-by-value-in-c/
+   What this funtion does is take the address of a vector pair and map. It then 
+   copies the key/values from the map into the vector of pairs, then sorts these
+   pairs and returns the sorted vector of pairs.  The vector of pairs is
+   sorted based on the second element which is distance.
+*/
+vector<pair<int,double>> * sortMap(vector<pair<int, double>>& vehicles, map<int, double>& mapOfDistances)
+{
+
+	// copy key-value pairs from the map to the vector
+	for (pair<int, double> element : mapOfDistances)
+	{
+		vehicles.push_back(std::make_pair(element.first, element.second));
+	}
+	// sort the vehicles by increasing order of the distance (the second item)
+	sort(vehicles.begin(), vehicles.end(), sortByVal);
+
+	return &vehicles;
+}
+
+// comparator function
+// Reference: https://www.educative.io/edpresso/how-to-sort-a-map-by-value-in-cpp
+bool sortByVal(const pair<int, double>& a, const pair<int, double>& b)
+{
+	return (a.second < b.second);
+}
+
+/* prints the key and values in a map
+   Reference: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+*/
+void printMap(map<int, double>* mapVehicles)
+{
+	cout << "Map of Other Vehicles and Their Distance" << endl;
+	cout << "\tVehicle ID\tDistance\n";
+	for (pair<int, double> element : *mapVehicles)
+	{
+		cout << '\t' << element.first
+			<< '\t' << element.second << '\n';
+	}
+	cout << endl;
+}
+
