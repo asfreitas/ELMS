@@ -50,11 +50,14 @@ class Base_Unit
     static string netFailFile;
     static string miscErrorFile;
     static vector<Vehicle>mine_vehicles;
+    static vector<Vehicle*>mine_vehicles1;
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
     string pathToLogs = "C:\\logs";
 public:
+    ~Base_Unit();
+
     bool checkMessageCount(int type);
     void logFile(string& fileName, string* inputMessage, int type);
     void lockWriteFile(string& filePath, string* inputMessage);
@@ -74,20 +77,33 @@ public:
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
     void addToMineVehicles(Vehicle& v);
+    void addToMineVehicles1(Vehicle *v);
+
     void print_vector(vector<Vehicle>& v);
+    void print_vector1(vector<Vehicle*> v);
+
+
     vector<Vehicle>getMineVehicles();
+    vector<Vehicle*> getMineVehicles1();
     void addToPriorityQueue(Vehicle& v);
     vector<Vehicle>getPriorityQueue();
     void input_data(int index, struct message* ptr,Port& p, HANDLE& h);
+
     void update_data(struct message* ptr, int indice);
     int get_size(vector<Vehicle>& v);
+    int get_size1(vector<Vehicle*>& v);
+
     int contains_id_number(int id, int& index);
+    int contains_id_number1(int id, int& index);
     map<int, double> checkDistancesInMasterVector(Vehicle& v);
+    map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     void updateMasterPriority(Vehicle& v);
     void setVehicleInMineVehicles1(Vehicle &, int time, double latitude, double longitude,
         double velocity, double bearing, int priority);
     void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
        double velocity, double bearing, int priority);
+    void setVehicleInMineVehicles2(Vehicle *v, int time, double latitude, double longitude,
+        double velocity, double bearing, int priority);
 };
 
 #endif // !BASE_UNIT_H
