@@ -92,7 +92,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 15)
+	while (p.isPortReady() && count < 20)
 	{
 
 		if (!p.isBufferEmpty())
@@ -121,7 +121,7 @@ int main()
 					//set the index to the size of the mineVehicles
 					index = b.getMineVehicles().size();
 					// add the vehicle pointer to the vector
-					b.addToMineVehicles1(vehicle);
+					b.addToMineVehicles(vehicle);
 					//this function is going to have a mutex and lock within the input_data function
 					HANDLE h = p.getHandle();
 					b.input_data(index, ptr, p, h);
@@ -132,8 +132,8 @@ int main()
 			}
 			count++;
 			// only print again if we added or updated vehicles
-			mineVehicles = b.getMineVehicles();
-			b.print_vector(mineVehicles);
+			//mineVehicles = b.getMineVehicles();
+			b.print_vector(b.getMineVehicles());
 		}
 		else
 		{
@@ -142,7 +142,6 @@ int main()
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	} /* end while loop */
-
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
     return 0;
