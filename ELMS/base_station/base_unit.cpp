@@ -38,11 +38,7 @@ vector<Vehicle*> Base_Unit::mine_vehicles;
 Base_Unit::~Base_Unit()
 {
     cout << "Base_Unit destructor was called" << endl;
-    for (size_t i = 0; i < mine_vehicles.size(); i++)
-    {
-        delete mine_vehicles.at(i);
-        mine_vehicles.at(i) = nullptr;
-    }
+    std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 
 /*
@@ -513,9 +509,8 @@ void Base_Unit::getFilePath(string& fileName, int type)
 }
 
 
-// Reference for how to move a unique_ptr
-//https://stackoverflow.com/questions/3283778/why-can-i-not-push-back-a-unique-ptr-into-a-vector
-void Base_Unit::addToMineVehicles1(Vehicle* v)
+// Add the vehicle object pointer to the vector.
+void Base_Unit::addToMineVehicles(Vehicle* v)
 {
     mine_vehicles.push_back(v);
 }
@@ -687,6 +682,8 @@ void Base_Unit::update_data(struct message* ptr, int indice)
         //first we need to erase the duplicate we added to the end of the
         // vector and then just update the existing vehicle at its index
         //int size = mine_vehicles.size();
+        //delete the ptr created for the vector.
+        delete mine_vehicles.at(mine_vehicles.size() - 1);
         mine_vehicles.erase(mine_vehicles.begin() + mine_vehicles.size() - 1);
         setVehicleInMineVehicles2(mine_vehicles.at(index), ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
     }
