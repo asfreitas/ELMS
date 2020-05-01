@@ -33,7 +33,17 @@ string Base_Unit::alertFile = "";
 string Base_Unit::netFailFile = "";
 string Base_Unit::miscErrorFile = "";
 vector<Vehicle> Base_Unit::mine_vehicles;
+vector<Vehicle*> Base_Unit::mine_vehicles1;
 
+Base_Unit::~Base_Unit()
+{
+    cout << "Base_Unit destructor was called" << endl;
+    for (size_t i = 0; i < mine_vehicles1.size(); i++)
+    {
+        delete mine_vehicles1.at(i);
+        mine_vehicles1.at(i) = nullptr;
+    }
+}
 
 /*
  * Function: checkMessageCount(int type)
@@ -507,6 +517,13 @@ void Base_Unit::addToMineVehicles(Vehicle& v)
     mine_vehicles.push_back(v);
 }
 
+// Reference for how to move a unique_ptr
+//https://stackoverflow.com/questions/3283778/why-can-i-not-push-back-a-unique-ptr-into-a-vector
+void Base_Unit::addToMineVehicles1(Vehicle* v)
+{
+    mine_vehicles1.push_back(v);
+}
+
 /* prints the contents held in the mine_vehicle vector*/
 void Base_Unit::print_vector(vector<Vehicle>& v)
 {
@@ -528,14 +545,53 @@ void Base_Unit::print_vector(vector<Vehicle>& v)
         cout << "velocity: " << itr.getVelocity() << endl;
         cout << "bearing: " << itr.getBearing() << endl;
         cout << "priority: " << itr.getPriorityNumber() << endl << endl;
+        if (itr.getMapSize(itr) > 0)
+        {
+           map<int, double>*mapVehicles = itr.getMapOfVehicles();
+           printMap(mapVehicles);
+        }
     }
     cout << "***************************************" << endl << endl;
 
 }
 
+void Base_Unit::print_vector1(vector<Vehicle*> v)
+{
+    if (v.size() == 0)
+        return;
+    //cout << "The size of the vector in print function is: " << v.size() << endl;
+    cout << "**********************************" << endl << endl;
+
+    for (auto itr : v)
+    {
+        cout << "*****VEHICLE " << itr->getUnit() << " *****" << endl;
+        cout << std::fixed;
+        cout << std::setprecision(5);
+        cout << "latitude: " << itr->getLatitude() << endl;
+        cout << "longitude: " << itr->getLongitude() << endl;
+        cout << std::fixed;
+        cout << std::setprecision(0);
+        cout << "time_stamp: " << itr->getTime() << endl;
+        cout << "velocity: " << itr->getVelocity() << endl;
+        cout << "bearing: " << itr->getBearing() << endl;
+        cout << "priority: " << itr->getPriorityNumber() << endl << endl;
+        if (itr->getMapSize(*itr) > 0)
+        {
+            map<int, double>* mapVehicles = itr->getMapOfVehicles();
+            printMap(mapVehicles);
+        }
+    }
+    cout << "***************************************" << endl << endl;
+}
+
 vector<Vehicle> Base_Unit::getMineVehicles()
 {
     return mine_vehicles;
+}
+
+vector<Vehicle*> Base_Unit::getMineVehicles1()
+{
+    return mine_vehicles1;
 }
 
 void Base_Unit::addToPriorityQueue(Vehicle& v)
@@ -562,24 +618,24 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
     char fileName[100];
     double speed, distance = 0, bearing;
     int index;
-    //this map holds vehicles that are within 50 meters or less of the input
-    // vehicle.  The int is the index in the master list of that vehicle and
-    // the double is the distance. 
+    
+    //iterator that will be used to iterate thru a map
     map<int, double>::iterator itr;
 
-    size = get_size(mine_vehicles);
+    //size = get_size(mine_vehicles);
+    size = get_size1(mine_vehicles1);
     //if the size of the vector is 0, then we know we need to add the 
     // vehicle to the vector
     if (size == 0)
     {
-
-        mine_vehicles.at(indice).setBearing(ptr->bearing);
-        mine_vehicles.at(indice).setLatitude(ptr->latitude);
-        mine_vehicles.at(indice).setLongitude(ptr->longitude);
-        mine_vehicles.at(indice).setTime(ptr->time);
-        mine_vehicles.at(indice).setUnit(ptr->vehicle);
-        mine_vehicles.at(indice).setVelocity(ptr->velocity);
-        mine_vehicles.at(indice).setPriority(3);
+  
+        mine_vehicles1.at(indice)->setBearing(ptr->bearing);
+        mine_vehicles1.at(indice)->setLatitude(ptr->latitude);
+        mine_vehicles1.at(indice)->setLongitude(ptr->longitude);
+        mine_vehicles1.at(indice)->setTime(ptr->time);
+        mine_vehicles1.at(indice)->setUnit(ptr->vehicle);
+        mine_vehicles1.at(indice)->setVelocity(ptr->velocity);
+        mine_vehicles1.at(indice)->setPriority(3);
 
     }
     // otherwise, we check to see if the vehicle id already exists
@@ -594,8 +650,14 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         //now the newly added node or updated node needs to have their distance
         // checked to all the other nodes. 
         //need to check for the index again where the vehicles is.
-        contains_id_number(ptr->vehicle, index);
-        map<int, double>list = checkDistancesInMasterVector(mine_vehicles.at(index));
+        contains_id_number1(ptr->vehicle, index);
+
+
+        //this map holds vehicles that are within 50 meters or less of the input
+        // vehicle.  The int is the index in the master list of that vehicle and
+        // the double is the distance.
+
+        map<int, double>list = checkDistancesInMasterVector1(mine_vehicles1.at(index));
         //next we iterate through the map with the distances and send out alerts
         if (list.size() > 0)
         {
@@ -608,13 +670,16 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 //The list contains the index in the master list of vehicles that is
                 // in immediate danger of collision. Set the second vehicle to this
                 // index
-                Vehicle v1 = mine_vehicles.at(itr->first);
+                Vehicle *v1 = mine_vehicles1.at(itr->first);
 
                 // now we get the bearing
-                bearing = calc.getBearing(&mine_vehicles.at(index), &v1);
+                // bearing = calc.getBearing(&mine_vehicles.at(index), &v1);
+                bearing = calc.getBearing(mine_vehicles1.at(index), v1);
                 // we create the outgoing message;
-                outgoing_message(alertMessage, ptr->vehicle, v1.getUnit(), ptr->time, speed,
-                    itr->second, bearing);
+                outgoing_message(alertMessage, ptr->vehicle, v1->getUnit(), ptr->time, speed,
+                        itr->second, bearing);
+
+
 
                 //copy the message to use to create the log file for the alert
                 alertLogMessage = alertMessage;
@@ -634,8 +699,9 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         }
 
         // now we need to sort the mine_vehicles
-        Vehicle v;
-        v.sortVehicleVector(mine_vehicles);
+        std::sort(mine_vehicles1.begin(), mine_vehicles1.end(), Vehicle::compById);
+        
+        
 
         //now we need to add these vehicles to each other's priority queues as well
         // as add the vehicles to the master unit's priority queue. 
@@ -649,18 +715,18 @@ void Base_Unit::update_data(struct message* ptr, int indice)
     mtx_update_master.lock();
     int duplicate, index;
     //check for a duplicate id
-    duplicate = contains_id_number(ptr->vehicle, index);
+    duplicate = contains_id_number1(ptr->vehicle, index);
  
     //if duplicate is 0, this means that this is a new vehicle
     if (duplicate == 0)
     {
-        mine_vehicles.at(indice).setBearing(ptr->bearing);
-        mine_vehicles.at(indice).setLatitude(ptr->latitude);
-        mine_vehicles.at(indice).setLongitude(ptr->longitude);
-        mine_vehicles.at(indice).setTime(ptr->time);
-        mine_vehicles.at(indice).setUnit(ptr->vehicle);
-        mine_vehicles.at(indice).setVelocity(ptr->velocity);
-        mine_vehicles.at(indice).setPriority(3);
+        mine_vehicles1.at(indice)->setBearing(ptr->bearing);
+        mine_vehicles1.at(indice)->setLatitude(ptr->latitude);
+        mine_vehicles1.at(indice)->setLongitude(ptr->longitude);
+        mine_vehicles1.at(indice)->setTime(ptr->time);
+        mine_vehicles1.at(indice)->setUnit(ptr->vehicle);
+        mine_vehicles1.at(indice)->setVelocity(ptr->velocity);
+        mine_vehicles1.at(indice)->setPriority(3);
     }
     //otherwise, this is a duplicate id and we need to update
     // the Vehicle objects location data
@@ -669,14 +735,18 @@ void Base_Unit::update_data(struct message* ptr, int indice)
         //first we need to erase the duplicate we added to the end of the
         // vector and then just update the existing vehicle at its index
         int size = mine_vehicles.size();
-        mine_vehicles.erase(mine_vehicles.begin() + mine_vehicles.size() - 1);
-        setVehicleInMineVehicles(index, ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
+        mine_vehicles1.erase(mine_vehicles1.begin() + mine_vehicles1.size() - 1);
+        setVehicleInMineVehicles2(mine_vehicles1.at(index), ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
     }
     mtx_update_master.unlock();
-
 }
 // returns the size of the vector
 int Base_Unit::get_size(vector<Vehicle>& v)
+{
+    return v.size();
+}
+
+int Base_Unit::get_size1(vector<Vehicle*>& v)
 {
     return v.size();
 }
@@ -687,6 +757,20 @@ int Base_Unit::contains_id_number(int id, int& index)
     for (size_t i = 0; i < getMineVehicles().size(); i++)
     {
         if (getMineVehicles().at(i).getUnit() == id)
+        {
+            index = i;
+
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int Base_Unit::contains_id_number1(int id, int& index)
+{
+    for (size_t i = 0; i < getMineVehicles1().size(); i++)
+    {
+        if (getMineVehicles1().at(i)->getUnit() == id)
         {
             index = i;
             //cout << "the index is: " << index << endl;
@@ -718,6 +802,16 @@ map<int,double> Base_Unit::checkDistancesInMasterVector(Vehicle& v)
             //distance returns as km, need to change to meters so multiply
             // by 1000
             distance = 1000 * distance;
+
+            //update the current vehicles distances from other vehicles
+            v.updateVehicleMap(v, getMineVehicles().at(i).getUnit(), distance);
+           
+
+            //we also need to update the other vehicles distances as well. 
+            
+            v.updateVehicleMap(getMineVehicles().at(i), getMineVehicles().at(i).getUnit(), distance);
+           
+
             //if the result is 50 or less than the index of the vehicle in the 
             // master list and it's distance is inserted into the map
             if (distance <= 50)
@@ -733,11 +827,9 @@ map<int,double> Base_Unit::checkDistancesInMasterVector(Vehicle& v)
             else if (distance > 50 && distance <= 75 && !set)
             {
                 
-                //mining_vehicles.at(index).setPriority(1);
                 setVehicleInMineVehicles1(v, -1, -1, -1, -1, -1, 1);
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 1);
                 
-
             }
             else if (distance > 75 && distance < 100 && !set && v.getPriorityNumber()>2)
             {
@@ -750,6 +842,69 @@ map<int,double> Base_Unit::checkDistancesInMasterVector(Vehicle& v)
                 setVehicleInMineVehicles1(v, -1, -1, -1, -1, -1, 3);
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 3);
           
+            }
+        }
+    }
+    return listOfAlerts;
+}
+
+map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
+{
+    Calculations c;
+    map<int, double> listOfAlerts;
+    bool set = false;
+    double distance;
+
+    //iterate through the master list of vehicles
+    for (size_t i = 0; i < getMineVehicles1().size(); i++)
+    {
+        
+        if (getMineVehicles1().at(i)->getUnit() != v->getUnit())
+        {
+            // get the distance
+            distance = c.haversine(v, mine_vehicles1.at(i));
+            //distance returns as km, need to change to meters so multiply
+            // by 1000
+            distance = 1000 * distance;
+
+            //update the current vehicles distances from other vehicles
+            v->updateVehicleMap1(v, getMineVehicles1().at(i)->getUnit(), distance);
+
+            //we also need to update the other vehicles distances as well. 
+
+            v->updateVehicleMap1(getMineVehicles1().at(i), v->getUnit(), distance);
+
+            //if the result is 50 or less than the index of the vehicle in the 
+            // master list and it's distance is inserted into the map
+            if (distance <= 50)
+            {
+                listOfAlerts.insert(pair<int, double>(i, distance));
+                // set both of the vehicles priority numbers to 0
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0);
+                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0);
+                // a 0 priority was set, so this needs to remain
+                set = true;
+
+            }
+            else if (distance > 50 && distance <= 75 && !set)
+            {
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 1);
+                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1);
+
+
+            }
+            else if (distance > 75 && distance < 100 && !set && v->getPriorityNumber()>2)
+            {
+                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 2);
+
+            }
+            else if (distance >= 100 && !set && v->getPriorityNumber() > 3)
+            {
+                
+                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 3);
+
             }
         }
     }
@@ -773,27 +928,55 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
 {
     if (time != -1)
     {
-        mine_vehicles.at(index).setTime(time);
+        mine_vehicles1.at(index)->setTime(time);
     }
     if (latitude != -1)
     {
-        mine_vehicles.at(index).setLatitude(latitude);
+        mine_vehicles1.at(index)->setLatitude(latitude);
     }
     if (longitude != -1)
     {
-        mine_vehicles.at(index).setLongitude(longitude);
+        mine_vehicles1.at(index)->setLongitude(longitude);
     }
     if (velocity != -1)
     {
-        mine_vehicles.at(index).setVelocity(velocity);
+        mine_vehicles1.at(index)->setVelocity(velocity);
     }
     if (bearing != -1)
     {
-        mine_vehicles.at(index).setBearing(bearing);
+        mine_vehicles1.at(index)->setBearing(bearing);
     }
     if (priority != -1)
     {
-        mine_vehicles.at(index).setPriority(priority);
+        mine_vehicles1.at(index)->setPriority(priority);
+    }
+}
+
+void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude, double velocity, double bearing, int priority)
+{
+    if (time != -1)
+    {
+        v->setTime(time);
+    }
+    if (latitude != -1)
+    {
+        v->setLatitude(latitude);
+    }
+    if (longitude != -1)
+    {
+        v->setLongitude(longitude);
+    }
+    if (velocity != -1)
+    {
+        v->setVelocity(velocity);
+    }
+    if (bearing != -1)
+    {
+        v->setBearing(bearing);
+    }
+    if (priority != -1)
+    {
+        v->setPriority(priority);
     }
 }
 
