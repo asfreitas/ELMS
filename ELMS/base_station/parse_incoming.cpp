@@ -68,3 +68,4 @@ message* createNewMessage(string incomingMessage)
 	return newMessage;
 
 }
+

@@ -49,6 +49,7 @@ using std::thread;
 
 int main()
 {
+
 	//used to check for memory leak
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
@@ -71,14 +72,13 @@ int main()
 
 	//This function is called to create the log directories that will be 
 	// used in the program...if they do not already exist. 
-	b.createFolder();
 
 	// this function call creates the name of the file and the path to it. 
 	// this will be used to open the files and write to them. 
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
-	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
+	b.getPathToLogFile();
+	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
 	Port p(portname);
 	bool startNewLog = false;
 
@@ -106,7 +106,7 @@ int main()
                 #pragma omp section
 				{
 					cout << incomingMessage << endl;
-					b.logFile(fileName, &incomingMessage, 0);
+					b.logToFile(fileName, incomingMessage, MessageType::incoming);
 				}
 
                 #pragma omp section

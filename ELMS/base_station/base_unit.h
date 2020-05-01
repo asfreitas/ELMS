@@ -12,16 +12,17 @@
 #include <iomanip>
 #include <Windows.h>
 #include <vector>
+#include <algorithm>
+#include <map>
+#include <iterator>
 #include "parse_incoming.h"
 #include "outgoing.h"
 #include "utilities.h"
 #include "vehicle.h"
-#include "parse_incoming.h"
 #include "calculations.h"
 #include "port.h"
-#include <algorithm>
-#include <map>
-#include <iterator>
+#include "fileio.h"
+
 //#include <iterator>
 using std::string;
 using std::vector;
@@ -34,6 +35,7 @@ using std::setprecision;
 #define MESSAGE_LIMIT 5
 
 static vector<Vehicle>priority_list;
+
 class Base_Unit
 {
     // using static variables will be the same value for all class objects.
@@ -41,38 +43,18 @@ class Base_Unit
     //The vector of Vehicles functions as a "master list" of all the vehicles
     // that are currently in the mine
     //static vector<Vehicle>mine_vehicles;
-    static int messageCount;
-    static int alertCount;
-    static int networkCount;
-    static int miscCount;
     static string logFileName;
     static string alertFile;
     static string netFailFile;
     static string miscErrorFile;
     static vector<Vehicle>mine_vehicles;
+    FileIO fileHandler;
+
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
-    string pathToLogs = "C:\\logs";
 public:
-    bool checkMessageCount(int type);
-    void logFile(string& fileName, string* inputMessage, int type);
-    void lockWriteFile(string& filePath, string* inputMessage);
-    int getMessageCount(int type);
-    void resetMessageCount(int type);
-    void incMessageCount(int type);
-    void createFileName(string* fileName, int type);
-    void createFolder();
-    bool directoryExists(const std::string& directoryName);
-    void setPathToLogs(string& path);
-    string getPathToLogs();
-    string getPathToMessages();
-    string getPathToAlerts();
-    string getPathToNetWorkFailure();
-    string getPathToMiscErrors();
-    string getCurrentFileName(int type);
-    void setFileName(int type);
-    void getFilePath(string& fileName, int type);
+    void logToFile(std::string, std::string, MessageType);
     void addToMineVehicles(Vehicle& v);
     void print_vector(vector<Vehicle>& v);
     vector<Vehicle>getMineVehicles();
@@ -85,9 +67,14 @@ public:
     map<int, double> checkDistancesInMasterVector(Vehicle& v);
     void updateMasterPriority(Vehicle& v);
     void setVehicleInMineVehicles1(Vehicle &, int time, double latitude, double longitude,
-        double velocity, double bearing, int priority);
+    double velocity, double bearing, int priority);
     void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
-       double velocity, double bearing, int priority);
+    double velocity, double bearing, int priority);
+    string getPathToMessages() { return fileHandler.getPathToMessages(); }
+    string getPathToLogs() { return fileHandler.getPathToLogs(); }
+    string getPathToLogFile() { return fileHandler.getLogFilePath(); }
+    Base_Unit() : fileHandler("C:\\", 5) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+
 };
 
 #endif // !BASE_UNIT_H
