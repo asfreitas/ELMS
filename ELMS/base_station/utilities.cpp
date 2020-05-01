@@ -85,8 +85,8 @@ bool sortByVal(const pair<int, double>& a, const pair<int, double>& b)
 */
 void printMap(map<int, double>* mapVehicles)
 {
-	cout << "Map of Other Vehicles and Their Distance" << endl;
-	cout << "\tVehicle ID\tDistance\n";
+	cout << "Other Vehicles and Their Distance" << endl;
+	cout << "\tUnit\tDistance\n";
 	for (pair<int, double> element : *mapVehicles)
 	{
 		cout << '\t' << element.first
