@@ -27,6 +27,7 @@ using std::vector;
 using std::map;
 using std::pair;
 using std::setprecision;
+using std::iterator;
 
 //this is how many messages will be in each log file before it is close. 
 // this is easily changed and we can make any number we want. 
@@ -48,7 +49,6 @@ class Base_Unit
     static string alertFile;
     static string netFailFile;
     static string miscErrorFile;
-    //static vector<Vehicle>mine_vehicles;
     static vector<Vehicle*>mine_vehicles;
 
     //this is the path to the folder that stores the logs. It has a set function
@@ -76,7 +76,7 @@ public:
     string getCurrentFileName(int type);
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
-    void addToMineVehicles1(Vehicle *v);
+    void addToMineVehicles(Vehicle *v);
 
     /* Print Function*/
     void print_vector(vector<Vehicle*> v);
@@ -100,6 +100,7 @@ public:
 
     int contains_id_number(int id, int& index);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
+
 };
 
 #endif // !BASE_UNIT_H

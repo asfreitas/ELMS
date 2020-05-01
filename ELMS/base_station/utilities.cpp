@@ -95,3 +95,4 @@ void printMap(map<int, double>* mapVehicles)
 	cout << endl;
 }
 
+
