@@ -3,6 +3,7 @@
 */
 
 #include "vehicle.h"
+#include <functional>
 using std::vector;
 
 /* initialize class
@@ -19,7 +20,6 @@ Vehicle::Vehicle() {
     velocity = -1;
     bearing = -1;
     priority = 4; //initialize the priority to 4
-    vectorVehicles.clear();
 }
 
 //construct vehicle
@@ -35,7 +35,7 @@ Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, doubl
 
 //desctructor
 Vehicle::~Vehicle() {
-    //std::cout << "Vehicle destructor called " << std::endl;
+    std::cout << "Vehicle destructor called " << std::endl;
 
 }
 
@@ -109,9 +109,16 @@ int Vehicle::getPriorityNumber()
     return priority;
 }
 
-vector<Vehicle> Vehicle::getVehicleVector() {
-    return vectorVehicles;
+map<int, double>* Vehicle::getMapOfVehicles()
+{
+    return &distance_to_other_vehicles;
 }
+
+int Vehicle::getMapSize(Vehicle& v)
+{
+    return v.getMapOfVehicles()->size();
+}
+
 
 /*
 =============
@@ -120,10 +127,10 @@ This sorts a vector of Vehicles by their priority number.
 It uses a bool operator defined in the class public members
 =============
 */
-void Vehicle::sortVehicleVector(vector<Vehicle> &v) {
-
-    sort(v.begin(), v.end());
-
+void Vehicle::sortVehicleVector1(vector<Vehicle*>v)
+{
+    //std::sort(v.begin(), v.end(), [](Vehicle* a, Vehicle* b) {return a->getPriorityNumber() < b->getPriorityNumber(); });
+    sort(v.begin(), v.end(), compById);
 }
 
 /*
@@ -152,6 +159,42 @@ bool Vehicle::checkVehicleVector(int vehicleUnit){
     }
     //If not found, return -1;
     return false;
+
+}
+
+void Vehicle::updateVehicleMap(Vehicle & v, int vehicle_id, double distance)
+{    
+    bool found = false;
+    //while (itr != distance_to_other_vehicles.end()) {
+    for(auto itr:*v.getMapOfVehicles())
+    {
+        if (itr.first == vehicle_id)
+        {
+            itr.second = distance;
+        }
+
+    }
+    if (found == false)
+    {
+        v.getMapOfVehicles()->insert(std::make_pair(vehicle_id, distance));
+    }
+}
+
+void Vehicle::updateVehicleMap1(Vehicle* v, int vehicle_id, double distance)
+{
+    bool found = false;
+    for (auto itr : *v->getMapOfVehicles())
+    {
+        if (itr.first == vehicle_id)
+        {
+            itr.second = distance;
+        }
+
+    }
+    if (found == false)
+    {
+        v->getMapOfVehicles()->insert(std::make_pair(vehicle_id, distance));
+    }
 
 }
 
