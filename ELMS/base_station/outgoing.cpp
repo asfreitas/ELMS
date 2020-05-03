@@ -25,7 +25,7 @@ void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTi
     string distance1 = doubleToString(distance);
     string bearing1 = doubleToString(bearing);
 	alertMessage = "$" + unit11 + "->" + unit22 + ',' + messageTime1 + ',' + velocity1 + ',' +
-			distance1 + ',' + bearing1 + "* " + "\n" + "\r\0";
+            distance1 + ',' + bearing1 + "*" + "\n";
 }
 
 /*This is a placeholder function that will be used to create network failure messages.*/
