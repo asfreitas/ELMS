@@ -134,17 +134,21 @@ void Vehicle::sortVehicleVector(vector<Vehicle*>v)
 }
 
 /* reference on updating maps
-   https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method  */
+   https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method  
+   This function updates the vehicles map which contains the distances it is
+   from other vehicles */
 void Vehicle::updateVehicleMap(Vehicle* v, int vehicle_id, double distance)
 {
     bool found = false;
+    //declare an iterator to find if the vehicle is in the map
     auto itr = v->distance_to_other_vehicles.find(vehicle_id);
     if (itr != v->distance_to_other_vehicles.end())
     {
+        //if the vehicle id is found, then update the distance
         (*itr).second = distance;
         found = true;
     }
-
+    //if the id was not found then add the new vehicle. 
     if (found == false)
     {
         v->getMapOfVehicles()->insert(std::make_pair(vehicle_id, distance));
