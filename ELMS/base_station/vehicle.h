@@ -72,6 +72,9 @@ class Vehicle
         //update the Vehicle map by either adding to it or updating current
         // information. 
         void updateVehicleMap(Vehicle* v, int vehicle_id, double distance);
+        //find the smallest distance that a vehicle is from other vehicles contained
+        // in its map.
+        double findSmallestDistance(Vehicle* v);
 
         /*This defined a bool operator which is used to sort a vector of vehicles
          * This is used to sort the mine_vehicles vector./

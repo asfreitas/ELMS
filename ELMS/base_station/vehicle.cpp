@@ -155,4 +155,21 @@ void Vehicle::updateVehicleMap(Vehicle* v, int vehicle_id, double distance)
     }
 
 }
+//find the smallest distance that a vehicle is from other vehicles contained
+// in its map. It returns a double that represents that smallest distance.
+double Vehicle::findSmallestDistance(Vehicle* v)
+{
+    // set the min distance to a very high number
+    double min_distance = 10000000000;
+    map<int, double>* temp = v->getMapOfVehicles();
+    // declare a map iterator to iterate thru the map.
+    map<int, double>::iterator itr;
+    for(itr = temp->begin(); itr != temp->end(); itr++)
+    {
+        if ((*itr).second <= min_distance)
+            min_distance = (*itr).second;
+    }
+    return min_distance;
+
+}
 
