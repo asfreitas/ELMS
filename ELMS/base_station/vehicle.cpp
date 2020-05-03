@@ -133,18 +133,18 @@ void Vehicle::sortVehicleVector(vector<Vehicle*>v)
     sort(v.begin(), v.end(), compById);
 }
 
-
+/* reference on updating maps
+   https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method  */
 void Vehicle::updateVehicleMap(Vehicle* v, int vehicle_id, double distance)
 {
     bool found = false;
-    for (auto itr : *v->getMapOfVehicles())
+    auto itr = v->distance_to_other_vehicles.find(vehicle_id);
+    if (itr != v->distance_to_other_vehicles.end())
     {
-        if (itr.first == vehicle_id)
-        {
-            itr.second = distance;
-        }
-
+        (*itr).second = distance;
+        found = true;
     }
+
     if (found == false)
     {
         v->getMapOfVehicles()->insert(std::make_pair(vehicle_id, distance));
