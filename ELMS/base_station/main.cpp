@@ -51,7 +51,6 @@ void printf_notice();
    * change directory to your files. Then run: mingw32-make all
    * to clean: mingw32-make clean */
 
-
 int main()
 {
 	//used to check for memory leak
