@@ -731,7 +731,10 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 {
     Calculations c;
     map<int, double> listOfAlerts;
-    bool set = false;
+    bool set0 = false;
+    bool set1 = false;
+    bool set2 = false;
+    int p;
     double distance;
 
     //iterate through the master list of vehicles
@@ -762,32 +765,85 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0);
                 setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0);
                 // a 0 priority was set, so this needs to remain
-                set = true;
+                set0 = true;
 
             }
-            else if (distance > 50 && distance <= 75 && !set)
+            //else if (distance > 50 && distance <= 75 && !set)
+            else if (distance > 50 && distance <= 75)
             {
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 1);
-                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1);
+                //need to search the vehicle at i's list to make sure it does
+                // not have a higher priority before changing. 
+                p = checkOtherVehiclesPriorityNumbers(v, i, 1);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+                if (!set0)
+                {
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1);
+                    set1 = true;
+                }
 
 
             }
-            else if (distance > 75 && distance < 100 && !set && v->getPriorityNumber()>2)
+            //else if (distance > 75 && distance < 100 && !set && v->getPriorityNumber()>2)
+            else if (distance > 75 && distance < 100)
             {
-                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2);
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 2);
-
-            }
-            else if (distance >= 100 && !set && v->getPriorityNumber() > 3)
-            {
+                /* check the other vehicles distances from other vehicles before
+                   we change it's overall priority number
+                 */
+                p = checkOtherVehiclesPriorityNumbers(v, i, 2);
                 
-                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3);
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 3);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
 
+                if (!set0 && !set1)
+                {
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2);
+                    set2 = true;
+                }
+
+            }
+            //else if (distance >= 100 && !set && v->getPriorityNumber() > 3)
+            else if (distance >= 100)
+            {
+                /* check the other vehicles distances from other vehicles before
+                   we change it's overall priority number
+                 */
+                p = checkOtherVehiclesPriorityNumbers(v, i, 3);
+                /*set the other vehicle to the lowest priority number based
+                  on distances it is from other vehicles in its map*/
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+                if (!set0 && !set1 && !set2)
+                {
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3);
+                }
             }
         }
     }
     return listOfAlerts;
+}
+
+/* This function checks the vehicle at the index of the mine_vehicle to see what
+   the smallest distance is to any other vehicle.  It returns this distance*/
+int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number)
+{
+    double d;
+    int priority = 3;
+    d = v1->findSmallestDistance(mine_vehicles.at(index));
+    if (d <= 50)
+    {
+        priority = 0;
+    }
+    else if (d > 50 && d <= 75 && priority_number > 1)
+    {
+        priority = 1;
+    }
+    else if (d > 75 && d <= 100 && priority_number > 2)
+    {
+        priority = 2;
+    }
+    else
+    {
+        priority = priority_number;
+    }
+    return priority;
 }
 
 /* This updates the master vehical vector vehicles at a specific index.  If you only
@@ -819,7 +875,8 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
         mine_vehicles.at(index)->setPriority(priority);
     }
 }
-
+/*This updates the master vehical vector vehicles at a specific index.If you only
+ * want to update one value, set the other inputs to - 1 and nothing will be changed.*/
 void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude, double velocity, double bearing, int priority)
 {
     if (time != -1)

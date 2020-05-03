@@ -77,7 +77,6 @@ public:
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
     void addToMineVehicles(Vehicle *v);
-
     /* Print Function*/
     void print_vector(vector<Vehicle*> v);
 
@@ -95,11 +94,11 @@ public:
     /* Functions to input, update, check for vehicle id's and distances from
      * other vehicles */
     void input_data(int index, struct message* ptr,Port& p, HANDLE& h);
-
     void update_data(struct message* ptr, int indice);
-
     int contains_id_number(int id, int& index);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
+    int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
+
 
 };
 
