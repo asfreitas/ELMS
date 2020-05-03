@@ -493,18 +493,23 @@ void Base_Unit::getFilePath(string& fileName, int type)
     if (type == 0)
     {
         fileName = getPathToMessages() + fileName;
+        logFileName = fileName;
     }
     else if (type == 1)
     {
         fileName = getPathToAlerts() + fileName;
+        alertFile = fileName;
+        cout << "Here is the current name of the alertFile" << alertFile << endl;
     }
     else if (type == 2)
     {
         fileName = getPathToNetWorkFailure() + fileName;
+        netFailFile = fileName;
     }
     else
     {
         fileName = getPathToMiscErrors() + fileName;
+        miscErrorFile = fileName;
     }
 }
 
@@ -626,8 +631,6 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 outgoing_message(alertMessage, ptr->vehicle, v1->getUnit(), ptr->time, speed,
                         itr->second, bearing);
 
-
-
                 //copy the message to use to create the log file for the alert
                 alertLogMessage = alertMessage;
                 //convert the outgoing message to a char * so that it can be transmitted
@@ -639,7 +642,16 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
                 //get the file path
-                getFilePath(alertFileName, 1);
+                if (getMessageCount(1) == MESSAGE_LIMIT || getMessageCount(1) == 1)
+                {
+                    getFilePath(alertFileName, 1);
+                }
+                else
+                {
+                    //get the current open file.
+                    alertFileName = getCurrentFileName(1);
+
+                }
                 // call logFile to create the log file
                 logFile(alertFileName, &alertLogMessage, 1);
             }
