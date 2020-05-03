@@ -28,6 +28,7 @@ void storeMessage(string & filePath, string &message) {
 	if (inputFile.is_open())
 	{
 		inputFile << message;
+		inputFile << "\n";
 	}
 	inputFile.close();
 }
