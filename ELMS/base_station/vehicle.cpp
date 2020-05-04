@@ -35,7 +35,7 @@ Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, doubl
 
 //desctructor
 Vehicle::~Vehicle() {
-    std::cout << "Vehicle destructor called " << std::endl;
+    //std::cout << "Vehicle destructor called " << std::endl;
 
 }
 

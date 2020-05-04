@@ -499,7 +499,6 @@ void Base_Unit::getFilePath(string& fileName, int type)
     {
         fileName = getPathToAlerts() + fileName;
         alertFile = fileName;
-        cout << "Here is the current name of the alertFile" << alertFile << endl;
     }
     else if (type == 2)
     {
