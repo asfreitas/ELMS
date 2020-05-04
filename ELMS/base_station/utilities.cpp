@@ -5,7 +5,7 @@
 
 
 
-
+/* Function converts a string into an integer*/
 int stringToInt(string str) {
 	int integer = -1;
 
@@ -19,7 +19,7 @@ int stringToInt(string str) {
 	return integer;
 }
 
-
+/* Function takes a string and returns a double*/
 double stringToDouble(string str) {
 	double number = -1;
 	//size_t sz;
@@ -32,7 +32,7 @@ double stringToDouble(string str) {
 
 	return number;
 }
-
+/* Function takes a string and returns a pointer to a char array*/
 /*Reference https://www.geeksforgeeks.org/convert-string-char-array-cpp*/
 char* stringToCharPointer(string& str, char* fileName)
 {
@@ -43,7 +43,7 @@ char* stringToCharPointer(string& str, char* fileName)
 	}
 	return fileName;
 }
-
+/* Function takes a double and returns a string*/
 /* Reference: https://stackoverflow.com/questions/332111/how-do-i-convert-a-double-into-a-string-in-c*/
 string doubleToString(double num)
 {
@@ -73,15 +73,15 @@ vector<pair<int,double>> * sortMap(vector<pair<int, double>>& vehicles, map<int,
 	return &vehicles;
 }
 
-// comparator function
+/* This is a comparator function that is used in a sort for a map.*/
 // Reference: https://www.educative.io/edpresso/how-to-sort-a-map-by-value-in-cpp
 bool sortByVal(const pair<int, double>& a, const pair<int, double>& b)
 {
 	return (a.second < b.second);
 }
 
-/* prints the key and values in a map
-   Reference: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+/* This function takes a pointer to a map and prints it's contents 
+   * Reference: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
 */
 void printMap(map<int, double>* mapVehicles)
 {

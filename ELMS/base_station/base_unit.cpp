@@ -32,7 +32,6 @@ string Base_Unit::logFileName = "";
 string Base_Unit::alertFile = "";
 string Base_Unit::netFailFile = "";
 string Base_Unit::miscErrorFile = "";
-//vector<Vehicle> Base_Unit::mine_vehicles;
 vector<Vehicle*> Base_Unit::mine_vehicles;
 
 Base_Unit::~Base_Unit()
@@ -486,7 +485,10 @@ void Base_Unit::setFileName(int type)
         miscErrorFile = tempName;
     }
 }
-
+/* This function takes a fileName and its type (incoming message = 0, alert = 1,
+   network failure = 2, and misc = 3) and return the file path.  This file
+   path is used so that the file will ultimately be stored in the correct 
+   folder*/
 void Base_Unit::getFilePath(string& fileName, int type)
 {
     createFileName(&fileName, type);
@@ -549,6 +551,7 @@ void Base_Unit::print_vector(vector<Vehicle*> v)
     cout << "***************************************" << endl << endl;
 }
 
+/* This function returns mine_vehicles*/
 vector<Vehicle*> Base_Unit::getMineVehicles()
 {
     return mine_vehicles;
@@ -666,8 +669,14 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         //addToPriorityQueue(v);
 
     }
-
 }
+/* This function takes a pointer to a struct message that contains the data
+ * that was contained in the most recent message.  The indice represents
+ * the index of the mine_vehicles vector that the vehicle object was added to.
+ * The function will check for duplicate id's. If the id is not a duplicate,
+ * then the information is added to the newly created vehicle object. If it is
+ * a duplicate, then the current information for that vehcile object is 
+ * updated.  */
 void Base_Unit::update_data(struct message* ptr, int indice)
 {
     mtx_update_master.lock();
@@ -692,7 +701,6 @@ void Base_Unit::update_data(struct message* ptr, int indice)
     {
         //first we need to erase the duplicate we added to the end of the
         // vector and then just update the existing vehicle at its index
-        //int size = mine_vehicles.size();
         //delete the ptr created for the vector.
         delete mine_vehicles.at(mine_vehicles.size() - 1);
         mine_vehicles.erase(mine_vehicles.begin() + mine_vehicles.size() - 1);
@@ -706,6 +714,12 @@ int Base_Unit::get_size(vector<Vehicle*>& v)
     return v.size();
 }
 
+/* This function takes a vehicle id and an address to an integer that represents
+ * the index of the mine_vehicles vector where the vehicle is located. It iterates
+ * thru the vector, finds the index, then sets the value of index to it. If the 
+ * the vehicle id exists in the vector, then the function returns a 1 which means
+ * true.  If it does not contain that vehicle, then a 0 is returned which means
+ * false  */
 int Base_Unit::contains_id_number(int id, int& index)
 {
     for (size_t i = 0; i < getMineVehicles().size(); i++)
@@ -713,26 +727,28 @@ int Base_Unit::contains_id_number(int id, int& index)
         if (getMineVehicles().at(i)->getUnit() == id)
         {
             index = i;
-            //cout << "the index is: " << index << endl;
             return 1;
         }
     }
     return 0;
 }
 
-/* function iterates through the master list and checks the distance each
- * vehicle is from the other vehicles, it adds any vehicles that are close to that
+/* Function iterates through the master list and checks the distance each
+ * vehicle is from the other vehicles. Tt adds any vehicles that are close to that
  * input vehicle to a vector that contains ints which represent the index number
- * in the vector of vehicles where there is risk of collision*/
+ * in the vector of vehicles (mine_vehicles) where there is risk of collision*/
 //Reference for maps: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
-
 map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 {
     Calculations c;
+    //this map holds the list of vehicles that will need alerts sent
     map<int, double> listOfAlerts;
+    //these bools represent whether or not a priority of 0, 1, or 2 has been 
+    // set in this iteration
     bool set0 = false;
     bool set1 = false;
     bool set2 = false;
+    // an integer that holds a priority number
     int p;
     double distance;
 
@@ -767,31 +783,37 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 set0 = true;
 
             }
-            //else if (distance > 50 && distance <= 75 && !set)
+
             else if (distance > 50 && distance <= 75)
             {
-                //need to search the vehicle at i's list to make sure it does
-                // not have a higher priority before changing. 
+                /*need to search the vehicle at i's list to make sure it does
+                 *not have a higher priority before changing. p represents the
+                 *priority of the other vehicle this loop is comparing against.*/
                 p = checkOtherVehiclesPriorityNumbers(v, i, 1);
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+
+                /* If the vehicle has not had a priority of 0 set yet, we can
+                   set it to 1. */
                 if (!set0)
                 {
+                    /*set the priority to 1*/
                     setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1);
                     set1 = true;
                 }
 
-
             }
-            //else if (distance > 75 && distance < 100 && !set && v->getPriorityNumber()>2)
+            
             else if (distance > 75 && distance < 100)
             {
                 /* check the other vehicles distances from other vehicles before
                    we change it's overall priority number
                  */
                 p = checkOtherVehiclesPriorityNumbers(v, i, 2);
-                
+                /* set the other vehicles priority number */
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
 
+                /* for the current vehicle, if it has not already been set to
+                 * a priority 0 or 1, then set to a priority 2 */
                 if (!set0 && !set1)
                 {
                     setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2);
@@ -799,16 +821,19 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 }
 
             }
-            //else if (distance >= 100 && !set && v->getPriorityNumber() > 3)
+            
             else if (distance >= 100)
             {
-                /* check the other vehicles distances from other vehicles before
-                   we change it's overall priority number
+                /* check the other vehicles distances from vehicles in its map
+                   before we change it's overall priority number
                  */
                 p = checkOtherVehiclesPriorityNumbers(v, i, 3);
                 /*set the other vehicle to the lowest priority number based
                   on distances it is from other vehicles in its map*/
                 setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+
+                /* for the current vehicle, it it has not yet been set to a 
+                 * priority 0, 1, or 2, then set it to a priority 3 */
                 if (!set0 && !set1 && !set2)
                 {
                     setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3);
@@ -845,7 +870,7 @@ int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int pri
     return priority;
 }
 
-/* This updates the master vehical vector vehicles at a specific index.  If you only
+/* This updates mine_vehicles (master vector) at a specific index.  If you only
  *  want to update one value, set the other inputs to -1 and nothing will be changed. */
 void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, double longitude, double velocity, double bearing, int priority)
 {
@@ -874,7 +899,7 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
         mine_vehicles.at(index)->setPriority(priority);
     }
 }
-/*This updates the master vehical vector vehicles at a specific index.If you only
+/*This updates mine_vehicles (master vector) at a specific index.If you only
  * want to update one value, set the other inputs to - 1 and nothing will be changed.*/
 void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude, double velocity, double bearing, int priority)
 {

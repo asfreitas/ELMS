@@ -76,10 +76,11 @@ public:
     string getCurrentFileName(int type);
     void setFileName(int type);
     void getFilePath(string& fileName, int type);
+
+    /* mine_vehicle functions */
     void addToMineVehicles(Vehicle *v);
     /* Print Function*/
     void print_vector(vector<Vehicle*> v);
-
 
     /* Get Functions for the Master Vector Containing Vehicle Objects*/
     vector<Vehicle*> getMineVehicles();

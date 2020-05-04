@@ -33,7 +33,9 @@ void storeMessage(string & filePath, string &message) {
 	inputFile.close();
 }
 
-/* Reference for how to remove blank spaces in a string
+/* This function parses the incoming message and creates a struct message which
+ * will be used to load data into vehicle objects. 
+ * Reference for how to remove blank spaces in a string
  * https://stackoverflow.com/questions/83439/remove-spaces-from-stdstring-in-c
  */
 message* createNewMessage(string incomingMessage)
@@ -67,5 +69,4 @@ message* createNewMessage(string incomingMessage)
 		}
 	}
 	return newMessage;
-
 }
