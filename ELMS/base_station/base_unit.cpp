@@ -36,7 +36,7 @@ vector<Vehicle*> Base_Unit::mine_vehicles;
 
 Base_Unit::~Base_Unit()
 {
-    cout << "Base_Unit destructor was called" << endl;
+    //cout << "Base_Unit destructor was called" << endl;
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 

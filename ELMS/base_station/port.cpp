@@ -220,7 +220,7 @@ Shuts down the port and makes sure all data has been sent before closing
 */
 Port::~Port()
 {
-    std::cout << "I am in the port destructor" << std::endl;
+    //std::cout << "I am in the port destructor" << std::endl;
     stillReceiving = false;
     if (messageThread.joinable())
         messageThread.join();
