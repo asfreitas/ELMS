@@ -644,7 +644,7 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
                 //get the file path
-                if (getMessageCount(1) == MESSAGE_LIMIT || getMessageCount(1) == 1)
+                if (getMessageCount(1) == MESSAGE_LIMIT + 1 || getMessageCount(1) == 1)
                 {
                     getFilePath(alertFileName, 1);
                 }
