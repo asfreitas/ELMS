@@ -47,13 +47,11 @@ using std::thread;
 void printf_notice();
 #endif
 
-  /* A note about how to compile this program using a makefile in mingw
-   * change directory to your files. Then run: mingw32-make all
-   * to clean: mingw32-make clean */
 
 int main()
 {
-	//used to check for memory leak
+	//used to check for memory leak. When the program exists, it will dump all
+	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
 	Base_Unit b;
@@ -83,11 +81,6 @@ int main()
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
-	/* SetCommMask sets the event that will cause a notification
-	 * in this case, we use EV_RXCHAR which means that a new character was
-	 * received a put in the input buffer
-	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN */
-
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
@@ -101,7 +94,10 @@ int main()
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
 
+			// This line of code declares two threads that will be used in 
+			// the parallel section
 			omp_set_num_threads(2);
+
             #pragma omp parallel sections
 			{
                 #pragma omp section
@@ -146,6 +142,8 @@ int main()
     return 0;
 }
 
+/* This void function will print a notice to the terminal if openMP is not
+   supported */
 void printf_notice()
 {
 	fprintf(stderr, "OpenMP is not supported \n");
