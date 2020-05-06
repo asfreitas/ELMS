@@ -76,7 +76,7 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
+	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
 	Port p(portname);
 	bool startNewLog = false;
 
