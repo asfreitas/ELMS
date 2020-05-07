@@ -1,32 +1,41 @@
 #pragma once
 
 #include "database.h"
-#include "vehicle.h"
 
-void updateVehicle(Vehicle* vehicle)
+
+Database::Database(std::string _uri)
 {
-	auto connection = mongo_access::instance().get_connection();
+	static instance instance{};
+	uri = mongocxx::uri(_uri);
+	pool = new mongocxx::pool{ uri };
+}
+
+Database::~Database()
+{
+	std::cout << "This can't go out of scope until the" 
+		"program closes otherwise we lose the connection";
+	delete pool;
+}
+
+Database::connection Database::getConnection()
+{
+	return pool->acquire();
+}
+
+void Database::updateVehicle(Vehicle* vehicle)
+{
+
+	auto connection = getConnection();
+
+	collection vehicles = connection->database("test").collection("Vehicles");
+
+	std::cout << vehicles.find({});
+
 }
 
 void addVehicle(Vehicle* vehicle)
 {
-	auto connection = mongo_access::instance().get_connection();
+	//auto connection = mongo_access::instance().get_connection();
 
-	connection->database("test").collection("vehicles").find({});
-}
-
-void configure(mongocxx::uri uri) {
-    class noop_logger : public mongocxx::logger {
-    public:
-        virtual void operator()(mongocxx::log_level,
-            bsoncxx::stdx::string_view,
-            bsoncxx::stdx::string_view) noexcept {}
-    };
-
-    auto instance =
-        bsoncxx::stdx::make_optional<mongocxx::instance>(bsoncxx::stdx::make_unique<noop_logger>());
-
-    mongo_access::instance().configure(std::move(instance),
-        bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(uri)));
-    bsoncxx::stdx::make_optional<
+	//connection->database("test").collection("vehicles").find({});
 }
