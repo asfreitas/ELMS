@@ -23,6 +23,7 @@ References:
 #include <time.h>
 #include <omp.h>
 #include "parse_incoming.h"
+#include "base_unit_gui.h"
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 using std::cout;
@@ -47,13 +48,16 @@ using std::thread;
 void printf_notice();
 #endif
 
-
+//int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow)
 int main()
 {
+	startWindow();
+
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
+
 	Base_Unit b;
 
 	string fileName;
@@ -74,8 +78,9 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
+	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname);
+
 	bool startNewLog = false;
 
 	//declare a pointer to a Vehicle v
