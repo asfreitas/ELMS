@@ -101,3 +101,4 @@ void AddControls(HWND hWnd)
 	hEdit = CreateWindowW(L"edit", L" ", WS_VISIBLE | WS_CHILD| WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL, 200, 152, 100, 50, hWnd, NULL, NULL, NULL);
 
 }
+
