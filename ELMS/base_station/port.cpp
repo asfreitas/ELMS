@@ -139,12 +139,13 @@ Check for a handle until we find one that doesn't return an error
 */
 HANDLE Port::setupPort(LPCSTR portname)
 {
-    HANDLE hSerial;
+    HANDLE hSerial = NULL;
     std::string name;
+    vector<string> listOfPorts;
 
     if (portname == NULL)
     {
-        for (int x = 1; x <= 10; x++)
+        /*for (int x = 1; x <= 10; x++)
         {
             name = "COM" + std::to_string(x);
             portname = name.c_str();
@@ -154,8 +155,43 @@ HANDLE Port::setupPort(LPCSTR portname)
             {
                 return hSerial; // open the port if we find one that doesn't return an eror
             }
+            else
+                std::cout << "here is the port name: " << portname << std::endl;
+        }*/
+        SelectComPort(listOfPorts);
+        //if there are no COM ports detected, the vector list will be empty
+        // and the program will exit
+        if (listOfPorts.empty())
+        {
+            std::cout << "There are no COM ports available" << std::endl;
+            std::cout << "Program is exiting..." << std::endl;
+            //exit the program because there are no COM ports detected. 
+            exit(1);
+        }
+
+        else
+        {
+            for (size_t i = 0; i < listOfPorts.size(); i++)
+            {
+                std::cout << listOfPorts.at(i) << std::endl;
+            }
+            /* Here is where the Window for the user to select the port they 
+             * wish to use will be displayed.  Once they make their selection,
+             * portname will be set to that value and createPort will be called.
+             * The window has not been implemented yet. The reference for how
+             * to convert a std::string to LPCSTR (Long Pointer to Constant 
+             * STR is:
+             * https://stackoverflow.com/questions/44279753/how-to-convert-stdstring-to-lptstr
+            */
+            string str = listOfPorts.at(0);
+            portname = str.c_str();
+            printf("here is the portname: %s\n", portname);
+            hSerial = createPort(portname);
+
         }
     }
+
+    // The portnname is known, the the serial handle is created. 
     else
     {
         hSerial = createPort(portname); // if we know the port go ahead and open it
@@ -406,7 +442,7 @@ void Port::setCommMask(DWORD mask)
         TRUE,   // manual-reset event 
         FALSE,  // not signaled 
         NULL    // no name
-    );
+        );
 
 
     // Initialize the rest of the OVERLAPPED structure to zero.
@@ -427,7 +463,7 @@ void Port::setCommMask(DWORD mask)
 =============
 waitCommMask
 
-Wait for a particular mask 
+Wait for a particular mask
 =============
 */
 bool Port::waitCommMask(DWORD mask)
@@ -436,4 +472,38 @@ bool Port::waitCommMask(DWORD mask)
     setCommMask(mask);
     status = WaitCommEvent(hSerial, &dwEventMask, NULL);
     return dwEventMask;
+}
+
+/* This function is from the following two references
+ https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
+ https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
+  It will find the available COM ports and adds them to a vector list that is
+  sent in by reference. 
+  */
+void Port::SelectComPort(vector <string>& comPortList) //added function to find the present serial 
+{
+    char lpTargetPath[5000]; // buffer to store the path of the COM PORTS
+    bool isComPort = false; // represents if a COM port is available or not
+
+    for (int i = 0; i < 20; i++) // checking ports from COM0 to COM20
+    {
+        std::string str = "COM" + std::to_string(i); // converting to COM0, COM1....
+
+        // queries if there is a MS-DOS device.  Serial ports are this type
+        // of device. 
+
+        DWORD test = QueryDosDevice(str.c_str(), lpTargetPath, 5000);
+
+        // Test the return value and error if any
+        if (test != 0) //QueryDosDevice returns zero if it didn't find an object
+        {
+            //push the port onto the list of serial ports available.
+            comPortList.push_back(str);
+            isComPort = true;
+        }
+
+        if (::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+        }
+    }
 }

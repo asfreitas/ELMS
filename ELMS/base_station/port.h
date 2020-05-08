@@ -16,6 +16,9 @@
 #include <mutex>
 #include <chrono>
 //#include "timer.h"
+#include <vector>
+using std::vector;
+using std::string;
 
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
@@ -58,6 +61,8 @@ class Port
         void setCommMask(DWORD);
         bool waitCommMask(DWORD);
         bool isPortReady() { return portReady; }
+        // returns a list of possible COM ports available
+        void SelectComPort(vector<string>&);
 };
 
 #endif
