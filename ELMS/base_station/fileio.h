@@ -49,7 +49,7 @@ class FileIO
         bool checkMessageCount(MessageType);
         int& getMessageCount(MessageType);
         void logToFile(std::string inputMessage, MessageType);
-        void logExistingFile(std::string, string* inputMessage, MessageType);
+        void logToExistingFile(std::string existingFile, string inputMessage, MessageType);
         void resetMessageCount(MessageType);
         std::string createFileName(MessageType);
         void setFileName(MessageType);

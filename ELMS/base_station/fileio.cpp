@@ -126,6 +126,20 @@ void FileIO::logToFile(std::string inputMessage, MessageType type)
 
 }
 
+/*This function accepts the fileName for a file that is currently being written
+ to and writes to it. */
+void FileIO::logToExistingFile(std::string fileName, string inputMessage, MessageType)
+{
+    //increment the alert message count;
+    alertCount++;
+
+    if (writing_thread.joinable())
+        writing_thread.join(); // check to join previous write before wriing again 
+    // in the future we can setup a thread pool for a potential speedup
+    writing_thread = std::thread(&FileIO::lockWriteFile, this, fileName, inputMessage);
+    
+}
+
 
  /* Function lockWriteFile locks any other part of the program writing to
   * log files while another process is writing to it. */
