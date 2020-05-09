@@ -21,23 +21,26 @@ enum class MessageType { incoming, alert, network_failure, misc };
 class FileIO
 {
     private:
-        // current directory locations
+        // current directory locations. The pathToLogs is initialized in case
+        // the user does not provide one to the constructor. 
         std::string pathToLogs;
         std::string pathToMessages;
         std::string pathToAlerts;
         std::string pathToNetworkFailure;
         std::string pathToMiscErrors;
-        // current message counts
-        int messageCount;
-        int networkFailureCount;
-        int miscCount;
-        int alertCount;
-        int messageLimit;
-        // filenames being written to
-        std::string logFileName;
-        std::string alertFile;
-        std::string netFailFile;
-        std::string miscErrorFile;
+        // current message counts need to be the same for all objects in the
+        // class
+        static int messageCount;
+        static int networkFailureCount;
+        static int miscCount;
+        static int alertCount;
+        static int messageLimit;
+        // filenames being written to need to be the same for all objects in
+        // the class. 
+        static std::string logFileName;
+        static std::string alertFile;
+        static std::string netFailFile;
+        static std::string miscErrorFile;
         // remaining variables
         std::thread writing_thread;
         std::mutex mtx_write;
@@ -58,6 +61,9 @@ class FileIO
         bool directoryExists(const std::string&);
         void lockWriteFile(string, string);
         void writeToFile(string, string);
+
+        // get functions 
+        int getMessageLimit();
         void getNewFilePath(MessageType);
         string getFilePath(MessageType);
         string getLogFilePath() { return logFileName; }

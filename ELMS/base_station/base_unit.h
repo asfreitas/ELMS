@@ -4,6 +4,7 @@
 #ifndef BASE_UNIT_H
 #define BASE_UNIT_H
 
+#define MESSAGE_LIMIT 5
 
 #include <iostream>
 #include <fstream>
@@ -34,9 +35,6 @@ using std::pair;
 using std::setprecision;
 using std::iterator;
 
-//this is how many messages will be in each log file before it is close. 
-// this is easily changed and we can make any number we want. 
-#define MESSAGE_LIMIT 5
 
 static vector<Vehicle>priority_list;
 
@@ -53,6 +51,7 @@ class Base_Unit
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
 public:
+
     // class destructor will manage memory leak by deleting pointings to
     // vehicle objects in the mine_vehicles vector
     ~Base_Unit();

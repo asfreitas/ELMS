@@ -51,8 +51,8 @@ void printf_notice();
 //int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow)
 int main()
 {
-	getPort();
-	startWindow();
+	//getPort();
+	//startWindow();
 	FileIO file("C:\\logs", 5);
 
 	//used to check for memory leak. When the program exists, it will dump all
@@ -92,7 +92,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 11)
+	while (p.isPortReady() && count < 2)
 	{
 
 		if (!p.isBufferEmpty())
