@@ -69,4 +69,13 @@ message* createNewMessage(string incomingMessage)
 		}
 	}
 	return newMessage;
+}<<<<<<< HEAD
 }
+||||||| merged common ancestors
+
+}
+=======
+
+}
+
+>>>>>>> origin/FileHandle
