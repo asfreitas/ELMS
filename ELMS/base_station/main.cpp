@@ -7,30 +7,22 @@ References:
  * https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 */
 
-#include <Windows.h>
-#include <mutex>
-#include <thread>
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include "port.h"
 #include <vector>
-#include "base_unit.h"
-#include <iostream>
 #include <fstream>
-# include <string>
 #include <ctime>
 #include <time.h>
 #include <omp.h>
+
 #include "parse_incoming.h"
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-using std::cout;
-using std::endl;
-using std::ofstream;
-using std::ios;
-using std::string;
-using std::thread;
+#include "database.h"
+#include "base_unit.h"
+#include "port.h"
+
+
+
 
 /* reference for the following -- this was an issue if you are using Visual Studio
  * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711
@@ -51,7 +43,7 @@ void printf_notice();
    * change directory to your files. Then run: mingw32-make all
    * to clean: mingw32-make clean */
 
-
+/*
 int main()
 {
 	//used to check for memory leak
@@ -77,7 +69,7 @@ int main()
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
-	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
+	LPCSTR portname = "COM7";                //Ports will vary for each computer 
 	Port p(portname);
 	bool startNewLog = false;
 
@@ -87,7 +79,7 @@ int main()
 	/* SetCommMask sets the event that will cause a notification
 	 * in this case, we use EV_RXCHAR which means that a new character was
 	 * received a put in the input buffer
-	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN */
+	 * https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN 
 
     // this counter is only here for testing purposes.
 	int count = 0;
@@ -144,7 +136,7 @@ int main()
 	} /* end while loop */
 
 	/* No need to close the serial port because the class destructor automatically
-	 * does this */
+	 * does this 
 	//call the Base_Unit destructor to free the ptr's in the mineVehicles vector
 	b.~Base_Unit();
     return 0;
@@ -153,4 +145,12 @@ int main()
 void printf_notice()
 {
 	fprintf(stderr, "OpenMP is not supported \n");
+}
+*/
+
+void main()
+{
+	Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
+
+	newDB.updateVehicle();
 }

@@ -1,4 +1,3 @@
-#pragma once
 
 #include "database.h"
 
@@ -12,7 +11,7 @@ Database::Database(std::string _uri)
 
 Database::~Database()
 {
-	std::cout << "This can't go out of scope until the" 
+	std::cout << "This can't go out of scope until the"
 		"program closes otherwise we lose the connection";
 	delete pool;
 }
@@ -22,14 +21,19 @@ Database::connection Database::getConnection()
 	return pool->acquire();
 }
 
-void Database::updateVehicle(Vehicle* vehicle)
+void Database::updateVehicle()
 {
 
 	auto connection = getConnection();
 
-	collection vehicles = connection->database("test").collection("Vehicles");
+	collection vehicles = connection->database("test").collection("vehicles");
 
-	std::cout << vehicles.find({});
+	auto find = vehicles.find({});
+	
+	for (auto doc : find)
+	{
+		std::cout << bsoncxx::to_json(doc);
+	}
 
 }
 
@@ -39,3 +43,4 @@ void addVehicle(Vehicle* vehicle)
 
 	//connection->database("test").collection("vehicles").find({});
 }
+

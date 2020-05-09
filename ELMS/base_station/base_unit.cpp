@@ -336,7 +336,7 @@ void Base_Unit::createFolder()
         // if the exists is false, then create the directory
         if (!exists)
         {
-            directory = CreateDirectory(messages[i].c_str(), NULL);
+            directory = CreateDirectoryA(messages[i].c_str(), NULL);
 
             // if an error occurs creating the directory then notify the user
             if (directory == 0)

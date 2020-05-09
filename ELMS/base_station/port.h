@@ -8,6 +8,9 @@
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
 
+#ifndef SERIALPORT_HPP
+#define SERIALPORT_HPP
+
 #include <windows.h>
 #include <iostream>
 #include <string>
@@ -17,8 +20,7 @@
 #include <chrono>
 //#include "timer.h"
 
-#ifndef SERIALPORT_HPP
-#define SERIALPORT_HPP
+
 
 class Port
 {
