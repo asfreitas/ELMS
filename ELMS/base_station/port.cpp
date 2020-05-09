@@ -212,7 +212,6 @@ HANDLE Port::createPort(LPCSTR portname)
     HANDLE hSerial;
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
 
-   return hSerial = CreateFile(portname, 
    return hSerial = CreateFileA(portname, 
        accessdirection, 0, 0, OPEN_EXISTING ,0, 0);
 }

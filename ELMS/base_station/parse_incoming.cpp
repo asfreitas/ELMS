@@ -69,7 +69,7 @@ message* createNewMessage(string incomingMessage)
 		}
 	}
 	return newMessage;
-}<<<<<<< HEAD
+<<<<<<< HEAD
 }
 ||||||| merged common ancestors
 
