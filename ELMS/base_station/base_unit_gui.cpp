@@ -11,6 +11,7 @@
 
 // declare needed globals
 HWND hEdit;
+HWND hList;
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
@@ -102,3 +103,61 @@ void AddControls(HWND hWnd)
 
 }
 
+
+LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+	case WM_CLOSE:
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == ID_SELF_DESTROY_BUTTON) {
+			if (SendMessage(hList, LB_GETSEL, 1, 0) > 0) {
+				std::cout << "Middle selected" << std::endl;
+				return 0;
+			}
+		}
+		break;
+	}
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+//https://gist.github.com/Pilzschaf/d950a86042c37a9c8d1a8b9b5f082fff
+bool getPort()
+{
+	HINSTANCE hInstance = GetModuleHandle(0);
+	HWND hWnd;
+	HWND hButton;
+	WNDCLASS wc;
+	MSG msg;
+
+	wc = {};
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = MessageHandler;
+	wc.hInstance = hInstance;
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wc.lpszClassName = "WINAPITest";
+
+	if (!RegisterClass(&wc))
+		std::cout << "Failed to register" << std::endl;
+
+	hWnd = CreateWindowW(L"WINAPITest", L"WinAPI Tutorial", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
+	hButton = CreateWindow("button", "Selbstzerstörung", WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 10, 70, 300, 50, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON, hInstance, 0);
+	hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL, 400, 40, 150, 200, hWnd, (HMENU)ID_LISTBOX, 0, 0);
+
+	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"first");
+	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"second");
+	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"last");
+
+	std::cout << "Created window" << std::endl;
+
+	while (true) {
+		BOOL result = GetMessage(&msg, 0, 0, 0);
+		if (result > 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else {
+			return result;
+		}
+	}
+}

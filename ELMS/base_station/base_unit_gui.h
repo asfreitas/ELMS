@@ -16,6 +16,8 @@ using std::string;
 #define FILE_MENU_OPEN 2
 #define FILE_MENU_EXIT 3
 #define CHANGE_TITLE 4
+#define ID_SELF_DESTROY_BUTTON 100
+#define ID_LISTBOX 101
 
 
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
@@ -23,6 +25,6 @@ LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 void startWindow();
 void AddMenus(HWND hWnd);
 void AddControls(HWND);
-
+bool getPort();
 
 #endif // !BASE_UNIT_GUI_H
