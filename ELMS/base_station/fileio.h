@@ -48,7 +48,7 @@ class FileIO
         ~FileIO();
         bool checkMessageCount(MessageType);
         int& getMessageCount(MessageType);
-        void logToFile(std::string fileName, std::string inputMessage, MessageType);
+        void logToFile(std::string inputMessage, MessageType);
         void resetMessageCount(MessageType);
         std::string createFileName(MessageType);
         void setFileName(MessageType);
@@ -57,15 +57,14 @@ class FileIO
         bool directoryExists(const std::string&);
         void lockWriteFile(string, string);
         void writeToFile(string, string);
-        void getNewFilePath(string, MessageType);
+        void getNewFilePath(MessageType);
+        string getFilePath(MessageType);
         string getLogFilePath() { return logFileName; }
         string getalertFilePath() { return alertFile; }
         string getNetFailFilePath() { return netFailFile; }
         string getmiscErrorFilePath() { return miscErrorFile; }
         string getPathToMessages() { return pathToMessages; }
         string getPathToLogs() { return pathToLogs; }
-
-
 
 };
 #endif

@@ -19,12 +19,13 @@ FileIO::FileIO(std::string path, int limit)
 }
 FileIO::FileIO() 
 {
-    createFolders();
-
     pathToMessages = pathToLogs + "\\incoming_messages\\";
     pathToAlerts = pathToLogs + "\\alerts\\";
     pathToNetworkFailure = pathToLogs + "\\network_failure\\";
     pathToMiscErrors = pathToLogs + "\\misc_errors\\";
+
+    createFolders();
+
 } 
 FileIO::~FileIO()
 {
@@ -52,6 +53,18 @@ int& FileIO::getMessageCount(MessageType type)
     case MessageType::misc: return miscCount;
     default: break;
     }
+
+}
+string FileIO::getFilePath(MessageType type)
+{
+    switch (type)
+    {
+    case MessageType::incoming: return logFileName;
+    case MessageType::alert: return alertFile;
+    case MessageType::network_failure: return netFailFile;
+    case MessageType::misc: return miscErrorFile;
+    default: break;
+    }
 }
 
 /*
@@ -68,12 +81,24 @@ int& FileIO::getMessageCount(MessageType type)
  * Important to use a reference wrapper when passing in threads.
  * https://stackoverflow.com/questions/34078208/passing-object-by-reference-to-stdthread-in-c11
  */
-void FileIO::logToFile(std::string fileName, std::string inputMessage, MessageType type)
+void FileIO::logToFile(std::string inputMessage, MessageType type)
 {
     bool needNewFile = false;
 
     // flag that will be true when both writing and closing to a file have finished. 
     bool done = false;
+
+
+    bool messageCountAtLimit = checkMessageCount(type);
+
+    string fileName = getFilePath(type);
+
+    if (messageCountAtLimit || fileName.size() == 0)
+    {
+        getNewFilePath(type);
+        fileName = getFilePath(type);
+    }
+
 
     //check to see if the number of messages written to the file is at the limit
     // It checks for the message type to determine if more should be written to
@@ -83,12 +108,7 @@ void FileIO::logToFile(std::string fileName, std::string inputMessage, MessageTy
     // in the future we can setup a thread pool for a potential speedup
     writing_thread = std::thread(&FileIO::lockWriteFile, this, fileName, inputMessage);
 
-    bool messageCountAtLimit = checkMessageCount(type);
 
-    if (messageCountAtLimit)
-    {
-        getNewFilePath(fileName, type);
-    }
 }
 
 /* Function lockCloseFile
@@ -181,7 +201,6 @@ std::string FileIO::createFileName(MessageType type)
     tempName = tempName + ".txt";
 
     return tempName;
-
 }
 
 
@@ -210,7 +229,7 @@ bool FileIO::createFolder(const string folderName)
     // if the exists is false, then create the directory
     if (!exists)
     {
-        directory = CreateDirectory(folderName.c_str(), NULL);
+        directory = CreateDirectoryA(folderName.c_str(), NULL);
 
         // if an error occurs creating the directory then notify the user
         if (directory == 0)
@@ -259,15 +278,15 @@ bool FileIO::directoryExists(const std::string& directoryName)
     return false;
 }
 
-void FileIO::getNewFilePath(string fileName,MessageType type)
+void FileIO::getNewFilePath(MessageType type)
 {
     string newFilename = createFileName(type);
     switch (type)
     {
-    case MessageType::incoming: logFileName = newFilename + fileName; break;
-    case MessageType::alert: alertFile = newFilename + fileName; break;
-    case MessageType::network_failure: netFailFile =  newFilename + fileName; break;
-    case MessageType::misc: miscErrorFile = newFilename + fileName; break;
+    case MessageType::incoming: logFileName = pathToMessages + newFilename; break;
+    case MessageType::alert: alertFile = pathToAlerts + newFilename; break;
+    case MessageType::network_failure: netFailFile = pathToNetworkFailure + newFilename; break;
+    case MessageType::misc: miscErrorFile = pathToMiscErrors + newFilename; break;
     default: break;
     }
 }
@@ -280,9 +299,12 @@ void FileIO::writeToFile(string filePath, string message)
     // if the log file is open, then write to it. 
     if (inputFile.is_open())
     {
-        inputFile << message;
+        inputFile << message << "\n";
+    }
+    else
+    {
+        std::cout << "Cannot write to filepath: " << filePath;
     }
     inputFile.close();
     
 }
-

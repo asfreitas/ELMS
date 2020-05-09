@@ -106,7 +106,7 @@ int main()
                 #pragma omp section
 				{
 					cout << incomingMessage << endl;
-					b.logToFile(fileName, incomingMessage, MessageType::incoming);
+					b.logToFile(incomingMessage, MessageType::incoming);
 				}
 
                 #pragma omp section

@@ -14,7 +14,8 @@
 #include <vector>
 #include <algorithm>
 #include <map>
-#include <iterator>
+#include <iterator> 
+
 #include "parse_incoming.h"
 #include "outgoing.h"
 #include "utilities.h"
@@ -43,10 +44,6 @@ class Base_Unit
     //The vector of Vehicles functions as a "master list" of all the vehicles
     // that are currently in the mine
     //static vector<Vehicle>mine_vehicles;
-    static string logFileName;
-    static string alertFile;
-    static string netFailFile;
-    static string miscErrorFile;
     static vector<Vehicle>mine_vehicles;
     FileIO fileHandler;
 
@@ -54,7 +51,7 @@ class Base_Unit
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
 public:
-    void logToFile(std::string, std::string, MessageType);
+    void logToFile(std::string, MessageType);
     void addToMineVehicles(Vehicle& v);
     void print_vector(vector<Vehicle>& v);
     vector<Vehicle>getMineVehicles();
@@ -62,7 +59,7 @@ public:
     vector<Vehicle>getPriorityQueue();
     void input_data(int index, struct message* ptr,Port& p, HANDLE& h);
     void update_data(struct message* ptr, int indice);
-    int get_size(vector<Vehicle>& v);
+    size_t get_size(const vector<Vehicle>& v);
     int contains_id_number(int id, int& index);
     map<int, double> checkDistancesInMasterVector(Vehicle& v);
     void updateMasterPriority(Vehicle& v);
@@ -73,7 +70,7 @@ public:
     string getPathToMessages() { return fileHandler.getPathToMessages(); }
     string getPathToLogs() { return fileHandler.getPathToLogs(); }
     string getPathToLogFile() { return fileHandler.getLogFilePath(); }
-    Base_Unit() : fileHandler("C:\\", 5) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+    Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
 
 };
 

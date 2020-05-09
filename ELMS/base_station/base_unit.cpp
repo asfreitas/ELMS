@@ -3,6 +3,7 @@
 */
 
 #include "base_unit.h"
+
 #include <iostream>
 #include <stdbool.h>
 #include <thread>
@@ -181,10 +182,9 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
                 //get the file path
-                fileHandler.getNewFilePath(alertFileName, MessageType::alert);
                 //getFilePath(alertFileName, 1);
                 // call logFile to create the log file
-                fileHandler.logToFile(alertFileName, alertLogMessage, MessageType::alert);
+                fileHandler.logToFile(alertLogMessage, MessageType::alert);
                 //logFile(alertFileName, &alertLogMessage, 1);
             }
         }
@@ -224,7 +224,7 @@ void Base_Unit::update_data(struct message* ptr, int indice)
     {
         //first we need to erase the duplicate we added to the end of the
         // vector and then just update the existing vehicle at its index
-        int size = mine_vehicles.size();
+        size_t size = mine_vehicles.size();
         mine_vehicles.erase(mine_vehicles.begin() + mine_vehicles.size() - 1);
         setVehicleInMineVehicles(index, ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
     }
@@ -232,7 +232,7 @@ void Base_Unit::update_data(struct message* ptr, int indice)
 
 }
 // returns the size of the vector
-int Base_Unit::get_size(vector<Vehicle>& v)
+size_t Base_Unit::get_size(const vector<Vehicle>& v)
 {
     return v.size();
 }
@@ -381,7 +381,7 @@ void Base_Unit::setVehicleInMineVehicles1(Vehicle &v, int time, double latitude,
     }
 }
 
-void Base_Unit::logToFile(std::string fileName, std::string message, MessageType type)
+void Base_Unit::logToFile(std::string message, MessageType type)
 {
-    fileHandler.logToFile(fileName, message, type);
+    fileHandler.logToFile(message, type);
 }
