@@ -31,7 +31,15 @@ FileIO::~FileIO()
 {
     // do something
 }
+/*
+=============
+checkMessageCount
 
+Returns true if the count of the message type 
+has exceeded the limit or increments and returns false
+=============
+
+*/
 bool FileIO::checkMessageCount(MessageType type)
 {
     int& messageCount = getMessageCount(type); // get it by reference so we can increment it after
@@ -42,7 +50,14 @@ bool FileIO::checkMessageCount(MessageType type)
     }
     return true;
 }
+/*
+=============
+getMessageCount
 
+Gets the number of messages currently written to the file
+=============
+
+*/
 int& FileIO::getMessageCount(MessageType type)
 {
     switch (type)
@@ -111,14 +126,6 @@ void FileIO::logToFile(std::string inputMessage, MessageType type)
 
 }
 
-/* Function lockCloseFile
- * This function locks while closing a file so that it can be stored in its folder
- * type = 0 means that it is an incoming message
- * type = 1 means that it is an alert being sent to a vehicle
- * type = 2 means that it is a network failure message
- * type = 3 means that it is a miscellaneous error.
- * Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
- */
 
  /* Function lockWriteFile locks any other part of the program writing to
   * log files while another process is writing to it. */
@@ -150,7 +157,14 @@ void FileIO::setFileName(MessageType type)
     default: break;
     }
 }
+/*
+=============
+resetMessageCount
 
+Resets the current count of messages for a particular file
+=============
+
+*/
 void FileIO::resetMessageCount(MessageType type)
 {
     switch (type)
@@ -162,7 +176,15 @@ void FileIO::resetMessageCount(MessageType type)
     default: break;
     }
 }
+/*
+=============
+createFileName
 
+Creates a new file name based on the current time stamp
+Returns a string carrying the filename
+=============
+
+*/
 std::string FileIO::createFileName(MessageType type)
 {
     resetMessageCount(type);
@@ -176,6 +198,7 @@ std::string FileIO::createFileName(MessageType type)
     case MessageType::misc: type_of_message = "M"; break;
     default: break;
     }
+   // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
 
     //get the current time
     time_t now = time(0);
@@ -203,7 +226,14 @@ std::string FileIO::createFileName(MessageType type)
     return tempName;
 }
 
+/*
+=============
+createFolders
 
+Creates all of the folders being used for the program
+=============
+
+*/
 /*This function first checks to see if a directory exists, then it creates the
  * logs directory and the 4 subfolders (1) incoming_messages (2) alerts (3) network_failure
  * (4) misc_errors. It will create the main logs file in the location that the user
@@ -219,7 +249,15 @@ void FileIO::createFolders()
     createFolder(pathToMiscErrors);
     createFolder(pathToNetworkFailure);
 }
+/*
+=============
+createFolder
 
+Takes in a string and then creates a new folder based on
+the name taken in
+=============
+
+*/
 bool FileIO::createFolder(const string folderName)
 {
     bool exists;
@@ -249,7 +287,14 @@ bool FileIO::createFolder(const string folderName)
     }
     return true;
 }
+/*
+=============
+directoryExists
 
+Checks to see if a directory exists 
+=============
+
+*/
 /*This function first checks to see if the directories exist before creating them
  * The GetFileAttributesA function returns attributes for specific file or
  * directory. If the call is successful, then the attribute is returned.
@@ -278,6 +323,14 @@ bool FileIO::directoryExists(const std::string& directoryName)
     return false;
 }
 
+/*
+=============
+getNewFilePath
+
+Creates a new file path for the files being written to 
+=============
+
+*/
 void FileIO::getNewFilePath(MessageType type)
 {
     string newFilename = createFileName(type);
@@ -291,6 +344,14 @@ void FileIO::getNewFilePath(MessageType type)
     }
 }
 
+/*
+=============
+writeToFile
+
+Creates a new file or opens an existing file and appends to it
+=============
+
+*/
 void FileIO::writeToFile(string filePath, string message)
 {
     std::ofstream inputFile;
