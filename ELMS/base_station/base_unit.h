@@ -46,7 +46,7 @@ class Base_Unit
     // that are currently in the mine
     //static vector<Vehicle>mine_vehicles;
     static vector<Vehicle*>mine_vehicles;
-    FileIO fileHandler;
+    FileIO* fileHandler;
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
@@ -55,6 +55,7 @@ public:
     // class destructor will manage memory leak by deleting pointings to
     // vehicle objects in the mine_vehicles vector
     ~Base_Unit();
+    Base_Unit(FileIO *_f);
 
     void logToFile(std::string, MessageType);
     void addToMineVehicles(Vehicle* v);
@@ -80,10 +81,7 @@ public:
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
 
-    string getPathToMessages() { return fileHandler.getPathToMessages(); }
-    string getPathToLogs() { return fileHandler.getPathToLogs(); }
-    string getPathToLogFile() { return fileHandler.getLogFilePath(); }
-    Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+   // Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
 };
 
 #endif // !BASE_UNIT_H

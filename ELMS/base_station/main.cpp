@@ -58,8 +58,8 @@ int main()
 	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
-
-	Base_Unit b;
+	FileIO f;
+	Base_Unit b(&f);
 
 	string fileName;
 	string incomingMessage;
@@ -80,7 +80,7 @@ int main()
 	// 3 = misc errors
 	//b.getFilePath(fileName, 0)
 	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
-	Port p(portname);
+	Port p(portname, &f);
 
 	bool startNewLog = false;
 
@@ -90,7 +90,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 2)
+	while (p.isPortReady())
 	{
 
 		if (!p.isBufferEmpty())

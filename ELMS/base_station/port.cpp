@@ -223,11 +223,14 @@ Contructor - No Parameters
 Opens a new port and attempts to find the port automatically 
 =============
 */
-Port::Port()
+Port::Port(FileIO* _f)
 {
     openSerialPort(NULL);
     startPortThread();
     startTimer(5);
+
+    fileHandler = _f;
+
 
 }
 
@@ -238,8 +241,9 @@ Contructor - Portname provided
 Opens a new port and attempts to open the port passed into the constructor
 =============
 */
-Port::Port(LPCSTR portname)
+Port::Port(LPCSTR portname, FileIO* _f)
 {
+    fileHandler = _f;
     openSerialPort(portname);
     if (waitCommMask(EV_RXCHAR))
         portReady = true;
@@ -332,9 +336,53 @@ void Port::receiveMessage()
             addToMessageBuffer(finalMessage);
 
         }
-        if (networkFailure == true)
+        if (networkFailure)
         {
-            std::cout << "Network Failure\n";
+            std::string mystring;
+            // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
+
+            //get the current time
+            time_t now = time(0);
+
+            //declare a time structure
+            struct tm gmtm;
+
+            //use a thread safe call to get the current UTC time
+            gmtime_s(&gmtm, &now);
+
+
+            int hour = gmtm.tm_hour;
+            int min = gmtm.tm_min;
+            int sec = gmtm.tm_sec;
+
+            mystring = "There was network failure from: " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec);
+            std::cout << mystring;
+            auto start = std::chrono::system_clock::now();
+
+            waitCommMask(EV_RXCHAR);
+
+            waitCommMask(EV_RXCHAR);
+
+
+
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff = end - start;
+            //get the current time
+            now = time(0);
+
+            //use a thread safe call to get the current UTC time
+            gmtime_s(&gmtm, &now);
+
+
+            hour = gmtm.tm_hour;
+            min = gmtm.tm_min;
+            sec = gmtm.tm_sec;
+
+            mystring += " to " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec) + " for " + std::to_string(diff.count()) + " seconds.\n";
+
+            fileHandler->logToFile(mystring, MessageType::network_failure);
+
+
         }
     }
 
@@ -409,6 +457,7 @@ void Port::netFailureCheck(int numSeconds)
 
             if (diff.count() > numSeconds)
             {
+                //std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 networkFailure = true;
                 timesUp = true;
             }

@@ -15,8 +15,9 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-//#include "timer.h"
 #include <vector>
+
+#include "fileio.h"
 using std::vector;
 using std::string;
 
@@ -35,12 +36,14 @@ class Port
         bool stillReceiving = true;
         bool networkFailure = false;
         bool portReady = false;
+        FileIO* fileHandler;
         //Timer t;
         
 
     public:
-        Port(LPCSTR portname);
-        Port();
+        Port(LPCSTR portname, FileIO*);
+        Port(FileIO*);
+        Port() {};
         ~Port();
         void openSerialPort(LPCSTR); 
         DWORD readFromSerialPort(char*, int);

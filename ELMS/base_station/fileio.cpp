@@ -304,7 +304,7 @@ bool FileIO::createFolder(const string folderName)
         // otherwise let the user know the directory was successfully made.
         else
         {
-            cout << "Directory" << folderName << " was successfully created" << endl;
+            cout << "Directory " << folderName << " was successfully created" << endl;
 
         }
         return false;

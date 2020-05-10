@@ -36,6 +36,10 @@ Base_Unit::~Base_Unit()
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 
+Base_Unit::Base_Unit(FileIO* _f)
+{
+    fileHandler = _f;
+}
 
 
 /*
@@ -203,7 +207,7 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
                 //get the file path
 
-                fileHandler.logToFile(alertLogMessage, MessageType::alert);
+                fileHandler->logToFile(alertLogMessage, MessageType::alert);
                 
 
             }
@@ -485,5 +489,5 @@ int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int pri
 /* This function allows the base unit to call a fileHandler. */
 void Base_Unit::logToFile(std::string message, MessageType type)
 {
-    fileHandler.logToFile(message, type);
+    fileHandler->logToFile(message, type);
 }
