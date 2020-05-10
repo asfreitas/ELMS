@@ -7,16 +7,7 @@
 // a file is correctly filled by any class object.  
 
 // current message counts are initialized to 1 and 5 for the message limitint FileIO::messageCount = 1;
-int FileIO::networkFailureCount = 1;
-int FileIO::miscCount = 1;
-int FileIO::alertCount = 1;
-int FileIO::messageLimit;
-int FileIO::messageCount = 1;
 
-std::string FileIO::logFileName = "";
-std::string FileIO::alertFile = "";
-std::string FileIO::netFailFile = "";
-std::string FileIO::miscErrorFile ="";
 
 FileIO::FileIO(std::string path, int limit)
 {
@@ -46,6 +37,8 @@ FileIO::FileIO()
 } 
 FileIO::~FileIO()
 {
+    if (writing_thread.joinable())
+        writing_thread.join();
     std::cout << "I am in the FileIO destructor" << endl;
 }
 /*

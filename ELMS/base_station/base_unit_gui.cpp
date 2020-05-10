@@ -81,7 +81,7 @@ void AddMenus(HWND handle)
 	HMENU hFileMenu = CreateMenu();
 	HMENU hSubMenu = CreateMenu();
 
-	AppendMenu(hSubMenu, MF_STRING, CHANGE_TITLE, "Change Title");
+	AppendMenuA(hSubMenu, MF_STRING, CHANGE_TITLE, "Change Title");
 
 	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_NEW, "New");
 	AppendMenu(hFileMenu, MF_POPUP, (UINT_PTR) hSubMenu, "Open Submenu");
@@ -141,8 +141,8 @@ bool getPort()
 		std::cout << "Failed to register" << std::endl;
 
 	hWnd = CreateWindowW(L"WINAPITest", L"WinAPI Tutorial", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
-	hButton = CreateWindow("button", "Selbstzerstörung", WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 10, 70, 300, 50, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON, hInstance, 0);
-	hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL, 400, 40, 150, 200, hWnd, (HMENU)ID_LISTBOX, 0, 0);
+	hButton = CreateWindowA("button", "Selbstzerstörung", WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 10, 70, 300, 50, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON, hInstance, 0);
+	hList = CreateWindowExA(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL, 400, 40, 150, 200, hWnd, (HMENU)ID_LISTBOX, 0, 0);
 
 	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"first");
 	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"second");

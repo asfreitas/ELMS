@@ -53,7 +53,6 @@ int main()
 {
 	//getPort();
 	//startWindow();
-	FileIO file("C:\\logs", 5);
 
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
@@ -74,14 +73,13 @@ int main()
 	//This function is called to create the log directories that will be 
 	// used in the program...if they do not already exist. 
 	//b.createFolder();
-	file.createFolders();
 
 	// this function call creates the name of the file and the path to it. 
 	// this will be used to open the files and write to them. 
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	//b.getFilePath(fileName, 0)
-	LPCSTR portname = "COM7";                /*Ports will vary for each computer */
+	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
 	Port p(portname);
 
 	bool startNewLog = false;
@@ -111,8 +109,8 @@ int main()
                 #pragma omp section
 				{
 					cout << incomingMessage << endl;
-					file.logToFile(incomingMessage, MessageType::incoming);
-					//b.logFile(fileName, &incomingMessage, 0);
+					//file.logToFile(incomingMessage, MessageType::incoming);
+					b.logToFile(incomingMessage, MessageType::incoming);
 				}
 
                 #pragma omp section
@@ -144,7 +142,7 @@ int main()
 			//cout << "The buffer is empty" << endl;
 		}
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	} /* end while loop */
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */

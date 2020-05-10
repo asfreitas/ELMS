@@ -30,17 +30,17 @@ class FileIO
         std::string pathToMiscErrors;
         // current message counts need to be the same for all objects in the
         // class
-        static int messageCount;
-        static int networkFailureCount;
-        static int miscCount;
-        static int alertCount;
-        static int messageLimit;
+        int messageCount;
+        int networkFailureCount;
+        int miscCount;
+        int alertCount;
+        int messageLimit;
         // filenames being written to need to be the same for all objects in
         // the class. 
-        static std::string logFileName;
-        static std::string alertFile;
-        static std::string netFailFile;
-        static std::string miscErrorFile;
+        std::string logFileName;
+        std::string alertFile;
+        std::string netFailFile;
+        std::string miscErrorFile;
         // remaining variables
         std::thread writing_thread;
         std::mutex mtx_write;

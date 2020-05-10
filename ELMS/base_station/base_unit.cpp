@@ -202,18 +202,10 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.size() - 2);
                 //get the file path
-                MessageType a = MessageType::alert;
-                if (fileHandler.getMessageCount(a) == fileHandler.getMessageLimit() || fileHandler.getMessageCount(a) == 1)
-                {
-                    fileHandler.logToFile(alertLogMessage, a);
-                }
-                else
-                {
-                    //get the current open file.
-                    alertFileName = fileHandler.getFilePath(a);
-                    fileHandler.logToExistingFile(alertFileName, alertLogMessage, a);
 
-                }
+                fileHandler.logToFile(alertLogMessage, MessageType::alert);
+                
+
             }
         }
 
