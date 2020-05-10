@@ -121,7 +121,7 @@ int main()
 					// added to the vector of mine vehicles
 					vehicle = new Vehicle();
 					//set the index to the size of the mineVehicles
-					index = b.getMineVehicles().size();
+					index = static_cast<int>(b.getMineVehicles().size());
 					// add the vehicle pointer to the vector
 					b.addToMineVehicles(vehicle);
 					//this function is going to have a mutex and lock within the input_data function

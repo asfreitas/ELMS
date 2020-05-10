@@ -61,7 +61,7 @@ class Vehicle
         double getBearing();
         int getPriorityNumber();
         map<int, double>* getMapOfVehicles();
-        int getMapSize(Vehicle& v);
+        size_t getMapSize(Vehicle& v);
         int getVehicleID() { return unit; }
 
         //regular functions

@@ -114,7 +114,7 @@ map<int, double>* Vehicle::getMapOfVehicles()
     return &distance_to_other_vehicles;
 }
 
-int Vehicle::getMapSize(Vehicle& v)
+size_t Vehicle::getMapSize(Vehicle& v)
 {
     return v.getMapOfVehicles()->size();
 }
