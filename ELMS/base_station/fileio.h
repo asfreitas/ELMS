@@ -30,10 +30,10 @@ class FileIO
         std::string pathToMiscErrors;
         // current message counts need to be the same for all objects in the
         // class
-        int messageCount;
-        int networkFailureCount;
-        int miscCount;
-        int alertCount;
+        int messageCount = 1;
+        int networkFailureCount = 1;
+        int miscCount = 1;
+        int alertCount = 1;
         int messageLimit;
         // filenames being written to need to be the same for all objects in
         // the class. 

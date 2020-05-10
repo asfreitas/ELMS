@@ -78,6 +78,8 @@ int& FileIO::getMessageCount(MessageType type)
     case MessageType::misc: return miscCount;
     default: break;
     }
+    //return messageCount as default
+    return messageCount;
 
 }
 string FileIO::getFilePath(MessageType type)
@@ -90,6 +92,7 @@ string FileIO::getFilePath(MessageType type)
     case MessageType::misc: return miscErrorFile;
     default: break;
     }
+    return "No file path available";
 }
 
 /*

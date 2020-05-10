@@ -133,7 +133,7 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
     string alertFileName;
     char fileName[100];
     double speed, distance = 0, bearing;
-    int index;
+    unsigned long int index;
 
     //iterator that will be used to iterate thru a map
     map<int, double>::iterator itr;
@@ -200,7 +200,8 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 //convert the outgoing message to a char * so that it can be transmitted
                 stringToCharPointer(alertMessage, fileName);
                 // send the alerts
-                DWORD test = p.writeToSerialPort(fileName, alertMessage.length() + 1, h);
+                auto len = static_cast<int>(alertMessage.length());
+                p.writeToSerialPort(fileName, len + 1, h);
 
                 //we also need to create the alert message
                 // remove the \n from the end of the message
@@ -235,7 +236,7 @@ void Base_Unit::update_data(struct message* ptr, int indice)
 {
     mtx_update_master.lock();
     int duplicate;
-    int index;
+    unsigned long int index;
     //check for a duplicate id
     duplicate = contains_id_number(ptr->vehicle, index);
 
@@ -276,13 +277,13 @@ size_t Base_Unit::get_size(const vector<Vehicle*>& v)
  * the vehicle id exists in the vector, then the function returns a 1 which means
  * true.  If it does not contain that vehicle, then a 0 is returned which means
  * false  */
-int Base_Unit::contains_id_number(int id, int& index)
+int Base_Unit::contains_id_number(int id, unsigned long int& index)
 {
-    for (size_t i = 0; i < getMineVehicles().size(); i++)
+    for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
     {
         if (getMineVehicles().at(i)->getUnit() == id)
         {
-            index = static_cast<int>(i);
+            index = (i);
             return 1;
         }
     }
@@ -369,9 +370,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
     double distance;
 
     //iterate through the master list of vehicles
-    for (size_t i = 0; i < getMineVehicles().size(); i++)
+    for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
     {
-        static_cast<int>(i);
 
         if (getMineVehicles().at(i)->getUnit() != v->getUnit())
         {
@@ -392,9 +392,9 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
             // master list and it's distance is inserted into the map
             if (distance <= 50)
             {
-                listOfAlerts.insert(pair<int, double>(static_cast<int>(i), distance));
+                listOfAlerts.insert(pair<int, double>(i, distance));
                 // set both of the vehicles priority numbers to 0
-                setVehicleInMineVehicles(static_cast<int>(i), -1, -1, -1, -1, -1, 0);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0);
                 setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0);
                 // a 0 priority was set, so this needs to remain
                 set0 = true;
@@ -406,8 +406,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 /*need to search the vehicle at i's list to make sure it does
                  *not have a higher priority before changing. p represents the
                  *priority of the other vehicle this loop is comparing against.*/
-                p = static_cast<int>(checkOtherVehiclesPriorityNumbers(v, static_cast<int>(i), 1));
-                setVehicleInMineVehicles(static_cast<int>(i), -1, -1, -1, -1, -1, p);
+                p = (checkOtherVehiclesPriorityNumbers(v, i, 1));
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
 
                 /* If the vehicle has not had a priority of 0 set yet, we can
                    set it to 1. */
@@ -425,9 +425,9 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 /* check the other vehicles distances from other vehicles before
                    we change it's overall priority number
                  */
-                p = static_cast<int>(checkOtherVehiclesPriorityNumbers(v, static_cast<int>(i), 2));
+                p = checkOtherVehiclesPriorityNumbers(v, i, 2);
                 /* set the other vehicles priority number */
-                setVehicleInMineVehicles(static_cast<int>(i), -1, -1, -1, -1, -1, p);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
 
                 /* for the current vehicle, if it has not already been set to
                  * a priority 0 or 1, then set to a priority 2 */
@@ -444,10 +444,10 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 /* check the other vehicles distances from vehicles in its map
                    before we change it's overall priority number
                  */
-                p = checkOtherVehiclesPriorityNumbers(v, static_cast<int>(i), 3);
+                p = checkOtherVehiclesPriorityNumbers(v, i, 3);
                 /*set the other vehicle to the lowest priority number based
                   on distances it is from other vehicles in its map*/
-                setVehicleInMineVehicles(static_cast<int>(i), -1, -1, -1, -1, -1, p);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
 
                 /* for the current vehicle, it it has not yet been set to a
                  * priority 0, 1, or 2, then set it to a priority 3 */
