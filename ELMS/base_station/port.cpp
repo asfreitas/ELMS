@@ -141,7 +141,6 @@ HANDLE Port::setupPort(LPCSTR portname)
 {
     HANDLE hSerial = NULL;
     std::string name;
-    vector<string> listOfPorts;
 
     if (portname == NULL)
     {
@@ -159,18 +158,19 @@ HANDLE Port::setupPort(LPCSTR portname)
                 std::cout << "here is the port name: " << portname << std::endl;
         }*/
         SelectComPort(listOfPorts);
+
         //if there are no COM ports detected, the vector list will be empty
         // and the program will exit
-        if (listOfPorts.empty())
-        {
-            std::cout << "There are no COM ports available" << std::endl;
-            std::cout << "Program is exiting..." << std::endl;
+        //if (listOfPorts.empty())
+        //{
+            //std::cout << "There are no COM ports available" << std::endl;
+            //std::cout << "Program is exiting..." << std::endl;
             //exit the program because there are no COM ports detected. 
-            exit(1);
-        }
+            //exit(1);
+        //}
 
-        else
-        {
+        //else
+        //{
             for (size_t i = 0; i < listOfPorts.size(); i++)
             {
                 std::cout << listOfPorts.at(i) << std::endl;
@@ -183,12 +183,14 @@ HANDLE Port::setupPort(LPCSTR portname)
              * STR is:
              * https://stackoverflow.com/questions/44279753/how-to-convert-stdstring-to-lptstr
             */
-            string str = listOfPorts.at(0);
-            portname = str.c_str();
-            printf("here is the portname: %s\n", portname);
-            hSerial = createPort(portname);
+            name = "COM" + std::to_string(1);
+            portname = name.c_str();
+            //printf("here is the portname: %s\n", portname);
+            getPort(&listOfPorts, portname);
+            printf("Here is the value of portname from port.cpp: %s\n", portname);
+            hSerial = createPort((LPCSTR)portname);
 
-        }
+        //}
     }
 
     // The portnname is known, the the serial handle is created. 

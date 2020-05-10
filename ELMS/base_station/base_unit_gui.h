@@ -8,8 +8,12 @@
 #ifndef BASE_UNIT_GUI_H
 #define BASE_UNIT_GUI_H
 #include <windows.h>
+#include "port.h"
 #include <string>
 #include <iostream>
+#include <cstring>
+#include <vector>
+using std::vector;
 using std::string;
 
 #define FILE_MENU_NEW 1
@@ -21,10 +25,11 @@ using std::string;
 
 
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 void startWindow();
 void AddMenus(HWND hWnd);
 void AddControls(HWND);
-bool getPort();
+bool getPort(vector<string>*, LPCSTR&);
 
 #endif // !BASE_UNIT_GUI_H

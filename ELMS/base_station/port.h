@@ -15,6 +15,13 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+//#include "timer.h"
+=======
+//#include "timer.h"
+#include "base_unit_gui.h"
+>>>>>>> Stashed changes
 #include <vector>
 
 #include "fileio.h"
@@ -23,6 +30,8 @@ using std::string;
 
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
+
+static vector<string> listOfPorts;
 
 class Port
 {
@@ -36,7 +45,12 @@ class Port
         bool stillReceiving = true;
         bool networkFailure = false;
         bool portReady = false;
+<<<<<<< Updated upstream
         FileIO* fileHandler;
+||||||| merged common ancestors
+=======
+
+>>>>>>> Stashed changes
         //Timer t;
         
 
