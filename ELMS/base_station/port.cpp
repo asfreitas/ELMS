@@ -150,11 +150,6 @@ HANDLE Port::setupPort(LPCSTR portname)
         // available ports. 
         SelectComPort(listOfPorts);
         
-        //print to the screen the available ports.
-        //for (size_t i = 0; i < listOfPorts.size(); i++)
-        //{
-            //std::cout << listOfPorts.at(i) << std::endl;
-        //}
         //call getPort to get the available ports
         getPort(&listOfPorts, temp);
 
