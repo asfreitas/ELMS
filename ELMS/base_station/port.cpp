@@ -151,15 +151,24 @@ HANDLE Port::setupPort(LPCSTR portname)
         SelectComPort(listOfPorts);
         
         //print to the screen the available ports.
-        for (size_t i = 0; i < listOfPorts.size(); i++)
-        {
-            std::cout << listOfPorts.at(i) << std::endl;
-        }
+        //for (size_t i = 0; i < listOfPorts.size(); i++)
+        //{
+            //std::cout << listOfPorts.at(i) << std::endl;
+        //}
         //call getPort to get the available ports
         getPort(&listOfPorts, temp);
 
         //convert temp to LPCSTR
         portname = temp.c_str();
+        //if the first letter of portname is 0, then this means portname 
+        // returned "No Ports Detected"...so we exit. 
+        if (portname[0] == 'N')
+        {
+            cout << "No serial ports found...exiting with code 1" << endl;
+            exit(1);
+        }
+        else
+            cout << "Waiting for data from mobile unit..." << endl;
         //we have a portname, so we call createPort
         hSerial = createPort(portname);
     }
@@ -525,7 +534,7 @@ void Port::SelectComPort(vector <string>& comPortList) //added function to find 
         // Test the return value and error if any
         if (test != 0) //QueryDosDevice returns zero if it didn't find an object
         {
-            //push the port onto the list of serial ports available.
+           //push the port onto the list of serial ports available.
             comPortList.push_back(str);
             isComPort = true;
         }

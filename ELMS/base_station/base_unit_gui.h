@@ -26,6 +26,7 @@ using std::endl;
 #define CHANGE_TITLE 4
 #define ID_SELF_DESTROY_BUTTON 100
 #define ID_LISTBOX 101
+#define ID_CLOSE 102
 
 
 

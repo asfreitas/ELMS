@@ -9,10 +9,17 @@
 //You tube reference called:
 // Windows GUI Programming with C/C++ ( Win32 API ) | Part -1 | Creating a window
 
-// declare needed globals
+//These are Win32 API handlers used.
 HWND hEdit;
 HWND hList;
+
+//This char array holds the COM port. 
 char comPort[50];
+
+/*
+TOP PART OF THIS FILE IS TUTORIAL -- BOTTOM HALF HAS PROGRAM CODE
+
+*/
 
 /*
 ===================================================================
@@ -31,7 +38,16 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		case CHANGE_TITLE:
 			wchar_t text[100];
+            /*This is a predefined function that gets the text inside the
+			 * control. First argument is the handler of the control. The 
+			 * second is where we want to store the text that is received, and
+			 * the third argument is the maximum length */
 			GetWindowTextW(hEdit, text, 100);
+
+			/* First argument is the handler of the window that we want to
+			 *  change the text. In this case, it is the parent window. The 
+			 *  second argument is the text.
+			 */
 			SetWindowTextW(hWnd, text);
 			break;
 
@@ -53,12 +69,12 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
-
 		break;
 
 	default:
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}
+	return DefWindowProcW(hWnd, msg, wp, lp);
 }
 /*                           
 ====================================================
@@ -103,7 +119,7 @@ void AddMenus(HWND handle)
 	HMENU hFileMenu = CreateMenu();
 	HMENU hSubMenu = CreateMenu();
 
-	AppendMenuA(hSubMenu, MF_STRING, CHANGE_TITLE, "Change Title");
+	AppendMenuA(hSubMenu, MF_STRING, NULL, "SumMenu Item");
 
 	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_NEW, "New");
 	AppendMenu(hFileMenu, MF_POPUP, (UINT_PTR)hSubMenu, "Open Submenu");
@@ -120,17 +136,61 @@ void AddMenus(HWND handle)
 ===========================================================================
 AddControls
 This function is part of a tutorial to add a text box that allows the user
-to enter text. 
+to enter text. The parameter is the window handler. 
 ==============================================================================
 */
 void AddControls(HWND hWnd)
 {
+	/* Win32 api has predefined classes of static and edit. First argument is the
+	 * class, second argument is the name of the window or the text inside the 
+	 * control. Third argument is style. Important to make sure that you use 
+	 * WS_VISIBLE | WS_CHILD because a control is a child of the parent window.
+	 * WS stands for Window Style. SS means static style which gives the 
+	 * alignment of the text. 
+	 * The 4th and 5th arguments are the x and y coordinates in the window. 
+	 * The top left coordinate is (0,0), The bottom left coordinate is (0, size of parent)
+	 * The top right is (size of parent, 0) and the bottom right is (size of parent, size of 
+	 * parent). The 6th and 7 arguments are the width and the height. In this case,
+	 * the width and height are 100 and 50. The 8th argument is the parent. hWnd 
+	 * is the parent widow of this static box. 9th argument is any menu which in
+	 * this case is NULL, 10th argument is the hInstance, but this is a child so
+	 * it is a NULL.  The last argument is another argument which in this case
+	 * is also not needed. 
+	*/
 	CreateWindowW(L"static", L"Enter Text In The Box Below ", WS_VISIBLE | WS_CHILD |
 		WS_BORDER | SS_CENTER, 200, 100, 100, 50, hWnd, NULL, NULL, NULL);
+
+	/* edit is the predined class for windows api which allows the user to 
+	 * edit in the window. Note that 152 was used in this child because the 
+	 * first box is (200, 100), so we want it to start a couple of pixels below
+	 * the top box. The width and height are the same as the box above. The
+	 * styles of ES_MULTILINE and AUTOVSCROLL allows the user to type in 
+	 * multilines and also for the window to scroll.
+	 * Whenever the CreateWindowW function is called, a handler is returned. 
+	 * This handler is stored in hEdit. 
+	 */
 	hEdit = CreateWindowW(L"edit", L" ", WS_VISIBLE | WS_CHILD | WS_BORDER |
 		ES_MULTILINE | ES_AUTOVSCROLL, 200, 152, 100, 50, hWnd, NULL, NULL, NULL);
 
+	/* To create a button, use the windows class button. The second argument is 
+	   the text present in the button, the 3rd argument is the style, the 4th 
+	   and 5th arguments are the window coordinates. In this case we use 204 and
+	   100 because the area above was 152 + 50 and then we add 2 pixels more for
+	   spacing. The 6th and 7th arguments are the width and height which are 
+	   kept the same. 8th argument is the handler of the parent window. The 9th
+	   argument is for HMenu, CHANGE_TITLE but we also need to cast it.
+	   The 10th and 11th arguments are NULL. 
+	 */
+	CreateWindowW(L"button", L"Change title", WS_VISIBLE | WS_CHILD, 204, 100, 100, 50,
+		hWnd, (HMENU)CHANGE_TITLE, NULL, NULL);
 }
+
+/*
+Tutorial is above -- Program code is below. 
+================================================================================
+===============================================================================
+================================================================================
+*/
 
 /*
 ============================================================================
@@ -161,26 +221,47 @@ https://stackoverflow.com/questions/42438135/c-winapi-listbox-getting-selected-i
 */
 LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	// a flag is used so that the user cannot exit via the close button until
+	// they have selected a port. 
+	static int flag = 0;
+	char buffer[50];
 	switch (uMsg) {
 	case WM_CLOSE:
+		DestroyWindow(hWnd);
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:
 
+
 		if (LOWORD(wParam) == ID_SELF_DESTROY_BUTTON) {
-			//if the button is pushed
-			char buffer[50];
+			//if the select port button is pushed
+			//char buffer[50];
+			// reset buffer and comPort
+			memset(buffer, '\0', 50);
+			memset(comPort, '\0', 50);
 			//get the list number that was selected
 			DWORD64 dwSel = SendMessage(hList, LB_GETCURSEL, 0, 0);
-			if (dwSel != LB_ERR)
+			if (dwSel > 0)
 			{
 				//retrieve the text
 				SendMessage(hList, LB_GETTEXT, dwSel, (LPARAM)(LPCSTR) buffer);
 				//copy it into the global string
 				strcpy_s(comPort, buffer);
-				break;
+				if (comPort[0] != 0)
+				{
+					flag = 1;
+				}
+				break;				
 			}
+			break;
+		}
+		else if (LOWORD(wParam) == ID_CLOSE && flag == 1)
+		{
+			// reset flag to 0
+			flag = 0;
+			SendMessage(hWnd, WM_CLOSE, NULL, NULL );			
 		}
 		break;
 
@@ -199,6 +280,7 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	HINSTANCE hInstance = GetModuleHandle(0);
 	HWND hWnd;
 	HWND hButton;
+	HWND hButtonClose;
 	WNDCLASS wc;
 	MSG msg;
 
@@ -211,19 +293,39 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 
 	if (!RegisterClass(&wc))
 		std::cout << "Failed to register" << std::endl;
-
+	//this creates the parent windows and sets it position on the screen
 	hWnd = CreateWindowW(L"SELECT_PORT", L"Select a COM port", WS_OVERLAPPEDWINDOW |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
+
+	/*this creates the button in the window that the user will use to select the
+	 * COM port. */
 	hButton = CreateWindowW(L"button", L"Select Port and Click This Button", WS_TABSTOP |
 		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 10, 70, 300, 50, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
 		hInstance, 0);
+
+	/*Create a button that will be used to close the window once the COM port 
+	  has been selected */
+	hButtonClose = CreateWindowW(L"button", L"Close Window after Port Selection"
+		, WS_VISIBLE | WS_CHILD |
+		WS_TABSTOP | BS_DEFPUSHBUTTON, 10, 130, 300, 50, hWnd, (HMENU)ID_CLOSE,
+		NULL, NULL);
+
 	hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE |
-		WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY, 400, 40, 150, 200, 
+		WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY, 400, 40, 200, 200, 
 		hWnd, (HMENU)ID_LISTBOX, 0, 0);
-	//if the listOfPorts is empty, then tell the user and exit
+
+	//Build the contents of the list box
+	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Select a COM Port");
+	//if the listOfPorts is empty, then tell the user
 	if (listOfPorts->empty())
 	{
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"No Ports Detected");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"No Ports Detected!");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Select No Ports Detected");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Click the Select Port button");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Then Close the Window");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"The Program will exit");
 	}
 	//otherwise, convert the list of ports to messages that will be added to
 	// the list in the listbox.
@@ -252,6 +354,7 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 			return result;
 		}
 	}
+	return 0;
 }
 
 
