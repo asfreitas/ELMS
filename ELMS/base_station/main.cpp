@@ -91,7 +91,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 3)
+	while (p.isPortReady() && count < 12)
 	{
 
 		if (!p.isBufferEmpty())
