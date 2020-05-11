@@ -140,57 +140,28 @@ Check for a handle until we find one that doesn't return an error
 HANDLE Port::setupPort(LPCSTR portname)
 {
     HANDLE hSerial = NULL;
-    std::string name;
+    string temp;
 
+    vector <string> listOfPorts;
+    //declare a vector that will hold the list of ports available
     if (portname == NULL)
     {
-        /*for (int x = 1; x <= 10; x++)
-        {
-            name = "COM" + std::to_string(x);
-            portname = name.c_str();
-            hSerial = createPort(portname);
-
-            if (hSerial != INVALID_HANDLE_VALUE) 
-            {
-                return hSerial; // open the port if we find one that doesn't return an eror
-            }
-            else
-                std::cout << "here is the port name: " << portname << std::endl;
-        }*/
+        //if portname was NULL, then we call SelectComPort to get the list of
+        // available ports. 
         SelectComPort(listOfPorts);
+        
+        //print to the screen the available ports.
+        for (size_t i = 0; i < listOfPorts.size(); i++)
+        {
+            std::cout << listOfPorts.at(i) << std::endl;
+        }
+        //call getPort to get the available ports
+        getPort(&listOfPorts, temp);
 
-        //if there are no COM ports detected, the vector list will be empty
-        // and the program will exit
-        //if (listOfPorts.empty())
-        //{
-            //std::cout << "There are no COM ports available" << std::endl;
-            //std::cout << "Program is exiting..." << std::endl;
-            //exit the program because there are no COM ports detected. 
-            //exit(1);
-        //}
-
-        //else
-        //{
-            for (size_t i = 0; i < listOfPorts.size(); i++)
-            {
-                std::cout << listOfPorts.at(i) << std::endl;
-            }
-            /* Here is where the Window for the user to select the port they 
-             * wish to use will be displayed.  Once they make their selection,
-             * portname will be set to that value and createPort will be called.
-             * The window has not been implemented yet. The reference for how
-             * to convert a std::string to LPCSTR (Long Pointer to Constant 
-             * STR is:
-             * https://stackoverflow.com/questions/44279753/how-to-convert-stdstring-to-lptstr
-            */
-            name = "COM" + std::to_string(1);
-            portname = name.c_str();
-            //printf("here is the portname: %s\n", portname);
-            getPort(&listOfPorts, portname);
-            printf("Here is the value of portname from port.cpp: %s\n", portname);
-            hSerial = createPort((LPCSTR)portname);
-
-        //}
+        //convert temp to LPCSTR
+        portname = temp.c_str();
+        //we have a portname, so we call createPort
+        hSerial = createPort(portname);
     }
 
     // The portnname is known, the the serial handle is created. 
@@ -525,11 +496,17 @@ bool Port::waitCommMask(DWORD mask)
     return dwEventMask;
 }
 
-/* This function is from the following two references
+/* 
+=============================================================================
+SelectComPort
+
+This function is from the following two references
  https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
  https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
   It will find the available COM ports and adds them to a vector list that is
   sent in by reference. 
+
+  ==========================================================================
   */
 void Port::SelectComPort(vector <string>& comPortList) //added function to find the present serial 
 {
