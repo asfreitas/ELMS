@@ -4,6 +4,7 @@
 * GUI Windows
 */
 #include "base_unit_gui.h"
+#include <commctrl.h>
 
 //https://www.youtube.com/watch?v=8GCvZs55mEM
 //You tube reference called:
@@ -12,6 +13,10 @@
 //These are Win32 API handlers used.
 HWND hEdit;
 HWND hList;
+HWND settingsText;
+static HBRUSH hBrush = CreateSolidBrush(RGB(230, 230, 230));
+HBITMAP hLogoImage, hLogoImage1;
+HWND hLogo, hLogo1;
 
 //This char array holds the COM port. 
 char comPort[50];
@@ -217,6 +222,11 @@ LRESULT CALLBACK MessageHandler
 This function is the call back for the listbox that was created. 
 https://stackoverflow.com/questions/42438135/c-winapi-listbox-getting-selected-item-using-lb-getsel-lb-getcursel
 /https://gist.github.com/Pilzschaf/d950a86042c37a9c8d1a8b9b5f082fff
+
+First Argument -- Window handler
+Second Argument -- Message which have been sent
+Third Argument -- 
+Fourth Argument -- 
 =============================================================================
 */
 LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -232,6 +242,53 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
+	case WM_CREATE:
+		//AddText(hWnd);
+		//loadImages();
+
+	/*case WM_PAINT: {
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+		HDC hdc_x = CreateCompatibleDC(NULL);
+		HBITMAP hBitmap = (HBITMAP)LoadImage(NULL, "C:\\Users\\DEBBIE\\source\\repos\\ELMS base gui\\x64\\red.bmp", IMAGE_BITMAP,
+			0, 0, LR_LOADFROMFILE);
+		SelectObject(hdc_x, hBitmap);
+
+		RECT rect;
+		GetWindowRect(hWnd, &rect);
+		BitBlt(hdc, 0, 0, rect.right - rect.left, 400, hdc_x, 0, 0, SRCCOPY);
+		EndPaint(hWnd, &ps);
+	}*/
+
+	/*case WM_CTLCOLORSTATIC:
+	{
+		if (settingsText == (HWND)lParam)
+		{
+			//OR if the handle is unavailable to you, get ctrl ID
+
+			DWORD CtrlID = GetDlgCtrlID((HWND)lParam); //Window Control ID
+			if (CtrlID == IDC_STATIC1) //If desired control
+			{
+				HDC hdcStatic = (HDC)wParam;
+				SetTextColor(hdcStatic, RGB(0, 0, 0));
+				SetBkColor(hdcStatic, RGB(255, 0, 0));
+				return (INT_PTR)hBrush;
+			}
+		}
+	}*/
+		/*Reference:https://www.cplusplus.com/forum/windows/176612/ */
+	case WM_CTLCOLORSTATIC:
+	{
+		HDC hdcStatic = (HDC)wParam; // or obtain the static handle in some other way
+		SetTextColor(hdcStatic, RGB(255, 0, 0)); // text color
+		//SetBkColor(hdcStatic, RGB(255, 255, 224));
+		return (LRESULT)GetStockObject(WHITE_BRUSH);
+		//return (INT_PTR)hBrush;
+		//return (INT_PTR)CreateSolidBrush(RGB(255, 255, 255));
+	}
+	break;
+
 	case WM_COMMAND:
 
 
@@ -281,37 +338,51 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	HWND hWnd;
 	HWND hButton;
 	HWND hButtonClose;
-	WNDCLASS wc;
+	WNDCLASS wc = { 0 };
 	MSG msg;
 
-	wc = {};
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = MessageHandler;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hInstance = hInstance;
-	wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-	wc.lpszClassName = "SELECT_PORT";
+	wc.hbrBackground = CreateSolidBrush(0xFF6633);
+	//wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);// (GetSysColorBrush(COLOR_3DFACE);//(HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	wc.lpszClassName = "SelectPort";
 
 	if (!RegisterClass(&wc))
 		std::cout << "Failed to register" << std::endl;
-	//this creates the parent windows and sets it position on the screen
-	hWnd = CreateWindowW(L"SELECT_PORT", L"Select a COM port", WS_OVERLAPPEDWINDOW |
-		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
 
+	/*this creates the parent windows and sets it position on the screen
+	  Arguments are:  Window class, Title of Window, Style of Window, X and Y 
+	  Position of Window, Width and Height of Window, remaining parameters are
+	  set to NULL
+	*/
+	//loadImages();
+	hWnd = CreateWindowW(L"SelectPort", L"Select a Port", WS_OVERLAPPEDWINDOW |
+		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+	loadImages();
 	/*this creates the button in the window that the user will use to select the
 	 * COM port. */
-	hButton = CreateWindowW(L"button", L"Select Port and Click This Button", WS_TABSTOP |
-		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 10, 70, 300, 50, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
+
+	hButton = CreateWindowW(L"button", NULL, WS_TABSTOP |
+		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP | WS_BORDER , 400, 250, 100, 60, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
 		hInstance, 0);
+	SendMessageW(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage1);
 
 	/*Create a button that will be used to close the window once the COM port 
 	  has been selected */
-	hButtonClose = CreateWindowW(L"button", L"Close Window after Port Selection"
-		, WS_VISIBLE | WS_CHILD |
-		WS_TABSTOP | BS_DEFPUSHBUTTON, 10, 130, 300, 50, hWnd, (HMENU)ID_CLOSE,
+	hButtonClose = CreateWindowW(L"button", NULL
+		, WS_VISIBLE | WS_CHILD | BS_BITMAP| WS_BORDER |
+		WS_TABSTOP | BS_DEFPUSHBUTTON , 502, 250, 100, 60, hWnd, (HMENU)ID_CLOSE,
 		NULL, NULL);
+	SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
+
+
+	//hLogo = CreateWindowW(L"static", L"Exit", WS_VISIBLE | WS_CHILD | SS_BITMAP, 100, 50, 98, 500, hWnd, NULL, NULL, NULL);
+	//SendMessageW(hLogo, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
 
 	hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE |
-		WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY, 400, 40, 200, 200, 
+		WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY | WS_THICKFRAME, 400, 40, 200, 200, 
 		hWnd, (HMENU)ID_LISTBOX, 0, 0);
 
 	//Build the contents of the list box
@@ -319,13 +390,9 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	//if the listOfPorts is empty, then tell the user
 	if (listOfPorts->empty())
 	{
+		AddText_NoSerial(hWnd);
 		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"");
 		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"No Ports Detected!");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Select No Ports Detected");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Click the Select Port button");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Then Close the Window");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"The Program will exit");
 	}
 	//otherwise, convert the list of ports to messages that will be added to
 	// the list in the listbox.
@@ -355,6 +422,51 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 		}
 	}
 	return 0;
+}
+/*
+==========================================================================
+* AddText
+
+* Predined class for text is static. Class name static is not sensitive. Second
+* Argument is the text in the static control.  This is usually a label. Third
+* argument is style. You must "Or" the two arguments here. The next two arguments
+* are the x and y coordinates. Next two arguments are the width and height, next
+* arguments is the parent window handler, next is HMenu if there is one, then
+* the instance but since this is a child we put NULL, and lastly a parameter 
+* which is not needed, so it is kept as NULL.
+References:
+http://forums.codeguru.com/showthread.php?105498-Multiline-in-Static-Text
+https://stackoverflow.com/questions/45653034/c-win32-change-static-color
+
+===============================================================================
+*/
+void AddText_NoSerial(HWND hWnd)
+{
+	settingsText = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Highlight \"No Ports Detected\"\
+     \r\n(2) Click on \"Select Port\" Button\r\n(3) Click on \"Exit\" Button"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+		10, 40, 300, 100, hWnd, NULL, NULL, NULL);
+	HDC hdcStatic = GetDC(settingsText);
+	
+}
+
+/*
+==============================================================================
+AddText_SerialDetected
+Adds instructions if serial ports are detected
+==============================================================================
+*/
+
+
+/*
+===========================================================================
+loadImages()
+
+*/
+void loadImages()
+{
+	hLogoImage = (HBITMAP)LoadImageW(NULL, L"x64\\red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	//hLogoImage = (HBITMAP)LoadImageW(NULL, L"C:\\Users\\DEBBIE\\source\\repos\\ELMS base gui\\x64\\red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"C:\\Users\\DEBBIE\\source\\repos\\ELMS base gui\\x64\\blue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 }
 
 
