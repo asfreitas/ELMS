@@ -38,6 +38,7 @@ void startWindow();
 void AddMenus(HWND hWnd);
 void AddControls(HWND);
 void AddText_NoSerial(HWND);
+void AddText_Serial(HWND hWnd);
 void loadImages();
 
 /*These two functions get the port with user input*/

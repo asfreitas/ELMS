@@ -157,9 +157,9 @@ HANDLE Port::setupPort(LPCSTR portname)
         portname = temp.c_str();
         //if the first letter of portname is 0, then this means portname 
         // returned "No Ports Detected"...so we exit. 
-        if (portname[0] == 'N')
+        if (portname[0] == 'N' || portname[0] == NULL)
         {
-            cout << "No serial ports found...exiting with code 1" << endl;
+            cout << "No serial ports found or none were selected...exiting with code 1" << endl;
             exit(1);
         }
         else

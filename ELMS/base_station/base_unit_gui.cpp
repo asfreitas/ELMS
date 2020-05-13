@@ -13,7 +13,7 @@
 //These are Win32 API handlers used.
 HWND hEdit;
 HWND hList;
-HWND settingsText;
+HWND settingsText, settingsText1, settingsText2;
 static HBRUSH hBrush = CreateSolidBrush(RGB(230, 230, 230));
 HBITMAP hLogoImage, hLogoImage1;
 HWND hLogo, hLogo1;
@@ -291,7 +291,6 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 	case WM_COMMAND:
 
-
 		if (LOWORD(wParam) == ID_SELF_DESTROY_BUTTON) {
 			//if the select port button is pushed
 			//char buffer[50];
@@ -319,6 +318,20 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			// reset flag to 0
 			flag = 0;
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL );			
+		}
+		else if (LOWORD(wParam) == ID_CLOSE && flag == 0)
+		{
+			memset(buffer, '\0', 50);
+			DWORD64 dwSel1 = SendMessage(hList, LB_GETCURSEL, 0, 0);
+			SendMessage(hList, LB_GETTEXT, dwSel1, (LPARAM)(LPCSTR)buffer);
+			if (buffer[0] == 'N')
+			{
+				SendMessage(hWnd, WM_CLOSE, NULL, NULL);
+			}
+			else
+			{
+				MessageBox(NULL, "Before Exit, select a COM port and Click Select Port Button", "Select a COM Port", MB_ICONWARNING);
+			}
 		}
 		break;
 
@@ -359,7 +372,7 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	*/
 	//loadImages();
 	hWnd = CreateWindowW(L"SelectPort", L"Select a Port", WS_OVERLAPPEDWINDOW |
-		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,800, 600, NULL, NULL, hInstance, NULL);
 	loadImages();
 	/*this creates the button in the window that the user will use to select the
 	 * COM port. */
@@ -386,18 +399,20 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 		hWnd, (HMENU)ID_LISTBOX, 0, 0);
 
 	//Build the contents of the list box
-	SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Select a COM Port");
 	//if the listOfPorts is empty, then tell the user
 	if (listOfPorts->empty())
 	{
 		AddText_NoSerial(hWnd);
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"");
-		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"No Ports Detected!");
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"NO PORTS DETECTED!!");
 	}
+
 	//otherwise, convert the list of ports to messages that will be added to
 	// the list in the listbox.
-	else
+	if(!listOfPorts ->empty())
 	{
+		//Build the contents of the list box
+		SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"Select a COM Port");
+		AddText_Serial(hWnd);
 		for (size_t i = 0; i < listOfPorts->size(); i++)
 		{
 			string str = listOfPorts->at(i);
@@ -442,8 +457,8 @@ https://stackoverflow.com/questions/45653034/c-win32-change-static-color
 */
 void AddText_NoSerial(HWND hWnd)
 {
-	settingsText = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Highlight \"No Ports Detected\"\
-     \r\n(2) Click on \"Select Port\" Button\r\n(3) Click on \"Exit\" Button"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+	settingsText = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Sorry, no COM ports were detected\
+     \r\n(2) Click on the \"EXIT\" Button\r\n(3) The program will exit with an error."), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
 		10, 40, 300, 100, hWnd, NULL, NULL, NULL);
 	HDC hdcStatic = GetDC(settingsText);
 	
@@ -455,6 +470,13 @@ AddText_SerialDetected
 Adds instructions if serial ports are detected
 ==============================================================================
 */
+void AddText_Serial(HWND hWnd)
+{
+	settingsText1 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Click on a COM Port to Highlight it\
+     \r\n(2) Click \"Select Port\" Button\r\n(3) Click \"Exit\" Button"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+		10, 40, 300, 100, hWnd, NULL, NULL, NULL);
+	HDC hdcStatic = GetDC(settingsText);
+}
 
 
 /*
@@ -464,9 +486,8 @@ loadImages()
 */
 void loadImages()
 {
-	hLogoImage = (HBITMAP)LoadImageW(NULL, L"x64\\red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
-	//hLogoImage = (HBITMAP)LoadImageW(NULL, L"C:\\Users\\DEBBIE\\source\\repos\\ELMS base gui\\x64\\red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
-	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"C:\\Users\\DEBBIE\\source\\repos\\ELMS base gui\\x64\\blue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage = (HBITMAP)LoadImageW(NULL, L"red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"blue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 }
 
 
