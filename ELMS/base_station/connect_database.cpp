@@ -15,45 +15,7 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/stdx.hpp>
 
-#include <iostream>
-#include <cstdint>
-#include <vector>
-#include <time.h>
-
-class Database {
-    typedef mongocxx::pool::entry connection;
-    typedef mongocxx::instance instance;
-    typedef mongocxx::database database;
-    typedef mongocxx::collection collection;
-
-private:
-    mongocxx::uri uri;
-    mongocxx::pool* pool;
-    mongocxx::client client;
-
-public:
-    Database(std::string);
-    ~Database();
-    connection getConnection();
-    void getVehicles();
-    void updateVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
-        double new_bearing, std::string status);
-    void updateVehicleStartupTime(std::string collection_name, int unit, std::chrono::milliseconds startup_time);
-    void updateVehicleLastReceiveTime(std::string collection_name, int unit, std::chrono::milliseconds last_receive_time);
-    void updateVehicleLastLongitude(std::string collection_name, int unit);
-    void updateVehicleLastLatitude(std::string collection_name, int unit);
-    void updateVehiclePastVelocity(std::string collection_name, int unit);
-    void updateVehiclePastBearing(std::string collection_name, int unit);
-    void updateVehicleNewTime(std::string collection_name, int unit);
-    void updateVehicleNewLongitude(std::string collection_name, int unit);
-    void updateVehicleNewLatitude(std::string collection_name, int unit);
-    void updateVehicleNewVelocity(std::string collection_name, int unit);
-    void updateVehicleNewBearing(std::string collection_name, int unit);
-    void updateVehicleStatus(std::string collection_name, int unit);
-    void updateVehicleDistanceToVehicles(std::string collection_name, int unit);
-    void addVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
-        double new_bearing, std::string status);
-};
+#include "connect_database.h"
 
 
 Database::Database(std::string _uri)
@@ -214,7 +176,9 @@ void Database::updateVehicle(std::string collection_name, int unit, std::chrono:
 }
 
 
-
+/*********************************************************
+Change all of these functions to one template
+*********************************************************
 void Database::updateVehicleStartupTime(std::string collection_name, int unit, std::chrono::milliseconds startup_time) {
 
 }
@@ -257,11 +221,58 @@ void updateVehicleStatus(std::string collection_name, int unit, std::string stat
 void updateVehicleDistanceToVehicles(std::string collection_name, int unit) {
 
 }
+*/
+
+template<typename T>
+void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value)
+{
+    //establish pool connection
+    auto connection = getConnection();
+
+    database test = connection->database("test");
+    //create vehicles
+    collection vehicles = test["vehicles"];
+    //store vehicles
+
+    bsoncxx::stdx::optional<bsoncxx::document::value> result
+        = vehicles.update_one(document{} << "vehicle_unit" << unit << bsoncxx::builder::stream::finalize,
+            document{} << "$set" << bsoncxx::builder::stream::open_document << 
+                queryType << value << bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize);
+    if (result)
+    {
+        std::cout << "Soccessfully updated\n";
+    }
+    else
+    {
+        std::cout << "There was a problem updating\n";
+    }
+
+}
 
 
 
+template <typename T>
+void Database::queryDatabase(std::string queryType, T value)
+{
+    //establish pool connection
+    auto connection = getConnection();
 
+    database test = connection->database("test");
+    //create vehicles
+    collection vehicles = test["vehicles"];
+    //store vehicles
+    bsoncxx::stdx::optional<bsoncxx::document::value> result
+        = vehicles.find_one(bsoncxx::builder::stream::document{} << queryType << value << bsoncxx::builder::stream::finalize);
 
+    if (result) 
+    {
+        std::cout << bsoncxx::to_json(*result) << "\n";
+    }
+    else
+    {
+        std::cout << "Cannot find document";
+    }
+}
 
 
 //create a document that can be inserted using builder method
@@ -317,7 +328,7 @@ void Database::addVehicle(std::string collection_name, int unit, std::chrono::mi
 int main(int, char**) {
 
     Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
-
+    /*
     int unitNum = 1001;
     char t[26];
     std::chrono::milliseconds message_time = std::chrono::milliseconds(5236521);
@@ -330,4 +341,9 @@ int main(int, char**) {
 
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
+    */
+    //newDB.getVehicles();
+
+    newDB.queryDatabase("vehicle_unit", 1);
+
 }
