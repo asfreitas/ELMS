@@ -22,11 +22,9 @@
  /*
  =============
  openSerialPort
-
  portname contains name of serial port and stopbits may be either [1, 1.5, 2]
  returns the handle of the port
  =============
-
  */
 void Port::openSerialPort(LPCSTR portname)
 {
@@ -81,7 +79,6 @@ void Port::openSerialPort(LPCSTR portname)
 /*
 =============
 readFromSerialPort
-
 hSerial		File HANDLE to the serial port
 returns the amount of data that was read
 =============
@@ -102,7 +99,6 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
 /*
 =============
 readFromSerialPort
-
 hSerial		File HANDLE to the serial port
 length is for how much data is going to be written
 returns the amount of data that was written
@@ -133,7 +129,6 @@ void Port::closeSerialPort(HANDLE hSerial)
 /*
 =============
 detectHandle
-
 Check for a handle until we find one that doesn't return an error
 =============
 */
@@ -180,7 +175,6 @@ HANDLE Port::setupPort(LPCSTR portname)
 /*
 =============
 testPort
-
 Attempts to open a port with a particular portname
 =============
 */
@@ -196,7 +190,6 @@ HANDLE Port::createPort(LPCSTR portname)
 /*
 =============
 Contructor - No Parameters
-
 Opens a new port and attempts to find the port automatically
 =============
 */
@@ -214,7 +207,6 @@ Port::Port(FileIO* _f)
 /*
 =============
 Contructor - Portname provided
-
 Opens a new port and attempts to open the port passed into the constructor
 =============
 */
@@ -231,7 +223,6 @@ Port::Port(LPCSTR portname, FileIO* _f)
 /*
 =============
 Destructor
-
 Shuts down the port and makes sure all data has been sent before closing
 =============
 */
@@ -273,7 +264,6 @@ void Port::addToMessageBuffer(std::string message)
 /*
 =============
 removeTopMessage
-
 Removes the top message from the buffer and returns it
 =============
 */
@@ -378,7 +368,6 @@ bool Port::isBufferEmpty()
 /*
 =============
 receiveDataFromSerialPort
-
 Starts up the main thread that will continuously receive data from serial port
 =============
 */
@@ -414,7 +403,6 @@ void Port::startTimer(int numSeconds)
 /*
 =============
 netFailureCheck
-
 Check for network failure and set the networkFailure variable
 =============
 */
@@ -452,7 +440,6 @@ void Port::netFailureCheck(int numSeconds)
 /*
 =============
 setCommMask
-
 // https://docs.microsoft.com/en-us/windows/win32/devio/monitoring-communications-events
 =============
 */
@@ -488,7 +475,6 @@ void Port::setCommMask(DWORD mask)
 /*
 =============
 waitCommMask
-
 Wait for a particular mask
 =============
 */
@@ -503,13 +489,11 @@ bool Port::waitCommMask(DWORD mask)
 /*
 =============================================================================
 SelectComPort
-
 This function is from the following two references
  https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
  https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
   It will find the available COM ports and adds them to a vector list that is
   sent in by reference.
-
   ==========================================================================
   */
 void Port::SelectComPort(vector <string>& comPortList) //added function to find the present serial 
