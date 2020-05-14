@@ -27,6 +27,7 @@ using std::endl;
 #define ID_SELF_DESTROY_BUTTON 100
 #define ID_LISTBOX 101
 #define ID_CLOSE 102
+#define IDC_STATIC1 103
 
 
 
@@ -36,10 +37,13 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 void startWindow();
 void AddMenus(HWND hWnd);
 void AddControls(HWND);
+void AddText_NoSerial(HWND);
+void AddText_Serial(HWND hWnd);
+void loadImages();
 
 /*These two functions get the port with user input*/
-BOOL getPort(vector<string>* v, string & name);
-BOOL getPort1(vector<string>* listOfPorts, string & name );
+BOOL getPort(vector<string>* v, string& name);
+BOOL getPort1(vector<string>* listOfPorts, string& name);
 
 
 #endif // !BASE_UNIT_GUI_H
