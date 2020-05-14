@@ -48,7 +48,7 @@ using std::thread;
 void printf_notice();
 #endif
 
-
+/*
 int main()
 {
 
@@ -79,7 +79,7 @@ int main()
 	// 3 = misc errors
 	//b.getFilePath(fileName, 0)
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
-	Port p(portname, &f);
+	/*Port p(portname, &f);
 
 	bool startNewLog = false;
 
@@ -145,8 +145,8 @@ int main()
 	} /* end while loop */
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
-	return 0;
-}
+	/*return 0;
+}*/
 
 /* This void function will print a notice to the terminal if openMP is not
    supported */
