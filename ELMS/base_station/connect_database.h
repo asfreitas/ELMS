@@ -13,18 +13,9 @@ class Database {
     typedef mongocxx::database database;
     typedef mongocxx::collection collection;
     typedef bsoncxx::builder::stream::document document;
-<<<<<<< Updated upstream
-    typedef bsoncxx::builder::stream::close_document_type close_document;
-    
-||||||| merged common ancestors
-    typedef bsoncxx::builder::stream::close_document close_document;
-
-
-=======
     typedef bsoncxx::builder::stream::close_document_type close_document;
 
 
->>>>>>> Stashed changes
 private:
     mongocxx::uri uri;
     mongocxx::pool* pool;

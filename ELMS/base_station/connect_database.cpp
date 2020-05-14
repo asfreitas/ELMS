@@ -74,7 +74,7 @@ void Database::updateVehicle(std::string collection_name, int unit, std::chrono:
 }
 
 template<typename T>
-void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value){
+void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value) {
     //establish pool connection
     auto connection = getConnection();
     database test = connection->database("test");
@@ -134,11 +134,11 @@ void Database::pushNewData(std::string queryType, int unit, T value) {
             //<< "past_bearing" << new_bearing
             << bsoncxx::builder::stream::close_document
             << bsoncxx::builder::stream::finalize
-        );
-    if (update_array){
+            );
+    if (update_array) {
         std::cout << "Successfully pushed\n";
     }
-    else{
+    else {
         std::cout << "There was a problem pushing\n";
     }
 }
@@ -162,20 +162,23 @@ void Database::getPastData(std::string queryType, int unit, T value) {
     bsoncxx::document::value doc_value = *find_result;
     bsoncxx::document::view doc_view = doc_value.view();
     bsoncxx::document::element ele{ doc_view[queryType] };
-    if(ele.type() == bsoncxx::type::k_utf8) {
+    if (ele.type() == bsoncxx::type::k_utf8) {
         auto eleView = ele.get_utf8().value;
         std::string eleValue = eleView.to_string();
         updatePastData(queryType, unit, eleValue);
-    }else if(ele.type() == bsoncxx::type::k_int32){
+    }
+    else if (ele.type() == bsoncxx::type::k_int32) {
         auto eleView = ele.get_int32();
         updatePastData(queryType, unit, eleView);
-    }else if(ele.type() == bsoncxx::type::k_double){
+    }
+    else if (ele.type() == bsoncxx::type::k_double) {
         auto eleView = ele.get_double();
         updatePastData(queryType, unit, eleView);
-    }else if(ele.type() == bsoncxx::type::k_date) {
+    }
+    else if (ele.type() == bsoncxx::type::k_date) {
         auto eleView = ele.get_date();
         updatePastData(queryType, unit, eleView);
-    }   
+    }
 }
 
 
@@ -204,7 +207,7 @@ void Database::updatePastData(std::string queryType, int unit, T eleView) {
 }
 
 template <typename T>
-void Database::queryDatabase(std::string queryType, T value){
+void Database::queryDatabase(std::string queryType, T value) {
     //establish pool connection
     auto connection = getConnection();
     database test = connection->database("test");
@@ -214,10 +217,10 @@ void Database::queryDatabase(std::string queryType, T value){
     bsoncxx::stdx::optional<bsoncxx::document::value> result
         = vehicles.find_one(bsoncxx::builder::stream::document{} << queryType << value << bsoncxx::builder::stream::finalize);
 
-    if (result){
+    if (result) {
         std::cout << bsoncxx::to_json(*result) << "\n";
     }
-    else{
+    else {
         std::cout << "Cannot find document";
     }
 }
@@ -225,7 +228,7 @@ void Database::queryDatabase(std::string queryType, T value){
 
 //create a document that can be inserted using builder method
 void Database::addVehicle(std::string collection_name, int unit, std::chrono::milliseconds message_time, double new_longitude, double new_latitude, double new_velocity,
-    double new_bearing, std::string status){
+    double new_bearing, std::string status) {
     //establish pool connection
     auto connection = getConnection();
     //create a database connection
@@ -272,7 +275,7 @@ void Database::addVehicle(std::string collection_name, int unit, std::chrono::mi
         std::cout << "Unsuccessful with creating" << "\n";
     }
 }
-/*
+
 int main(int, char**) {
 
     Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
@@ -286,22 +289,11 @@ int main(int, char**) {
     double new_bearing = 7.6;
     std::string status = "inactive";
     std::string collection_name = "vehicles";
-
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     */
-<<<<<<< Updated upstream
-    /*newDB.getVehicles();
-||||||| merged common ancestors
-    //newDB.getVehicles();
-
-    newDB.queryDatabase("vehicle_unit", 1);
-=======
-    //newDB.getVehicles();
-
-   newDB.queryDatabase("vehicle_unit", 1);
->>>>>>> Stashed changes
+    newDB.getVehicles();
 
     //newDB.queryDatabase("vehicle_unit", 1);
     //newDB.updateSingleVehicleTrait("new_velocity", 1001, 17);
-}*/
+}
