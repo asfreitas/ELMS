@@ -42,8 +42,8 @@ void AddText_Serial(HWND hWnd);
 void loadImages();
 
 /*These two functions get the port with user input*/
-BOOL getPort(vector<string>* v, string & name);
-BOOL getPort1(vector<string>* listOfPorts, string & name );
+BOOL getPort(vector<string>* v, string& name);
+BOOL getPort1(vector<string>* listOfPorts, string& name);
 
 
 #endif // !BASE_UNIT_GUI_H

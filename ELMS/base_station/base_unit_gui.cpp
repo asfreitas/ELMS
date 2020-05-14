@@ -243,6 +243,7 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 
+<<<<<<< HEAD
 	case WM_CREATE:
 		//AddText(hWnd);
 		//loadImages();
@@ -290,6 +291,22 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	break;
 
 	case WM_COMMAND:
+||||||| merged common ancestors
+=======
+    /*Reference:https://www.cplusplus.com/forum/windows/176612/ */
+	case WM_CTLCOLORSTATIC:
+	{
+		HDC hdcStatic = (HDC)wParam; // or obtain the static handle in some other way
+		SetTextColor(hdcStatic, RGB(255, 0, 0)); // text color
+		//SetBkColor(hdcStatic, RGB(255, 255, 224));
+		return (LRESULT)GetStockObject(WHITE_BRUSH);
+		//return (INT_PTR)hBrush;
+		//return (INT_PTR)CreateSolidBrush(RGB(255, 255, 255));
+	}
+	break;
+
+	case WM_COMMAND:
+>>>>>>> master
 
 		if (LOWORD(wParam) == ID_SELF_DESTROY_BUTTON) {
 			//if the select port button is pushed
@@ -344,6 +361,8 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 getPort1
 This function creates the listbox Window.
 //https://gist.github.com/Pilzschaf/d950a86042c37a9c8d1a8b9b5f082fff
+
+===========================================================================
 */
 BOOL getPort1(vector<string>* listOfPorts, string & name)
 {
@@ -358,9 +377,18 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	wc.lpfnWndProc = MessageHandler;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hInstance = hInstance;
+<<<<<<< HEAD
 	wc.hbrBackground = CreateSolidBrush(0xFF6633);
 	//wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);// (GetSysColorBrush(COLOR_3DFACE);//(HBRUSH)GetStockObject(LTGRAY_BRUSH);
 	wc.lpszClassName = "SelectPort";
+||||||| merged common ancestors
+	wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	wc.lpszClassName = "SELECT_PORT";
+=======
+	wc.hbrBackground = CreateSolidBrush(0xFF6633);
+	//wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);//(HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	wc.lpszClassName = "SelectPort";
+>>>>>>> master
 
 	if (!RegisterClass(&wc))
 		std::cout << "Failed to register" << std::endl;
@@ -438,6 +466,7 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	}
 	return 0;
 }
+<<<<<<< HEAD
 /*
 ==========================================================================
 * AddText
@@ -489,5 +518,61 @@ void loadImages()
 	hLogoImage = (HBITMAP)LoadImageW(NULL, L"red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"blue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 }
+||||||| merged common ancestors
+=======
+/*
+==========================================================================
+* AddText
+
+* Predined class for text is static. Class name static is not sensitive. Second
+* Argument is the text in the static control.  This is usually a label. Third
+* argument is style. You must "Or" the two arguments here. The next two arguments
+* are the x and y coordinates. Next two arguments are the width and height, next
+* arguments is the parent window handler, next is HMenu if there is one, then
+* the instance but since this is a child we put NULL, and lastly a parameter 
+* which is not needed, so it is kept as NULL.
+References:
+http://forums.codeguru.com/showthread.php?105498-Multiline-in-Static-Text
+https://stackoverflow.com/questions/45653034/c-win32-change-static-color
+
+===============================================================================
+*/
+void AddText_NoSerial(HWND hWnd)
+{
+	settingsText = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Sorry, no COM ports were detected\
+     \r\n(2) Click on the \"EXIT\" Button\r\n(3) The program will exit with an error."), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+		10, 40, 300, 100, hWnd, NULL, NULL, NULL);
+	HDC hdcStatic = GetDC(settingsText);
+	
+}
+
+/*
+==============================================================================
+AddText_SerialDetected
+Adds instructions if serial ports are detected
+==============================================================================
+*/
+void AddText_Serial(HWND hWnd)
+{
+	settingsText1 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"INSTRUCTIONS:\r\n\r\n(1) Click on a COM Port to Highlight it\
+     \r\n(2) Click \"Select Port\" Button\r\n(3) Click \"Exit\" Button"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+		10, 40, 300, 100, hWnd, NULL, NULL, NULL);
+	HDC hdcStatic = GetDC(settingsText);
+}
+
+
+/*
+===========================================================================
+loadImages()
+This loads the two .bmp files that are used to color the buttons. It is 
+important that they be placed in the same location as the .exe files
+===========================================================================
+*/
+void loadImages()
+{
+	hLogoImage = (HBITMAP)LoadImageW(NULL, L"red.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"blue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+}
+>>>>>>> master
 
 
