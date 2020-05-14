@@ -272,7 +272,7 @@ void Database::addVehicle(std::string collection_name, int unit, std::chrono::mi
         std::cout << "Unsuccessful with creating" << "\n";
     }
 }
-
+/*
 int main(int, char**) {
 
     Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
@@ -290,8 +290,8 @@ int main(int, char**) {
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     */
-    newDB.getVehicles();
+    /*newDB.getVehicles();
 
     //newDB.queryDatabase("vehicle_unit", 1);
     //newDB.updateSingleVehicleTrait("new_velocity", 1001, 17);
-}
+}*/
