@@ -3,19 +3,7 @@
 */
 
 
-#include <bsoncxx/stdx/optional.hpp>
-#include <bsoncxx/types.hpp>
-#include <bsoncxx/types/bson_value/view.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
 
-
-#include <bsoncxx/json.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/logger.hpp>
-#include <mongocxx/pool.hpp>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/stdx.hpp>
 
 #include "connect_database.h"
 
@@ -41,22 +29,6 @@ Database::connection Database::getConnection()
     return pool->acquire();
 }
 
-//get list of vehicles from vehicle document
-void Database::getVehicles()
-{
-    //establish pool connection
-    auto connection = getConnection();
-    database test = connection->database("test");
-    //create vehicles
-    collection vehicles = test["vehicles"];
-    //store vehicles
-    auto findVehicles = vehicles.find({});
-
-    for (auto doc : findVehicles)
-    {
-        std::cout << bsoncxx::to_json(doc) << "\n";
-    }
-}
 
 
 //Update a vehicle: find current vehicle with unit number, 
@@ -132,7 +104,7 @@ void Database::pushNewData(std::string queryType, int unit, T value) {
             << "$push" << bsoncxx::builder::stream::open_document
             << updateType << value
             //<< "past_bearing" << new_bearing
-            << bsoncxx::builder::stream::close_document
+            << close_document{}
             << bsoncxx::builder::stream::finalize
         );
     if (update_array){
@@ -205,20 +177,27 @@ void Database::updatePastData(std::string queryType, int unit, T eleView) {
 
 template <typename T>
 void Database::queryDatabase(std::string queryType, T value){
-    //establish pool connection
-    auto connection = getConnection();
-    database test = connection->database("test");
-    //create vehicles
-    collection vehicles = test["vehicles"];
-    //store vehicles
-    bsoncxx::stdx::optional<bsoncxx::document::value> result
-        = vehicles.find_one(bsoncxx::builder::stream::document{} << queryType << value << bsoncxx::builder::stream::finalize);
+    try
+    {
+        //establish pool connection
+        auto connection = getConnection();
+        database test = connection->database("test");
+        //create vehicles
+        collection vehicles = test["vehicles"];
+        //store vehicles
+        bsoncxx::stdx::optional<bsoncxx::document::value> result
+            = vehicles.find_one(bsoncxx::builder::stream::document{} << queryType << value << bsoncxx::builder::stream::finalize);
 
-    if (result){
-        std::cout << bsoncxx::to_json(*result) << "\n";
+        if (result) {
+            std::cout << bsoncxx::to_json(*result) << "\n";
+        }
+        else {
+            std::cout << "Cannot find document";
+        }
     }
-    else{
-        std::cout << "Cannot find document";
+    catch (mongocxx::exception& e)
+    {
+        std::cout << "There was an exception: " << e.what();
     }
 }
 
@@ -290,8 +269,8 @@ int main(int, char**) {
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     */
-    newDB.getVehicles();
 
-    //newDB.queryDatabase("vehicle_unit", 1);
-    //newDB.updateSingleVehicleTrait("new_velocity", 1001, 17);
+    newDB.updateSingleVehicleTrait("new_velocity", 1001, 17);
+    newDB.queryDatabase("vehicle_unit", 1);
+
 }
