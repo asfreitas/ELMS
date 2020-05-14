@@ -290,7 +290,17 @@ int main(int, char**) {
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     */
+<<<<<<< Updated upstream
     /*newDB.getVehicles();
+||||||| merged common ancestors
+    //newDB.getVehicles();
+
+    newDB.queryDatabase("vehicle_unit", 1);
+=======
+    //newDB.getVehicles();
+
+   newDB.queryDatabase("vehicle_unit", 1);
+>>>>>>> Stashed changes
 
     //newDB.queryDatabase("vehicle_unit", 1);
     //newDB.updateSingleVehicleTrait("new_velocity", 1001, 17);
