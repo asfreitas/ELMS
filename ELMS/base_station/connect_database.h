@@ -25,7 +25,12 @@
 #include <vector>
 #include <time.h>
 
-
+/* reference for using statement:
+ *  https://jira.mongodb.org/browse/CXX-860
+*/
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::close_array;
 
 class Database {
 
@@ -34,9 +39,8 @@ class Database {
     typedef mongocxx::database database;
     typedef mongocxx::collection collection;
     typedef bsoncxx::builder::stream::document document;
+    typedef struct bsoncxx::builder::stream::open_document_type open_document;
     typedef struct bsoncxx::builder::stream::close_document_type close_document;
-
-
 private:
     mongocxx::uri uri;
     mongocxx::pool* pool;
