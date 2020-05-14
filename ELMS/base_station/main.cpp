@@ -48,11 +48,9 @@ using std::thread;
 void printf_notice();
 #endif
 
-//int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow)
+
 int main()
 {
-	//getPort();
-	//startWindow();
 
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
