@@ -50,7 +50,7 @@ void printf_notice();
   /* A note about how to compile this program using a makefile in mingw
    * change directory to your files. Then run: mingw32-make all
    * to clean: mingw32-make clean */
-
+/*
 int main()
 {
 	//used to check for memory leak
@@ -77,7 +77,7 @@ int main()
 	// 3 = misc errors
 	b.getFilePath(fileName, 0);
 	LPCSTR portname = "COM3";                /*Ports will vary for each computer */
-	Port p(portname);
+	/*Port p(portname);
 	bool startNewLog = false;
 
 	//declare a pointer to a Vehicle v
@@ -91,7 +91,7 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 11)
+	/*while (p.isPortReady() && count < 11)
 	{
 
 		if (!p.isBufferEmpty())
@@ -143,8 +143,8 @@ int main()
 	} /* end while loop */
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
-    return 0;
-}
+   /* return 0;
+}*/
 
 void printf_notice()
 {
