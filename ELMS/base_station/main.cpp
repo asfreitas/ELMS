@@ -55,7 +55,7 @@ int main()
 	//startWindow();
 
 	//used to check for memory leak. When the program exists, it will dump all
-	// any memory leaks that are present.  You must run in debug to see them. 
+	// any memory leaks that are present.  You must run in debug to see them.
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
 	FileIO f;
@@ -71,12 +71,12 @@ int main()
 	 //declare the vector that will contain all of the vehicles in the mine
 	vector<Vehicle*>mineVehicles;
 
-	//This function is called to create the log directories that will be 
-	// used in the program...if they do not already exist. 
+	//This function is called to create the log directories that will be
+	// used in the program...if they do not already exist.
 	//b.createFolder();
 
-	// this function call creates the name of the file and the path to it. 
-	// this will be used to open the files and write to them. 
+	// this function call creates the name of the file and the path to it.
+	// this will be used to open the files and write to them.
 	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
 	// 3 = misc errors
 	//b.getFilePath(fileName, 0)
@@ -88,7 +88,7 @@ int main()
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
-    // this counter is only here for testing purposes.
+	// this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
 	while (p.isPortReady() && count < 12)
@@ -101,20 +101,20 @@ int main()
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
 
-			// This line of code declares two threads that will be used in 
+			// This line of code declares two threads that will be used in
 			// the parallel section
 			omp_set_num_threads(2);
 
-            #pragma omp parallel sections
+			#pragma omp parallel sections
 			{
-                #pragma omp section
+				#pragma omp section
 				{
 					cout << incomingMessage << endl;
 					//file.logToFile(incomingMessage, MessageType::incoming);
 					b.logToFile(incomingMessage, MessageType::incoming);
 				}
 
-                #pragma omp section
+				#pragma omp section
 				{
 					// declare a pointer to a message struct
 					struct message* ptr = createNewMessage(data);
@@ -147,11 +147,11 @@ int main()
 	} /* end while loop */
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
-    /*return 0;
-}
+	 /*return 0;
+ }
 
-/* This void function will print a notice to the terminal if openMP is not
-   supported */
+ /* This void function will print a notice to the terminal if openMP is not
+	supported */
 void printf_notice()
 {
 	fprintf(stderr, "OpenMP is not supported \n");

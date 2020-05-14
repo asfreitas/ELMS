@@ -4,30 +4,30 @@
 #include "port.h"
 
 
-  /* Reference for this code and serialport.hpp is https://github.com/waynix/SPinGW */
-  /********************************************************************************
-   * Helpful reference to understand the Win32 API is:
-   * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API 
-   *
-   */
+/* Reference for this code and serialport.hpp is https://github.com/waynix/SPinGW */
+/********************************************************************************
+ * Helpful reference to understand the Win32 API is:
+ * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API
+ *
+ */
 
 
-/************************************
-USAGE: In order to get messages from the buffer
-you must call the "getNextMessage" function
-*********************************/
+ /************************************
+ USAGE: In order to get messages from the buffer
+ you must call the "getNextMessage" function
+ *********************************/
 
 
 
-/*
-=============
-openSerialPort
+ /*
+ =============
+ openSerialPort
 
-portname contains name of serial port and stopbits may be either [1, 1.5, 2]
-returns the handle of the port
-=============
+ portname contains name of serial port and stopbits may be either [1, 1.5, 2]
+ returns the handle of the port
+ =============
 
-*/
+ */
 void Port::openSerialPort(LPCSTR portname)
 {
     const int BYTE_SIZE = 8;
@@ -41,7 +41,7 @@ void Port::openSerialPort(LPCSTR portname)
     const int PARITY = NOPARITY;
 
     hSerial = setupPort(portname); // get the port
-    
+
     if (hSerial == INVALID_HANDLE_VALUE)
     {
         perror("Error opening serial handle\n");
@@ -49,7 +49,7 @@ void Port::openSerialPort(LPCSTR portname)
 
     DCB dcbSerialParams = { 0 };
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    
+
     if (!GetCommState(hSerial, &dcbSerialParams))
     {
         perror("GetCommState ");
@@ -149,7 +149,7 @@ HANDLE Port::setupPort(LPCSTR portname)
         //if portname was NULL, then we call SelectComPort to get the list of
         // available ports. 
         SelectComPort(listOfPorts);
-        
+
         //call getPort to get the available ports
         getPort(&listOfPorts, temp);
 
@@ -174,7 +174,7 @@ HANDLE Port::setupPort(LPCSTR portname)
         hSerial = createPort(portname); // if we know the port go ahead and open it
     }
 
-    return hSerial; 
+    return hSerial;
 }
 
 /*
@@ -189,15 +189,15 @@ HANDLE Port::createPort(LPCSTR portname)
     HANDLE hSerial;
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
 
-   return hSerial = CreateFileA(portname, 
-       accessdirection, 0, 0, OPEN_EXISTING ,0, 0);
+    return hSerial = CreateFileA(portname,
+        accessdirection, 0, 0, OPEN_EXISTING, 0, 0);
 }
 
 /*
 =============
 Contructor - No Parameters
 
-Opens a new port and attempts to find the port automatically 
+Opens a new port and attempts to find the port automatically
 =============
 */
 Port::Port(FileIO* _f)
@@ -245,7 +245,7 @@ Port::~Port()
         portThread.join();
     //waitCommMask(EV_TXEMPTY); // make sure that there is nothing left to send before closing
     closeSerialPort(hSerial);
-    
+
 }
 
 /*
@@ -277,7 +277,7 @@ removeTopMessage
 Removes the top message from the buffer and returns it
 =============
 */
-void Port::removeMessageFromBuffer(std::string *mystring)
+void Port::removeMessageFromBuffer(std::string* mystring)
 {
     std::lock_guard<std::mutex> messageLock(mutex); // lock data for when it is being put into buffer
 
@@ -500,7 +500,7 @@ bool Port::waitCommMask(DWORD mask)
     return dwEventMask;
 }
 
-/* 
+/*
 =============================================================================
 SelectComPort
 
@@ -508,7 +508,7 @@ This function is from the following two references
  https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
  https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
   It will find the available COM ports and adds them to a vector list that is
-  sent in by reference. 
+  sent in by reference.
 
   ==========================================================================
   */
@@ -529,7 +529,7 @@ void Port::SelectComPort(vector <string>& comPortList) //added function to find 
         // Test the return value and error if any
         if (test != 0) //QueryDosDevice returns zero if it didn't find an object
         {
-           //push the port onto the list of serial ports available.
+            //push the port onto the list of serial ports available.
             comPortList.push_back(str);
             isComPort = true;
         }
