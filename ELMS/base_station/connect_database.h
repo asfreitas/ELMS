@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <vector>
 #include <time.h>
+#include "vehicle.h"
+#include "base_unit.h"
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860
@@ -31,6 +33,8 @@
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::close_array;
+using std::chrono::milliseconds;
+using std::string;
 
 class Database {
 
