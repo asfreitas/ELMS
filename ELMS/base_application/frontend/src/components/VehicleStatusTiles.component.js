@@ -1,8 +1,8 @@
 import React from "react"
-import VehicleRow from "./VehicleRow"
-import VehicleAtRisk from "./VehicleAtRisk"
-import VehicleActive from "./VehicleActive"
-import VehicleInactive from "./VehicleInactive"
+import VehicleRow from "./VehicleRow.component"
+import VehicleAtRisk from "./VehicleAtRisk.component"
+import VehicleActive from "./VehicleActive.component"
+import VehicleInactive from "./VehicleInactive.component"
 
 function VehicleStatusTiles(){
     return(
