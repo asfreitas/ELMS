@@ -55,10 +55,17 @@ public:
     Database(std::string);
     ~Database();
     connection getConnection();
+
+    //These two functions update an existing vehicle either with out without a pointer to the Vehicle
     void updateVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
         double new_bearing, std::string status);
+    void updateVehicleWithPointer(Vehicle *v, std::string status );
+
+    //These two functions add an existing vehicle either with out without a pointer to the Vehicle. 
     void addVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
         double new_bearing, std::string status);
+    void addVehicleWithPointer(Vehicle *v, std::string collection_name, std::string status);
+
     template <typename T>
     void queryDatabase(std::string, T);
     template <typename T>
