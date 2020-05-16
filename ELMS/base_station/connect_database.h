@@ -26,6 +26,7 @@
 #include <time.h>
 #include "vehicle.h"
 #include "base_unit.h"
+#include "utilities.h"
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860
