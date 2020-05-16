@@ -20,7 +20,7 @@ Vehicle::Vehicle() {
     velocity = -1;
     bearing = -1;
     priority = 4; //initialize the priority to 4
-    status = "inactive";
+    status = "active";
     previous_latitude = 0.0;
     previous_longitude = 0.0;
 }

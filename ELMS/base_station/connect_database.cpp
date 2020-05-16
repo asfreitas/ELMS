@@ -438,7 +438,7 @@ void Database::updateVehicle(Vehicle* vehicle)
         std::cout << "There was an exception: " << e.what();
     }
 }
-
+/*
 int main(int, char**) {
 
     //Base_Unit bu;
@@ -497,4 +497,4 @@ int main(int, char**) {
     int results = secondsBetweenTime(140503, 135905, 120);
     cout << "Here is the value of results: " << results << endl;
 
-}
+} */
