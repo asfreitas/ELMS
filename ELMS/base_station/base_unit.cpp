@@ -89,7 +89,8 @@ void Base_Unit::print_vector(vector<Vehicle*> v)
         cout << "time_stamp: " << itr->getTime() << endl;
         cout << "velocity: " << itr->getVelocity() << endl;
         cout << "bearing: " << itr->getBearing() << endl;
-        cout << "priority: " << itr->getPriorityNumber() << endl << endl;
+        cout << "priority: " << itr->getPriorityNumber() << endl;
+        cout << "status: " << itr->getStatus() << endl << endl;
         if (itr->getMapSize(*itr) > 0)
         {
             map<int, double>* mapVehicles = itr->getMapOfVehicles();
