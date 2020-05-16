@@ -340,9 +340,8 @@ a vehicle.  It defaults the collection_name and status...but these can be
 different if these options are filled in when the function is called. 
 ===============================================================================
 */
-void Database::addVehicleWithPointer(Vehicle* v)
+void Database::addVehicleWithPointer(Vehicle* v, std::string collection_name = "vehicles", std::string status = "active")
 {
-    std::string status = "active";
     try
     {
         //establish pool connection
@@ -403,44 +402,6 @@ void Database::addVehicleWithPointer(Vehicle* v)
         std::cout << "There was an exception: " << e.what();
     }
 }
-void Database::updateVehicle(Vehicle* vehicle)
-{
-    int id = vehicle->getUnit();
-
-    try 
-    {
-        //establish pool connection
-        auto connection = getConnection();
-        //create a database connection
-        auto test = connection->database("test");
-        auto vehicles = test["vehicles"];
-        milliseconds message_time = milliseconds(vehicle->getTime());
-
-
-        auto result = vehicles.update_one(
-            document{} << "vehicle_unit" << id << finalize,
-            document{} << "$set" << open_document{}
-            << "new_longitude" << vehicle->getLongitude()
-            << "new_latitude" << vehicle->getLatitude()
-            << "new_velocity" << vehicle->getVelocity()
-            << "new_bearing" << vehicle->getBearing()
-            << "new_time" << bsoncxx::types::b_date{ message_time }
-        << close_document{} << finalize);
-        if (result)
-        {
-            std::cout << "Successfully updated vehicle\n";
-        }
-        else
-        {
-            std::cout << "There was a problem updating\n";
-        }
-    }
-    catch (mongocxx::exception& e)
-    {
-        std::cout << "There was an exception: " << e.what();
-    }
-}
-
 
 int main(int, char**) {
 
@@ -480,8 +441,7 @@ int main(int, char**) {
         
    //}
     
-    v = new Vehicle(350, 25, 6789.1234, 6789.1234, 5.5, 5, 1);
-    newDB.updateVehicle(v);
+    
     int unitNum = 1001;
     std::chrono::milliseconds message_time = std::chrono::milliseconds(5236521);
     double new_longitude = 9876.5432;
@@ -499,5 +459,3 @@ int main(int, char**) {
     //newDB.queryDatabase("vehicle_unit", 1001);
 
 }
-
-
