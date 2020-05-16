@@ -34,24 +34,11 @@ Base_Unit::~Base_Unit()
 {
     //cout << "Base_Unit destructor was called" << endl;
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
-
-    // also delete pointer to file handler
-    delete fileHandler;
-
 }
 
 Base_Unit::Base_Unit(FileIO* _f)
 {
     fileHandler = _f;
-}
-
-/*
-=============================================================================
-Default Base_Unit Constructor
-*/
-Base_Unit::Base_Unit()
-{
-    fileHandler = new FileIO( );
 }
 
 
@@ -311,14 +298,25 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
 {
     if (time != -1)
     {
+        //set the previous time first using the current time before updating
+        // the system. 
+        mine_vehicles.at(index)->setPreviousTime(mine_vehicles.at(index)->getTime());
         mine_vehicles.at(index)->setTime(time);
+        // check to see if the vehicle is offline. 
+        int check = secondsBetweenTime(mine_vehicles.at(index)->getTime(), mine_vehicles.at(index)->getPreviousTime(), SECONDS_LIMIT);
+        if (check == 1)
+        {
+            mine_vehicles.at(index)->setStatus("offline");
+        }
     }
     if (latitude != -1)
     {
+        mine_vehicles.at(index)->setPreviousLatitude(mine_vehicles.at(index)->getLatitude());
         mine_vehicles.at(index)->setLatitude(latitude);
     }
     if (longitude != -1)
     {
+        mine_vehicles.at(index)->setPreviousLongitude(mine_vehicles.at(index)->getLongitude());
         mine_vehicles.at(index)->setLongitude(longitude);
     }
     if (velocity != -1)
@@ -332,22 +330,39 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
     if (priority != -1)
     {
         mine_vehicles.at(index)->setPriority(priority);
+        //if the priority was set to 0, then we need to update the status to at-risk
+        if (mine_vehicles.at(index)->getPriorityNumber() == 0)
+        {
+            mine_vehicles.at(index)->setStatus("at_risk");
+        }
     }
 }
 /*This updates mine_vehicles (master vector) at a specific index.If you only
  * want to update one value, set the other inputs to - 1 and nothing will be changed.*/
-void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude, double velocity, double bearing, int priority)
+void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
+    double longitude, double velocity, double bearing, int priority)
 {
     if (time != -1)
     {
+        //first we set the previous time with the current time.
+        v->setPreviousTime(v->getTime());
+        //next we set the current time to the new input time
         v->setTime(time);
+        // check to see if the vehicle is offline
+        int check = secondsBetweenTime(v->getTime(), v->getPreviousTime(), SECONDS_LIMIT);
+        if (check == 1)
+        {
+            v->setStatus("offline");
+        }
     }
     if (latitude != -1)
     {
+        v->setPreviousLatitude(v->getLatitude());
         v->setLatitude(latitude);
     }
     if (longitude != -1)
     {
+        v->setPreviousLongitude(v->getLongitude());
         v->setLongitude(longitude);
     }
     if (velocity != -1)
@@ -361,6 +376,12 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
     if (priority != -1)
     {
         v->setPriority(priority);
+        //if the priority is changed to a 0, then we need to change the
+        // status to at_risk
+        if (v->getPriorityNumber() == 0)
+        {
+            v->setStatus("at_risk");
+        }
     }
 }
 /* Function iterates through the master list and checks the distance each
@@ -388,6 +409,31 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 
         if (getMineVehicles().at(i)->getUnit() != v->getUnit())
         {
+
+            // check if the vehicle is offline or not
+            int check = secondsBetweenTime(getMineVehicles().at(i)->getTime(), getMineVehicles().at(i)->getPreviousTime(), SECONDS_LIMIT);
+            // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
+            if (check == 1 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
+            {
+                getMineVehicles().at(i)->setStatus("offline");
+            }
+
+            //if the vehicle has recent messages but has not moved and is not at risk, then
+            // set to either active or inactive
+            else if (check == 0 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
+            {
+                    // if the latitude and long
+                    if ((getMineVehicles().at(i)->getLatitude() == getMineVehicles().at(i)->getPreviousLatitude())
+                        && (getMineVehicles().at(i)->getLongitude() == getMineVehicles().at(i)->getPreviousLongitude()))
+                    {
+                        getMineVehicles().at(i)->setStatus("inactive");
+                    }
+                    else
+                    {
+                        getMineVehicles().at(i)->setStatus("active");
+
+                    }
+            }
             // get the distance
             distance = c.haversine(v, mine_vehicles.at(i));
             //distance returns as km, need to change to meters so multiply
