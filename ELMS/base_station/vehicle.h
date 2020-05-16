@@ -19,6 +19,7 @@ using std::vector;
 using std::map;
 using std::pair;
 using std::iterator;
+using std::string;
 
 class Vehicle
 {
@@ -30,6 +31,10 @@ class Vehicle
         double velocity;
         double bearing;
         int priority;
+        string status;
+        double previous_latitude;
+        double previous_longitude;
+        int previous_time;
         // this map holds the unit number of another vehicle and the distance
         // it is away from this vehicle object
         map<int, double>distance_to_other_vehicles;
@@ -39,7 +44,8 @@ class Vehicle
         Vehicle();
 
         //Create constructor
-        Vehicle(int unit, int time, double latitude, double longitude, double velocity, double bearing, int priority);
+        Vehicle(int unit, int time, double latitude, double longitude, double velocity,
+            double bearing, int priority, string status_string);
         //create destructor
         ~Vehicle();
 
@@ -51,6 +57,10 @@ class Vehicle
         void setVelocity(double);
         void setBearing(double);
         void setPriority(int);
+        void setPreviousTime(int);
+        void setPreviousLatitude(double);
+        void setPreviousLongitude(double);
+        void setStatus(string);
 
         //create getter functions
         int getUnit();
@@ -60,6 +70,10 @@ class Vehicle
         double getVelocity();
         double getBearing();
         int getPriorityNumber();
+        int getPreviousTime();
+        double getPreviousLatitude();
+        double getPreviousLongitude();
+        string getStatus();
         map<int, double>* getMapOfVehicles();
         size_t getMapSize(Vehicle& v);
         int getVehicleID() { return unit; }
