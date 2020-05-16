@@ -55,7 +55,6 @@ void Database::updateVehicle(std::string collection_name, int unit, std::chrono:
 /*
 ================================================================================
 updateVehicleWithPointer
-
 This function updates a vehicle in the database but uses a pointer instead
 ===============================================================================
 */
@@ -81,7 +80,7 @@ void Database::updateVehicleWithPointer(Vehicle* v, std::string status)
 }
 
 template<typename T>
-void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value){
+void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value) {
 
     try
     {
@@ -326,7 +325,7 @@ void Database::addVehicle(std::string collection_name, int unit, std::chrono::mi
             std::cout << "Unsuccessful with creating" << "\n";
         }
     }
-    catch(mongocxx::exception& e)
+    catch (mongocxx::exception& e)
     {
         std::cout << "There was an exception: " << e.what();
     }
@@ -334,14 +333,14 @@ void Database::addVehicle(std::string collection_name, int unit, std::chrono::mi
 /*
 ================================================================================
 addVehicleWithPointer
-
 This function gives the user the option to add a Vehicle using a pointer to
 a vehicle.  It defaults the collection_name and status...but these can be
-different if these options are filled in when the function is called. 
+different if these options are filled in when the function is called.
 ===============================================================================
 */
-void Database::addVehicleWithPointer(Vehicle* v, std::string collection_name = "vehicles", std::string status = "active")
+void Database::addVehicleWithPointer(Vehicle* v)
 {
+    std::string status = "active";
     try
     {
         //establish pool connection
@@ -402,6 +401,44 @@ void Database::addVehicleWithPointer(Vehicle* v, std::string collection_name = "
         std::cout << "There was an exception: " << e.what();
     }
 }
+void Database::updateVehicle(Vehicle* vehicle)
+{
+    int id = vehicle->getUnit();
+
+    try
+    {
+        //establish pool connection
+        auto connection = getConnection();
+        //create a database connection
+        auto test = connection->database("test");
+        auto vehicles = test["vehicles"];
+        milliseconds message_time = milliseconds(vehicle->getTime());
+
+
+        auto result = vehicles.update_one(
+            document{} << "vehicle_unit" << id << finalize,
+            document{} << "$set" << open_document{}
+            << "new_longitude" << vehicle->getLongitude()
+            << "new_latitude" << vehicle->getLatitude()
+            << "new_velocity" << vehicle->getVelocity()
+            << "new_bearing" << vehicle->getBearing()
+            << "new_time" << bsoncxx::types::b_date{ message_time }
+        << close_document{} << finalize);
+        if (result)
+        {
+            std::cout << "Successfully updated vehicle\n";
+        }
+        else
+        {
+            std::cout << "There was a problem updating\n";
+        }
+    }
+    catch (mongocxx::exception& e)
+    {
+        std::cout << "There was an exception: " << e.what();
+    }
+}
+
 
 int main(int, char**) {
 
@@ -413,35 +450,36 @@ int main(int, char**) {
     string status = "inactive";
 
     Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
-    
+
     //create a test vehicle with data
-    Vehicle *v = new Vehicle(350, 1000000, 1234.5678, 1234.5678, 2.0, 2, 2);
-   // bu.contains_id_number(v->getUnit(), index);
-    //bu.addToMineVehicles(v);
-    //if (index == -1)
-    //{
-       //newDB.addVehicleWithPointer(v);
+    Vehicle* v = new Vehicle(350, 1000000, 1234.5678, 1234.5678, 2.0, 2, 2);
+    // bu.contains_id_number(v->getUnit(), index);
+     //bu.addToMineVehicles(v);
+     //if (index == -1)
+     //{
+        //newDB.addVehicleWithPointer(v);
+     //}
+     //else
+     //{
+         //newDB.updateVehicleWithPointer(v);
+     //}
+     //newDB.queryDatabase("vehicle_unit", 350);
+
+    v->setBearing(4);
+    v->setVelocity(0.5);
+    v->setLongitude(8765.4321);
+
+    // bu.contains_id_number(v->getUnit(), index);
+
+     //if (index >= 0)
+     //{
+
+    newDB.updateVehicleWithPointer(v, status);
+
     //}
-    //else
-    //{
-        //newDB.updateVehicleWithPointer(v);
-    //}
-    //newDB.queryDatabase("vehicle_unit", 350);
 
-   v->setBearing(4);
-   v->setVelocity(0.5);
-   v->setLongitude(8765.4321);
-
-  // bu.contains_id_number(v->getUnit(), index);
-
-   //if (index >= 0)
-   //{
-
-       newDB.updateVehicleWithPointer(v, status);
-        
-   //}
-    
-    
+    v = new Vehicle(350, 25, 6789.1234, 6789.1234, 5.5, 5, 1);
+    newDB.updateVehicle(v);
     int unitNum = 1001;
     std::chrono::milliseconds message_time = std::chrono::milliseconds(5236521);
     double new_longitude = 9876.5432;
@@ -452,7 +490,7 @@ int main(int, char**) {
     //std::string collection_name = "vehicles";
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     //newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
-    
+
 
     //newDB.updateSingleVehicleTrait("new_velocity", 1001, 57);
     newDB.queryDatabase("vehicle_unit", 350);
