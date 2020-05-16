@@ -439,20 +439,19 @@ void Database::updateVehicle(Vehicle* vehicle)
     }
 }
 
-
 int main(int, char**) {
 
-    Base_Unit bu;
+    //Base_Unit bu;
 
-    int index = -1;
+    //int index = -1;
 
-    string collection_name = "vehicles";
-    string status = "inactive";
+    //string collection_name = "vehicles";
+    //string status = "inactive";
 
-    Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
+    //Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
 
     //create a test vehicle with data
-    Vehicle* v = new Vehicle(350, 1000000, 1234.5678, 1234.5678, 2.0, 2, 2);
+    //Vehicle* v = new Vehicle(350, 1000000, 1234.5678, 1234.5678, 2.0, 2, 2);
     // bu.contains_id_number(v->getUnit(), index);
      //bu.addToMineVehicles(v);
      //if (index == -1)
@@ -465,35 +464,37 @@ int main(int, char**) {
      //}
      //newDB.queryDatabase("vehicle_unit", 350);
 
-    v->setBearing(4);
-    v->setVelocity(0.5);
-    v->setLongitude(8765.4321);
+    //v->setBearing(4);
+    //v->setVelocity(0.5);
+    //v->setLongitude(8765.4321);
 
     // bu.contains_id_number(v->getUnit(), index);
 
      //if (index >= 0)
      //{
 
-    newDB.updateVehicleWithPointer(v, status);
+    //newDB.updateVehicleWithPointer(v, status);
 
     //}
 
-    v = new Vehicle(350, 25, 6789.1234, 6789.1234, 5.5, 5, 1);
-    newDB.updateVehicle(v);
-    int unitNum = 1001;
-    std::chrono::milliseconds message_time = std::chrono::milliseconds(5236521);
-    double new_longitude = 9876.5432;
-    double new_latitude = 1234.5678;
-    double new_velocity = 68;
-    double new_bearing = 7.6;
-    status = "inactive";
+   // v = new Vehicle(350, 25, 6789.1234, 6789.1234, 5.5, 5, 1);
+    //newDB.updateVehicle(v);
+    //int unitNum = 1001;
+    //std::chrono::milliseconds message_time = std::chrono::milliseconds(5236521);
+   // double new_longitude = 9876.5432;
+    //double new_latitude = 1234.5678;
+    //double new_velocity = 68;
+    //double new_bearing = 7.6;
+    //status = "inactive";
     //std::string collection_name = "vehicles";
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
     //newDB.updateVehicle(collection_name, unitNum, message_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
 
 
     //newDB.updateSingleVehicleTrait("new_velocity", 1001, 57);
-    newDB.queryDatabase("vehicle_unit", 350);
+    //newDB.queryDatabase("vehicle_unit", 350);
     //newDB.queryDatabase("vehicle_unit", 1001);
+    int results = secondsBetweenTime(140503, 135905, 120);
+    cout << "Here is the value of results: " << results << endl;
 
 }
