@@ -95,6 +95,16 @@ string FileIO::getFilePath(MessageType type)
     return "No file path available";
 }
 
+void FileIO::setPathToLogs(string path)
+{
+    pathToLogs = path;
+}
+
+void FileIO::setMessageLimit(int limit)
+{
+    messageLimit = limit;
+}
+
 /*
  * Function logFile
  * This function checks the message count. If it is < MESSAGE_LIMIT, then the inputMessage

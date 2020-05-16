@@ -34,11 +34,24 @@ Base_Unit::~Base_Unit()
 {
     //cout << "Base_Unit destructor was called" << endl;
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
+
+    // also delete pointer to file handler
+    delete fileHandler;
+
 }
 
 Base_Unit::Base_Unit(FileIO* _f)
 {
     fileHandler = _f;
+}
+
+/*
+=============================================================================
+Default Base_Unit Constructor
+*/
+Base_Unit::Base_Unit()
+{
+    fileHandler = new FileIO( );
 }
 
 

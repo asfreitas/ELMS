@@ -56,7 +56,11 @@ public:
     // class destructor will manage memory leak by deleting pointings to
     // vehicle objects in the mine_vehicles vector
     ~Base_Unit();
+
+    //Constructors
+    Base_Unit();
     Base_Unit(FileIO *_f);
+
 
     void logToFile(std::string, MessageType);
     void addToMineVehicles(Vehicle* v);
@@ -82,7 +86,7 @@ public:
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
 
-   // Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+    //Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
 };
 
 #endif // !BASE_UNIT_H
