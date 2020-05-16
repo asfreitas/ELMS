@@ -20,10 +20,14 @@ Vehicle::Vehicle() {
     velocity = -1;
     bearing = -1;
     priority = 4; //initialize the priority to 4
+    status = "inactive";
+    previous_latitude = 0.0;
+    previous_longitude = 0.0;
 }
 
 //construct vehicle
-Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude, double vehicleVelocity, double vehicleBearing, int priorityNum) {
+Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude,
+    double vehicleVelocity, double vehicleBearing, int priorityNum, string statusString) {
     unit = vehicleUnit;
     time = vehicleTime;
     latitude = vehicleLatitude;
@@ -31,6 +35,10 @@ Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, doubl
     velocity = vehicleVelocity;
     bearing = vehicleBearing;
     priority = priorityNum;
+    status = statusString;
+    previous_latitude = 0.0;
+    previous_longitude = 0.0;
+    previous_time = 0;
 }
 
 //desctructor
@@ -74,6 +82,26 @@ void Vehicle::setPriority(int p)
     priority = p;
 }
 
+void Vehicle::setPreviousTime(int prev_time)
+{
+    previous_time = prev_time;
+}
+
+void Vehicle::setPreviousLatitude(double prev_latitude)
+{
+    previous_latitude = prev_latitude;
+}
+
+void Vehicle::setPreviousLongitude(double prev_longitude)
+{
+    previous_longitude = prev_longitude;
+}
+
+void Vehicle::setStatus(string status_string)
+{
+    status = status_string;
+}
+
 /*
 =============
 get...()
@@ -107,6 +135,26 @@ double Vehicle::getBearing() {
 int Vehicle::getPriorityNumber()
 {
     return priority;
+}
+
+int Vehicle::getPreviousTime()
+{
+    return previous_time;
+}
+
+double Vehicle::getPreviousLatitude()
+{
+    return previous_latitude;
+}
+
+double Vehicle::getPreviousLongitude()
+{
+    return previous_longitude;
+}
+
+string Vehicle::getStatus()
+{
+    return status;
 }
 
 map<int, double>* Vehicle::getMapOfVehicles()
