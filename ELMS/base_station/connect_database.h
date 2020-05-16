@@ -76,4 +76,5 @@ public:
     void getPastData(std::string, int, T);
     template <typename T>
     void updatePastData(std::string, int, T);
+    void updateVehicle(Vehicle*);
 };
