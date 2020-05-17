@@ -156,6 +156,21 @@ ul.topnav li .elms {
     line-height: .5em;
 }
 
+.offline_vehicles_text {
+    font-family: 'Open Sans', serif;
+    font-size: 2.5em;
+    color: gray;
+    text-align: center;
+    padding: 0;
+    line-height: .5em;
+}
+
+.offline_vehicles_text {
+    border-color: gray;
+    border-width: .3em;
+    width: 100%;
+}
+
 .at_risk_line {
     border-color: red;
     border-width: .3em;

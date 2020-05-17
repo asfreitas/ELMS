@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Navbar from './Navbar.component'
 import Footer from "./Footer.component.js"
+import VehicleLastComm from "./last_comm/VehicleLastComm.component"
 
 
 
@@ -9,7 +10,7 @@ export default class LastCommunications extends Component {
         return (
             <div>
                 <Navbar />
-                <p>Last Communications Components</p>
+                <VehicleLastComm />
                 <Footer />
             </div>
         )

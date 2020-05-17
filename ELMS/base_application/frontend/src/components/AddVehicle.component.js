@@ -317,6 +317,7 @@ export default class AddVehicle extends Component {
                         <option value="at_risk">At risk</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
+                        <option value="offline">Offline</option>
                         </select>
                     </div>
                     <div className="form-button">

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const vehicleSchema = new Schema({
-    vehicle_unit: { type: Number, required: true},
+    vehicle_unit: { type: Number, required: true, unique: true},
     startup_time: { type: Date, required: true},  
     last_received_time: { type: Date, required: true},
     last_longitude: { type: Number, required: true},
