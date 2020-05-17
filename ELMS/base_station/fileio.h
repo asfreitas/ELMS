@@ -55,7 +55,6 @@ class FileIO
         void logToExistingFile(std::string existingFile, string inputMessage, MessageType);
         void resetMessageCount(MessageType);
         std::string createFileName(MessageType);
-        void setFileName(MessageType);
         void createFolders();
         bool createFolder(string);
         bool directoryExists(const std::string&);
@@ -73,5 +72,9 @@ class FileIO
         string getPathToMessages() { return pathToMessages; }
         string getPathToLogs() { return pathToLogs; }
 
+        //set functions
+        void setFileName(MessageType);
+        void setPathToLogs(string path);
+        void setMessageLimit(int limit);
 };
 #endif

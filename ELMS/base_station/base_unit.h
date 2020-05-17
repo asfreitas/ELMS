@@ -5,6 +5,7 @@
 #define BASE_UNIT_H
 
 #define MESSAGE_LIMIT 5
+#define SECONDS_LIMIT 10
 
 #include <iostream>
 #include <fstream>
@@ -53,10 +54,12 @@ class Base_Unit
     // to allow the user to create the folder wherever they want.  
 public:
 
+    //Constructors
+    Base_Unit(FileIO* _f);
+
     // class destructor will manage memory leak by deleting pointings to
-    // vehicle objects in the mine_vehicles vector
+    // vehicle objects in the mine_vehicles vector.
     ~Base_Unit();
-    Base_Unit(FileIO *_f);
 
     void logToFile(std::string, MessageType);
     void addToMineVehicles(Vehicle* v);
@@ -83,6 +86,7 @@ public:
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
 
    // Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+    Base_Unit() : fileHandler() {};
 };
 
 #endif // !BASE_UNIT_H

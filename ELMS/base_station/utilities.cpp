@@ -95,4 +95,103 @@ void printMap(map<int, double>* mapVehicles)
 	cout << endl;
 }
 
+/*
+===============================================================================
+secondsBetweenTime
+This function takes 3 arguments.  The first is a 6 digit time in Zulu that 
+represents the most current time.  The second is a 6 digit time in Zulu that
+represents the previous time.  The 3rd represents the number of seconds to allow
+between the time intervals up to 1 hour or 3600 seconds.  
+If the difference between the current time and the previous time is more than
+the numSecondsToCheckFor then a 1 is returned for true.  If it is less, than 
+a 0 is returned for false. If the numSecondsToCheckFor is greater than 3600, than
+a -1 is returned for being invalid. 
+*/
+int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor)
+{
+	if (numSecondsToCheckFor <= 60)
+	{
+		//we are only check for 60 seconds or less so we only need to look at
+		// the last two digits of the 6 digit number.  We can get the last 2
+		// digits by using modulo 100.
+		int val1 = value1 % 100;
+		int val2 = value2 % 100;
+		//subtract the two values. 
+		int numSeconds = val1 - val2;
+		//if it is a negative value, we add 60 seconds. 
+		if (numSeconds < 0)
+		{
+			numSeconds += 60;
+		}
+		// if the numSeconds is greater than the amount we were allowing, then
+		// we return true. 
+		if (numSeconds > numSecondsToCheckFor)
+		{
+			return 1;
+		}
+		// otherwise, we return false
+		else
+		{
+			return 0;
+		}
+	}
+	// if we are checking for more than 60 seconds but less than or equal to 
+	// 1 hour or 3600 seconds, then we do a similiar thing to above. 
+	else if (numSecondsToCheckFor > 60 && numSecondsToCheckFor <= 3600)
+	{
+		//if we add 60 seconds, we will need to subtract 1 from the minutes. 
+		int flag = 0;
+		int val1 = value1 % 100;
+		cout << "Here is val1: " << val1 << endl;
+		int val2 = value2 % 100;
+		int numSeconds = val1 - val2;
+		cout << "Here is val2: " << val2 << endl;
+		if (numSeconds < 0)
+		{
+			numSeconds += 60;
+			//set the flag to true so that we add 1 minute to the second time
+			flag = 1;
+		}
+		//get the middle two digitis of the 6 digit number that represent the
+		// minutes by using modulo and then division
+		int val3 = (value1 % 10000)/100;
+		int val4 = (value2 % 10000)/100;
+		//if the flag was set to true, then we add 1 minute to the second number
+		if (flag)
+		{
+			//if the second number was 59, we change it to 0
+			if (val4 == 59)
+			{
+				val4 = 0;
+			}
+			else {
+				val4++;
+			}
+		}
+		//check the number of minutes between the two middle numbers
+		int numMinutes = val3 - val4;
+		//if it is a negative number, then we add 60 seconds. 
+		if (numMinutes < 0)
+		{
+			numMinutes += 60;
+		}
+		// add up the total number of seconds and compare it to the desired
+		// limit of seconds. 
+		int numTotal = numSeconds + (numMinutes * 60);
+		if (numTotal > numSecondsToCheckFor)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	// return a -1, if the user entered a number larger than 3600. 
+	else
+	{
+		return -1;
+	}
+}
+
 

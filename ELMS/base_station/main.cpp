@@ -48,7 +48,7 @@ using std::thread;
 void printf_notice();
 #endif
 
-//int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow)
+
 int main()
 {
 	//getPort();
