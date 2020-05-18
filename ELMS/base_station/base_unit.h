@@ -5,7 +5,7 @@
 #define BASE_UNIT_H
 
 #define MESSAGE_LIMIT 5
-#define SECONDS_LIMIT 10
+#define SECONDS_LIMIT 5
 
 #include <iostream>
 #include <fstream>
@@ -73,9 +73,9 @@ public:
 
     /*Set Functions for the Master Vector Containing Vehicle Objects */
     void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
-        double velocity, double bearing, int priority);
+        double velocity, double bearing, int priority, string status);
     void setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude,
-        double velocity, double bearing, int priority);
+        double velocity, double bearing, int priority, string status);
 
     /* Functions to input, update, check for vehicle id's and distances from
      * other vehicles */

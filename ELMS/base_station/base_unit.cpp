@@ -261,7 +261,7 @@ void Base_Unit::update_data(struct message* ptr, int indice)
         //delete the ptr created for the vector.
         delete mine_vehicles.at(mine_vehicles.size() - 1);
         mine_vehicles.erase(mine_vehicles.begin() + mine_vehicles.size() - 1);
-        setVehicleInMineVehicles2(mine_vehicles.at(index), ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1);
+        setVehicleInMineVehicles2(mine_vehicles.at(index), ptr->time, ptr->latitude, ptr->longitude, ptr->velocity, ptr->bearing, -1, "active");
     }
     mtx_update_master.unlock();
 }
@@ -295,7 +295,7 @@ int Base_Unit::contains_id_number(int id, unsigned long int& index)
 
 /* This updates mine_vehicles (master vector) at a specific index.  If you only
  *  want to update one value, set the other inputs to -1 and nothing will be changed. */
-void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, double longitude, double velocity, double bearing, int priority)
+void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, double longitude, double velocity, double bearing, int priority, string status)
 {
     if (time != -1)
     {
@@ -304,11 +304,13 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
         mine_vehicles.at(index)->setPreviousTime(mine_vehicles.at(index)->getTime());
         mine_vehicles.at(index)->setTime(time);
         // check to see if the vehicle is offline. 
-        int check = secondsBetweenTime(mine_vehicles.at(index)->getTime(), mine_vehicles.at(index)->getPreviousTime(), SECONDS_LIMIT);
-        if (check == 1)
-        {
+        //cout << "Here is time and previous time: " << mine_vehicles.at(index)->getTime() << " and " << mine_vehicles.at(index)->getPreviousTime() << endl;
+        //int check = secondsBetweenTime(mine_vehicles.at(index)->getTime(), mine_vehicles.at(index)->getPreviousTime(), SECONDS_LIMIT);
+        //cout << "Here is the value of check for vehicle : " << mine_vehicles.at(index)->getUnit() << " " << check << endl;
+        //if (check == 1)
+        //{
             mine_vehicles.at(index)->setStatus("offline");
-        }
+        //}
     }
     if (latitude != -1)
     {
@@ -337,11 +339,19 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
             mine_vehicles.at(index)->setStatus("at_risk");
         }
     }
+
+    if (status != "")
+    {
+        mine_vehicles.at(index)->setStatus(status);
+
+    }
+
+
 }
 /*This updates mine_vehicles (master vector) at a specific index.If you only
  * want to update one value, set the other inputs to - 1 and nothing will be changed.*/
 void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
-    double longitude, double velocity, double bearing, int priority)
+    double longitude, double velocity, double bearing, int priority, string status)
 {
     if (time != -1)
     {
@@ -349,12 +359,7 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
         v->setPreviousTime(v->getTime());
         //next we set the current time to the new input time
         v->setTime(time);
-        // check to see if the vehicle is offline
-        int check = secondsBetweenTime(v->getTime(), v->getPreviousTime(), SECONDS_LIMIT);
-        if (check == 1)
-        {
-            v->setStatus("offline");
-        }
+ 
     }
     if (latitude != -1)
     {
@@ -384,6 +389,12 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
             v->setStatus("at_risk");
         }
     }
+
+    if (status != "")
+    {
+        v->setStatus(status);
+
+    }
 }
 /* Function iterates through the master list and checks the distance each
  * vehicle is from the other vehicles. Tt adds any vehicles that are close to that
@@ -412,7 +423,7 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
         {
 
             // check if the vehicle is offline or not
-            int check = secondsBetweenTime(getMineVehicles().at(i)->getTime(), getMineVehicles().at(i)->getPreviousTime(), SECONDS_LIMIT);
+            int check = secondsBetweenTime(v->getTime(), getMineVehicles().at(i)->getTime(), SECONDS_LIMIT);
             // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
             if (check == 1 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
             {
@@ -454,8 +465,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
             {
                 listOfAlerts.insert(pair<int, double>(i, distance));
                 // set both of the vehicles priority numbers to 0
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0);
-                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, 0, "at_risk");
+                setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0, "at_risk");
                 // a 0 priority was set, so this needs to remain
                 set0 = true;
 
@@ -467,14 +478,14 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                  *not have a higher priority before changing. p represents the
                  *priority of the other vehicle this loop is comparing against.*/
                 p = (checkOtherVehiclesPriorityNumbers(v, i, 1));
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p, "");
 
                 /* If the vehicle has not had a priority of 0 set yet, we can
                    set it to 1. */
                 if (!set0)
                 {
                     /*set the priority to 1*/
-                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1);
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 1, "");
                     set1 = true;
                 }
 
@@ -487,13 +498,13 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                  */
                 p = checkOtherVehiclesPriorityNumbers(v, i, 2);
                 /* set the other vehicles priority number */
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p, "");
 
                 /* for the current vehicle, if it has not already been set to
                  * a priority 0 or 1, then set to a priority 2 */
                 if (!set0 && !set1)
                 {
-                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2);
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 2, "");
                     set2 = true;
                 }
 
@@ -507,13 +518,13 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 p = checkOtherVehiclesPriorityNumbers(v, i, 3);
                 /*set the other vehicle to the lowest priority number based
                   on distances it is from other vehicles in its map*/
-                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p);
+                setVehicleInMineVehicles(i, -1, -1, -1, -1, -1, p, "");
 
                 /* for the current vehicle, it it has not yet been set to a
                  * priority 0, 1, or 2, then set it to a priority 3 */
                 if (!set0 && !set1 && !set2)
                 {
-                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3);
+                    setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3, "");
                 }
             }
         }

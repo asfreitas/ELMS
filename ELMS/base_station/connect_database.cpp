@@ -418,7 +418,7 @@ void Database::queryDatabase(std::string queryType, T value) {
     }
 }
 
-
+/*
 int main(int, char**) {
 
     //Base_Unit bu;
@@ -468,4 +468,4 @@ int main(int, char**) {
     //status = "inactive";
     //std::string collection_name = "vehicles";
     //newDB.addVehicle(collection_name, unitNum, startup_time, new_longitude, new_latitude, new_velocity, new_bearing, status);
-}
+}*/

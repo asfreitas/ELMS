@@ -353,7 +353,7 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	/*Create a button that will be used to close the window once the COM port 
 	  has been selected */
 	hButtonClose = CreateWindowW(L"button", NULL
-		, WS_VISIBLE | WS_CHILD | BS_BITMAP| WS_BORDER |
+		, WS_VISIBLE | WS_CHILD | BS_BITMAP| WS_BORDER | 
 		WS_TABSTOP | BS_DEFPUSHBUTTON , 502, 250, 100, 60, hWnd, (HMENU)ID_CLOSE,
 		NULL, NULL);
 	SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);

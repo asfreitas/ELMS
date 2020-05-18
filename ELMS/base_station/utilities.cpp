@@ -116,13 +116,16 @@ int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor)
 		// digits by using modulo 100.
 		int val1 = value1 % 100;
 		int val2 = value2 % 100;
+
 		//subtract the two values. 
 		int numSeconds = val1 - val2;
+		
 		//if it is a negative value, we add 60 seconds. 
 		if (numSeconds < 0)
 		{
 			numSeconds += 60;
 		}
+		
 		// if the numSeconds is greater than the amount we were allowing, then
 		// we return true. 
 		if (numSeconds > numSecondsToCheckFor)
@@ -142,10 +145,10 @@ int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor)
 		//if we add 60 seconds, we will need to subtract 1 from the minutes. 
 		int flag = 0;
 		int val1 = value1 % 100;
-		cout << "Here is val1: " << val1 << endl;
+		
 		int val2 = value2 % 100;
 		int numSeconds = val1 - val2;
-		cout << "Here is val2: " << val2 << endl;
+		
 		if (numSeconds < 0)
 		{
 			numSeconds += 60;
