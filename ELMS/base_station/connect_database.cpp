@@ -1,9 +1,16 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+This file provides the Database class definitions
 */
 #include "connect_database.h"
 
-//constructor for pool instance used for threading connections
+/*
+============
+Database
+
+constructor for pool instance used for threading connections
+============
+*/
 Database::Database(std::string _uri)
 {
     static instance instance{};
@@ -11,7 +18,15 @@ Database::Database(std::string _uri)
     pool = new mongocxx::pool{ uri };
 }
 
-//desctructor
+
+
+/*
+===============
+~Database
+
+destructor
+===============
+*/
 Database::~Database()
 {
     std::cout << "This can't go out of scope until the"
@@ -19,13 +34,32 @@ Database::~Database()
     delete pool;
 }
 
-//create a connection pool
+
+
+/*
+===============
+getConnection
+
+create a connection pool
+===============
+*/
 Database::connection Database::getConnection()
 {
     return pool->acquire();
 }
 
-//create a document that can be inserted using builder method
+
+
+
+/*
+===============
+addVehicle
+
+Arguments: a pointer to a vehicle
+
+create a document that can be inserted using builder method
+===============
+*/
 void Database::addVehicle(Vehicle* v) {
 
     try {
@@ -81,9 +115,19 @@ void Database::addVehicle(Vehicle* v) {
     }
 }
 
-//Update a vehicle: find current vehicle with unit number, 
-//update last and past data with current data, then update current data
-//with new data
+
+
+/*
+===============
+updateVehicle
+
+Arguments: A pointer to a vehcile
+
+Update a vehicle: find current vehicle with unit number,
+update last and past data with current data, then update current data
+with new data
+===============
+*/
 void Database::updateVehicle(Vehicle* vehicle)
 {
     int id = vehicle->getVehicleID();
@@ -125,6 +169,20 @@ void Database::updateVehicle(Vehicle* vehicle)
     }
 }
 
+
+/*
+===============
+updateSingleVehicleTrait
+
+Arguments: (1) a queryType such as "vehicle_unit", "past_velocity" ,"past_bearing",
+            "new_longitude", "new_latitude", "new_velocity","new_bearing","new_time:,
+            "status"
+            (2) an int that represents the vehicle unit id number
+            (3) the value for update
+
+Updates one specific vehicle trait in the database
+===============
+*/
 template<typename T>
 void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value) {
     try {
@@ -165,6 +223,19 @@ void Database::updateSingleVehicleTrait(std::string queryType, int unit, T value
 }
 
 
+/*
+===============
+pushNewData
+
+Arguments: (1) a queryType such as "vehicle_unit", "past_velocity" ,"past_bearing",
+            "new_longitude", "new_latitude", "new_velocity","new_bearing","new_time:,
+            "status"
+            (2) an int that represents the vehicle unit id number
+            (3) the value to be pushed
+
+Updates the database with new data
+===============
+*/
 template<typename T>
 void Database::pushNewData(std::string queryType, int unit, T value) {
     try {
@@ -207,6 +278,19 @@ void Database::pushNewData(std::string queryType, int unit, T value) {
     }
 }
 
+/*
+===============
+getPastData
+
+Arguments: (1) a queryType such as "vehicle_unit", "past_velocity" ,"past_bearing",
+            "new_longitude", "new_latitude", "new_velocity","new_bearing","new_time:,
+            "status"
+            (2) an int that represents the vehicle unit id number
+            (3) the value to be retrieved
+
+Allows user to retrieve previous vehicle information
+===============
+*/
 template<typename T>
 void Database::getPastData(std::string queryType, int unit, T value) {
     try {
@@ -252,6 +336,19 @@ void Database::getPastData(std::string queryType, int unit, T value) {
 }
 
 
+/*
+===============
+updatePastData
+
+Arguments: (1) a queryType such as "vehicle_unit", "past_velocity" ,"past_bearing",
+            "new_longitude", "new_latitude", "new_velocity","new_bearing","new_time:,
+            "status"
+            (2) an int that represents the vehicle unit id number
+            (3) the value to be placed into past data
+
+Update past data
+===============
+*/
 template<typename T>
 void Database::updatePastData(std::string queryType, int unit, T eleView) {
     try {
@@ -282,6 +379,20 @@ void Database::updatePastData(std::string queryType, int unit, T eleView) {
     }
 }
 
+/*
+===============
+queryDatabase
+
+Arguments: (1) a queryType such as "vehicle_unit", "past_velocity" ,"past_bearing",
+            "new_longitude", "new_latitude", "new_velocity","new_bearing","new_time:,
+            "status"
+            (2) the value to be queried for
+
+Displays requested information based for queryType. 
+For example, if querytype = "vehicle_unit" and T value = 350, information
+about vehicle unit 350 will be displayed. 
+===============
+*/
 template <typename T>
 void Database::queryDatabase(std::string queryType, T value) {
     try {
@@ -331,7 +442,7 @@ int main(int, char**) {
      //{
          //newDB.updateVehicleWithPointer(v);
      //}
-     //newDB.queryDatabase("vehicle_unit", 350);
+     newDB.queryDatabase("vehicle_unit", 350);
 
     //v->setBearing(4);
     //v->setVelocity(0.5);

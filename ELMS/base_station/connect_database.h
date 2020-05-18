@@ -1,5 +1,6 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+Provides the Database class declarations
 */
 
 
