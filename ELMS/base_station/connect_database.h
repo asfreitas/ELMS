@@ -26,7 +26,6 @@
 #include <time.h>
 #include "vehicle.h"
 #include "base_unit.h"
-#include "utilities.h"
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860
@@ -57,15 +56,11 @@ public:
     ~Database();
     connection getConnection();
 
-    //These two functions update an existing vehicle either with out without a pointer to the Vehicle
-    void updateVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
-        double new_bearing, std::string status);
-    void updateVehicleWithPointer(Vehicle* v, std::string status);
+    //This function updates an existing vehicle. 
+    void updateVehicle(Vehicle* v);
 
-    //These two functions add an existing vehicle either with out without a pointer to the Vehicle. 
-    void addVehicle(std::string collection_name, int unit, std::chrono::milliseconds startup_time, double new_longitude, double new_latitude, double new_velocity,
-        double new_bearing, std::string status);
-    void addVehicleWithPointer(Vehicle* v);
+    //This function adds a new vehicle to the database
+    void addVehicle(Vehicle* v);
 
     template <typename T>
     void queryDatabase(std::string, T);
@@ -77,5 +72,4 @@ public:
     void getPastData(std::string, int, T);
     template <typename T>
     void updatePastData(std::string, int, T);
-    void updateVehicle(Vehicle*);
 };
