@@ -7,23 +7,14 @@ References:
  * https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 */
 
-#include <Windows.h>
-#include <mutex>
-#include <thread>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "port.h"
-#include <vector>
-#include "base_unit.h"
-#include <iostream>
-#include <fstream>
-# include <string>
-#include <ctime>
-#include <time.h>
+
+
 #include <omp.h>
 #include "parse_incoming.h"
-#include "base_unit_gui.h"
+#include "base_unit.h"
+#include "port.h"
+
+
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 using std::cout;
@@ -143,7 +134,6 @@ int main()
 			//cout << "The buffer is empty" << endl;
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	} /* end while loop */
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */

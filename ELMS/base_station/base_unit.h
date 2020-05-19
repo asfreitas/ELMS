@@ -4,30 +4,18 @@
 #ifndef BASE_UNIT_H
 #define BASE_UNIT_H
 
-#define MESSAGE_LIMIT 5
-#define SECONDS_LIMIT 5
-
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <string>
-#include <iomanip>
-#include <Windows.h>
-#include <vector>
-#include <algorithm>
-#include <map>
-#include <iterator> 
-
 #include "parse_incoming.h"
 #include "outgoing.h"
 #include "utilities.h"
 #include "vehicle.h"
 #include "calculations.h"
 #include "port.h"
-#include <algorithm>
-#include <map>
-#include <iterator>
 #include "fileio.h"
+
+#include <iomanip>
+
+#define MESSAGE_LIMIT 5
+#define SECONDS_LIMIT 5
 
 using std::string;
 using std::vector;

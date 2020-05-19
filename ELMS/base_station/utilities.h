@@ -1,13 +1,15 @@
 #pragma once
 
+#include "vehicle.h"
+
 #include <string>
 #include <iostream>
-#include "vehicle.h"
 #include <algorithm>
 #include <sstream>
 #include <functional>
 #include <map>
 #include <set>
+
 using std::string;
 using std::cout;
 using std::endl;

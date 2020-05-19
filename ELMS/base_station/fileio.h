@@ -1,8 +1,11 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
+
+#ifndef FILEIO_H
+#define FILEIO_H
+
 #include <fstream>
-#include <istream>
 #include <Windows.h>
 #include <string>
 #include <thread>
@@ -13,8 +16,6 @@
 using std::string;
 using std::cout;
 using std::endl;
-#ifndef FILEIO_H
-#define FILEIO_H
 
 enum class MessageType { incoming, alert, network_failure, misc };
 

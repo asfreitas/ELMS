@@ -6,10 +6,12 @@
 
 #ifndef BASE_UNIT_GUI_H
 #define BASE_UNIT_GUI_H
+
+#include "utilities.h"
+
 #include <Windows.h>
 #include <string>
 #include <vector>
-#include "utilities.h"
 #include <iostream>
 #include <string.h>
 

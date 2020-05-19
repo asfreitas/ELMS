@@ -3,12 +3,14 @@
 Provides the Database class declarations
 */
 
+#ifndef CONNECT_DATABASE_H
+#define CONNECT_DATABASE_H
+
+#include "vehicle.h"
 
 #include <bsoncxx/stdx/optional.hpp>
-#include <bsoncxx/types.hpp>
 #include <bsoncxx/types/bson_value/view.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-
 
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -21,12 +23,7 @@ Provides the Database class declarations
 #include <bsoncxx/types.hpp>
 
 #include <thread>
-#include <iostream>
-#include <cstdint>
-#include <vector>
 #include <time.h>
-#include "vehicle.h"
-#include "base_unit.h"
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860
@@ -74,3 +71,4 @@ public:
     template <typename T>
     void updatePastData(std::string, int, T);
 };
+#endif

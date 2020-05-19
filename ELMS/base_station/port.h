@@ -7,6 +7,11 @@
  * I removed them because Visual Studio required enum classes since
  * it is felt that enums can lead to "surprises" or bugs versus an
  * enum class. */
+#ifndef SERIALPORT_HPP
+#define SERIALPORT_HPP
+
+#include "fileio.h"
+#include "base_unit_gui.h"
 
 #include <windows.h>
 #include <iostream>
@@ -15,16 +20,11 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-//#include "timer.h"
-#include "base_unit_gui.h"
 #include <vector>
 
-#include "fileio.h"
 using std::vector;
 using std::string;
 
-#ifndef SERIALPORT_HPP
-#define SERIALPORT_HPP
 
 static vector<string> listOfPorts;
 

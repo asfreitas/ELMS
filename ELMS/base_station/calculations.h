@@ -1,24 +1,28 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
-#define _USE_MATH_DEFINES
-#include <cmath>
-#include <iostream>
-#include <string>
-#include "utilities.h"
-#include "vehicle.h"
-
-
-const double EARTH_RADIUS = 6371;
 
 #ifndef CALCULATIONS_H
 #define CALCULATIONS_H
 
+#define _USE_MATH_DEFINES
+
+#include "utilities.h"
+#include "vehicle.h"
+
+#include <cmath>
+#include <iostream>
+#include <string>
+
+
+
+const double EARTH_RADIUS = 6371;
+
+
+
 class Calculations
 {
     private:
-
-
 
     public:
         double degrees_to_radians(double degreeMinutes);

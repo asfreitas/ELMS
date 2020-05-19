@@ -2,17 +2,16 @@
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
 
-//#include <queue>
-#include <vector>
 
 #ifndef VEHICLE_HPP
 #define VEHICLE_HPP
 
-//using std::priority_queue;
 #include <iostream>
 #include <algorithm>
 #include <map>
 #include <iterator>
+#include <vector>
+
 using std::cout;
 using std::endl;
 using std::vector;
