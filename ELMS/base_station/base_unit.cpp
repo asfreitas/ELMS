@@ -303,14 +303,7 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
         // the system. 
         mine_vehicles.at(index)->setPreviousTime(mine_vehicles.at(index)->getTime());
         mine_vehicles.at(index)->setTime(time);
-        // check to see if the vehicle is offline. 
-        //cout << "Here is time and previous time: " << mine_vehicles.at(index)->getTime() << " and " << mine_vehicles.at(index)->getPreviousTime() << endl;
-        //int check = secondsBetweenTime(mine_vehicles.at(index)->getTime(), mine_vehicles.at(index)->getPreviousTime(), SECONDS_LIMIT);
-        //cout << "Here is the value of check for vehicle : " << mine_vehicles.at(index)->getUnit() << " " << check << endl;
-        //if (check == 1)
-        //{
-            mine_vehicles.at(index)->setStatus("offline");
-        //}
+ 
     }
     if (latitude != -1)
     {
