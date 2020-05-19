@@ -60,7 +60,7 @@ Arguments: a pointer to a vehicle
 create a document that can be inserted using builder method
 ===============
 */
-void Database::addVehicle(Vehicle* v) {
+void Database::addVehicle(Vehicle* vehicle) {
 
     try {
         //establish pool connection
@@ -69,51 +69,57 @@ void Database::addVehicle(Vehicle* v) {
         auto test = connection->database("test");
         auto vehicles = test["vehicles"];
 
-        auto doc = document{};
+        //get a map of distance to vehicles vector
+        map<int, double>* mapVehicles = vehicle->getMapOfVehicles();
 
-        bsoncxx::document::value doc_value = doc
-            << "vehicle_unit" << v->getUnit()
+        bsoncxx::builder::stream::document builder{};
+        //first, build distance_to_vehicles array with objects of other vehicles
+        auto sub_array = builder << "distance_to_vehicles" << bsoncxx::builder::stream::open_array;
+        for (pair<int, double> element : *mapVehicles) {
+            sub_array = sub_array << bsoncxx::builder::stream::open_document
+                << "vehicle_unit" << element.first
+                << "distance" << element.second
+                << bsoncxx::builder::stream::close_document;
+        }
+        auto after_array = sub_array << bsoncxx::builder::stream::close_array;
+        after_array
+            << "vehicle_unit" << vehicle->getUnit()
             //<< "startup_time" << bsoncxx::types::b_date{ message_time }
             << "last_received_time" << NULL
             << "last_longitude" << NULL
             << "last_latitude" << NULL
             << "past_velocity" << open_array
-            << v->getVelocity()
+            << vehicle->getVelocity()
             << close_array
             << "past_bearing" << open_array
-            << v->getBearing()
+            << vehicle->getBearing()
             << close_array
             //<< "new_time" << bsoncxx::types::b_date{ message_time }
-            << "new_longitude" << v->getLongitude()
-            << "new_latitude" << v->getLatitude()
-            << "new_velocity" << v->getVelocity()
-            << "new_bearing" << v->getBearing()
-            << "status" << v->getStatus()
-            << "distance_to_vehicles" << open_array
-            << open_document{}
-            << "vehicle_unit" << 1
-            << "distance" << 75
-            << close_document{}
-            << close_array
-            << finalize;
+            << "new_longitude" << vehicle->getLongitude()
+            << "new_latitude" << vehicle->getLatitude()
+            << "new_velocity" << vehicle->getVelocity()
+            << "new_bearing" << vehicle->getBearing()
+            << "status" << vehicle->getStatus();
+        bsoncxx::document::value doc_view = after_array << finalize;
 
         //obtain view of document to insert it
-        bsoncxx::document::view view = doc_value.view();
+        bsoncxx::document::view view = doc_view.view();
         //insert the view of the document
         bsoncxx::stdx::optional<mongocxx::result::insert_one> result = vehicles.insert_one(view);
-
         if (result) {
             std::cout << "Vehicle succuessfully created" << "\n";
         }
         else {
             std::cout << "Unsuccessful with creating" << "\n";
         }
+
     }
     catch (mongocxx::exception& e)
     {
         std::cout << "There was an exception: " << e.what();
     }
 }
+
 
 
 
@@ -130,7 +136,6 @@ with new data
 */
 void Database::updateVehicle(Vehicle* vehicle)
 {
-    int id = vehicle->getVehicleID();
     try
     {
         //establish pool connection
@@ -138,10 +143,12 @@ void Database::updateVehicle(Vehicle* vehicle)
         //create a database connection
         auto test = connection->database("test");
         auto vehicles = test["vehicles"];
-        milliseconds message_time = milliseconds(vehicle->getTime());
+
+        //get a map of distance to vehicles vector
+        map<int, double>* mapVehicles = vehicle->getMapOfVehicles();
 
         auto result = vehicles.update_one(
-            document{} << "vehicle_unit" << id << finalize,
+            document{} << "vehicle_unit" << vehicle->getUnit() << finalize,
             document{} << "$push" << open_document{}
             << "past_velocity" << vehicle->getVelocity()
             << "past_bearing" << vehicle->getBearing()
@@ -151,7 +158,7 @@ void Database::updateVehicle(Vehicle* vehicle)
             << "new_latitude" << vehicle->getLatitude()
             << "new_velocity" << vehicle->getVelocity()
             << "new_bearing" << vehicle->getBearing()
-            << "new_time" << bsoncxx::types::b_date{ message_time }
+            //<< "new_time" << bsoncxx::types::b_date{ messageTime }
             << "status" << vehicle->getStatus()
             << close_document{} << finalize);
         if (result)
@@ -168,8 +175,6 @@ void Database::updateVehicle(Vehicle* vehicle)
         std::cout << "There was an exception: " << e.what();
     }
 }
-
-
 /*
 ===============
 updateSingleVehicleTrait
