@@ -41,27 +41,12 @@ Base_Unit::Base_Unit(FileIO* _f)
     fileHandler = _f;
 }
 
-
 /*
- * Function logFile
- * This function checks the message count. If it is < MESSAGE_LIMIT, then the inputMessage
- * is written to a log file and the message count is incremented. If the
- * message count is >= MESSAGE_LIMIT, then this last message is written to the log file
- * and the log file is closed.  This log file will be stored in the log file
- * directory and at regular intervals uploaded to the database.  When it is
- * closed it will be saved with a name created by using the local time. (we
- * may need to change this is Zulu time later)
- * References: https://www.cplusplus.com/reference/mutex/mutex/lock/
- * https://cplusplus.com/forum/general/194132
- * Important to use a reference wrapper when passing in threads.
- * https://stackoverflow.com/questions/34078208/passing-object-by-reference-to-stdthread-in-c11
- * type = 0 means that it is an incoming message
- * type = 1 means that it is an alert being sent to a vehicle
- * type = 2 means that it is a network failure message
- * type = 3 means that it is a miscellaneous error.
- *
- * string fileName is created by using b.getFileName(&fileName, 0); where b
- * is a Base_Unit object and the second parameter is the message type
+===============
+addToMineVehicles
+
+Function adds a vector pointer to the master vector of mine vehicles
+===============
 */
 
 void Base_Unit::addToMineVehicles(Vehicle* v)
@@ -69,12 +54,19 @@ void Base_Unit::addToMineVehicles(Vehicle* v)
     mine_vehicles.push_back(v);
 }
 
-/* prints the contents held in the mine_vehicle vector*/
+/*
+===============
+print_vector
+
+prints the contents held in the mine_vehicle vector
+===============
+*/
 void Base_Unit::print_vector(vector<Vehicle*> v)
 {
+    //do not print anything if the vector is empty
     if (v.size() == 0)
         return;
-    //cout << "The size of the vector in print function is: " << v.size() << endl;
+
     cout << "**********************************" << endl << endl;
 
     for (auto itr : v)
@@ -102,20 +94,18 @@ void Base_Unit::print_vector(vector<Vehicle*> v)
 
 }
 
+/*
+===============
+getMineVehicles
+
+returns the vector of pointers to the vehicles in the mine
+===============
+*/
 vector<Vehicle*> Base_Unit::getMineVehicles()
 {
     return mine_vehicles;
 }
 
-void Base_Unit::addToPriorityQueue(Vehicle& v)
-{
-    priority_list.push_back(v);
-}
-
-vector<Vehicle> Base_Unit::getPriorityQueue()
-{
-    return priority_list;
-}
 
 /* This function takes the new message and either inputs a new vehicle or
  * updates a current one The reference to use maps is the following:

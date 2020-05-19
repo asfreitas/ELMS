@@ -33,7 +33,6 @@ class Base_Unit
 
     //The vector of Vehicles functions as a "master list" of all the vehicles
     // that are currently in the mine
-    //static vector<Vehicle>mine_vehicles;
     static vector<Vehicle*>mine_vehicles;
     FileIO* fileHandler;
 
@@ -53,8 +52,6 @@ public:
     void addToMineVehicles(Vehicle* v);
     void print_vector(vector<Vehicle*> v);
     vector<Vehicle*>getMineVehicles();
-    void addToPriorityQueue(Vehicle& v);
-    vector<Vehicle>getPriorityQueue();
 
     /* returns the size of the mine_vehicle vector*/
     size_t get_size(const vector<Vehicle*>& v);
@@ -73,7 +70,7 @@ public:
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
 
-   // Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT) {}; // https://stackoverflow.com/questions/849812/c-construction-of-an-object-inside-a-class
+    //constructor for fileHandler
     Base_Unit() : fileHandler() {};
 };
 
