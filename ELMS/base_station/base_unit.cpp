@@ -107,14 +107,15 @@ vector<Vehicle*> Base_Unit::getMineVehicles()
 }
 
 
-/* This function takes the new message and either inputs a new vehicle or
- * updates a current one The reference to use maps is the following:
- * https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
- */
- /* This function takes the new message and either inputs a new vehicle or
-  * updates a current one The reference to use maps is the following:
-  * https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
-  */
+/*
+===============
+input_data
+
+This function takes the new message and either inputs a new vehicle or
+ updates a current one The reference to use maps is the following:
+ https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+===============
+*/
 void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 {
     Calculations calc;
@@ -128,8 +129,6 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 
     //iterator that will be used to iterate thru a map
     map<int, double>::iterator itr;
-
-    //size = get_size(mine_vehicles);
     size = get_size(mine_vehicles);
     //if the size of the vector is 0, then we know we need to add the 
     // vehicle to the vector
@@ -182,14 +181,17 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 // now we get the bearing
                 // bearing = calc.getBearing(&mine_vehicles.at(index), &v1);
                 bearing = calc.getBearing(mine_vehicles.at(index), v1);
+
                 // we create the outgoing message;
                 outgoing_message(alertMessage, ptr->vehicle, v1->getUnit(), ptr->time, speed,
                     itr->second, bearing);
 
                 //copy the message to use to create the log file for the alert
                 alertLogMessage = alertMessage;
+
                 //convert the outgoing message to a char * so that it can be transmitted
                 stringToCharPointer(alertMessage, fileName);
+
                 // send the alerts
                 auto len = static_cast<int>(alertMessage.length());
                 p.writeToSerialPort(fileName, len + 1, h);
@@ -197,32 +199,29 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 //we also need to create the alert message
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 2);
-                //get the file path
-
-                fileHandler->logToFile(alertLogMessage, MessageType::alert);
                 
-
+                //get the file path
+                fileHandler->logToFile(alertLogMessage, MessageType::alert);               
             }
         }
-
         // now we need to sort the mine_vehicles
         std::sort(mine_vehicles.begin(), mine_vehicles.end(), Vehicle::compById);
-
-
-
-        //now we need to add these vehicles to each other's priority queues as well
-        // as add the vehicles to the master unit's priority queue. 
-        //addToPriorityQueue(v);
-
     }
 }
-/* This function takes a pointer to a struct message that contains the data
+
+/*
+===============
+update_data
+
+This function takes a pointer to a struct message that contains the data
  * that was contained in the most recent message.  The indice represents
  * the index of the mine_vehicles vector that the vehicle object was added to.
  * The function will check for duplicate id's. If the id is not a duplicate,
  * then the information is added to the newly created vehicle object. If it is
  * a duplicate, then the current information for that vehcile object is
- * updated.  */
+ * updated.  
+===============
+*/
 void Base_Unit::update_data(struct message* ptr, int indice)
 {
     mtx_update_master.lock();
@@ -256,18 +255,30 @@ void Base_Unit::update_data(struct message* ptr, int indice)
     mtx_update_master.unlock();
 }
 
-// returns the size of the vector
+/*
+===============
+get_size
+
+returns the size of the mine_vehicles vector
+===============
+*/
 size_t Base_Unit::get_size(const vector<Vehicle*>& v)
 {
     return v.size();
 }
 
-/* This function takes a vehicle id and an address to an integer that represents
+/*
+===============
+contains_id_number
+
+This function takes a vehicle id and an address to an integer that represents
  * the index of the mine_vehicles vector where the vehicle is located. It iterates
  * thru the vector, finds the index, then sets the value of index to it. If the
  * the vehicle id exists in the vector, then the function returns a 1 which means
  * true.  If it does not contain that vehicle, then a 0 is returned which means
- * false  */
+ * false
+===============
+*/
 int Base_Unit::contains_id_number(int id, unsigned long int& index)
 {
     for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
@@ -282,9 +293,14 @@ int Base_Unit::contains_id_number(int id, unsigned long int& index)
 }
 
 
+/*
+===============
+setVehicleInMineVehicles
 
-/* This updates mine_vehicles (master vector) at a specific index.  If you only
- *  want to update one value, set the other inputs to -1 and nothing will be changed. */
+This function updates mine_vehicles (master vector) at a specific index.  If you only
+want to update one value, set the other inputs to -1 and nothing will be changed.
+===============
+*/
 void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, double longitude, double velocity, double bearing, int priority, string status)
 {
     if (time != -1)
@@ -316,6 +332,7 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
     if (priority != -1)
     {
         mine_vehicles.at(index)->setPriority(priority);
+
         //if the priority was set to 0, then we need to update the status to at-risk
         if (mine_vehicles.at(index)->getPriorityNumber() == 0)
         {
@@ -328,11 +345,19 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
         mine_vehicles.at(index)->setStatus(status);
 
     }
-
-
 }
-/*This updates mine_vehicles (master vector) at a specific index.If you only
- * want to update one value, set the other inputs to - 1 and nothing will be changed.*/
+
+/*
+===============
+setVehicleInMineVehicles2
+
+This function differs from setVehicleInMineVehicles in the parameters it takes.
+The first parameter is a pointer to a vehicle whereas in setVehicleInMineVehicles
+the first parameter is the index in the mine_vehicles with the vehicle we
+wish to update. If you only want to update one value, set the other inputs to - 1 
+and nothing will be changed.
+===============
+*/
 void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
     double longitude, double velocity, double bearing, int priority, string status)
 {
@@ -340,6 +365,7 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
     {
         //first we set the previous time with the current time.
         v->setPreviousTime(v->getTime());
+
         //next we set the current time to the new input time
         v->setTime(time);
  
@@ -365,6 +391,7 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
     if (priority != -1)
     {
         v->setPriority(priority);
+
         //if the priority is changed to a 0, then we need to change the
         // status to at_risk
         if (v->getPriorityNumber() == 0)
@@ -379,21 +406,29 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
 
     }
 }
-/* Function iterates through the master list and checks the distance each
+/*
+===============
+checkDistancesInMasterVector1
+
+ Function iterates through the master list and checks the distance each
  * vehicle is from the other vehicles. Tt adds any vehicles that are close to that
  * input vehicle to a vector that contains ints which represent the index number
- * in the vector of vehicles (mine_vehicles) where there is risk of collision*/
+ * in the vector of vehicles (mine_vehicles) where there is risk of collision
  //Reference for maps: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+================
+*/
 map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 {
     Calculations c;
     //this map holds the list of vehicles that will need alerts sent
     map<int, double> listOfAlerts;
+
     //these bools represent whether or not a priority of 0, 1, or 2 has been 
     // set in this iteration
     bool set0 = false;
     bool set1 = false;
     bool set2 = false;
+
     // an integer that holds a priority number
     int p;
     double distance;
@@ -407,6 +442,7 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 
             // check if the vehicle is offline or not
             int check = secondsBetweenTime(v->getTime(), getMineVehicles().at(i)->getTime(), SECONDS_LIMIT);
+
             // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
             if (check == 1 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
             {
@@ -431,6 +467,7 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
             }
             // get the distance
             distance = c.haversine(v, mine_vehicles.at(i));
+
             //distance returns as km, need to change to meters so multiply
             // by 1000
             distance = 1000 * distance;
@@ -452,7 +489,6 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0, "at_risk");
                 // a 0 priority was set, so this needs to remain
                 set0 = true;
-
             }
 
             else if (distance > 50 && distance <= 75)
@@ -515,8 +551,13 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
     return listOfAlerts;
 }
 
-/* This function checks the vehicle at the index of the mine_vehicle to see what
-   the smallest distance is to any other vehicle.  It returns this distance*/
+/*
+===============
+checkOtherVehiclesPriorityNumbers
+his function checks the vehicle at the index of the mine_vehicle to see what
+   the smallest distance is to any other vehicle.  It returns this distance
+===============
+*/
 int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number)
 {
     double d;
@@ -541,8 +582,12 @@ int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int pri
     return priority;
 }
 
-
-/* This function allows the base unit to call a fileHandler. */
+/*
+===============
+logToFile
+This function allows the base unit to call a fileHandler.
+===============
+*/
 void Base_Unit::logToFile(std::string message, MessageType type)
 {
     fileHandler->logToFile(message, type);
