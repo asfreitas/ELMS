@@ -113,3 +113,6 @@ int Calculations::normalizeBearing(double bearing)
 	newBearing = (newBearing + 360) % 360;
 	return newBearing;
 }
+
+
+

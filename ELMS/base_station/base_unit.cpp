@@ -19,27 +19,48 @@ using std::thread;
 using std::cout;
 using std::endl;
 
+//This string is the uri to the test database
+string _uri = "mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority";
+
 // declare a mutex that locks when the program is writing to a log file
 std::mutex mtx_close;
 std::mutex mtx_update_master;
 std::mutex mtx_udate_vehicle;
 
-/* Static members must be initialized outside of the class
- * Since it is a static member, it must be initialized outside of the class
- */
+//static count so that vehicles in mine are only updated in the database, periodically
+static int countTime = 0;
 
+/* Static members must be initialized outside of the class
+ * Since mine_vehicles is a static member, it must be initialized outside of
+ * the class
+ */
 vector<Vehicle*> Base_Unit::mine_vehicles;
 
+/*
+===============
+Base_Unit
+
+Default Constructor for Base_Unit
+===============
+*/
+Base_Unit::Base_Unit() :  fileHandler("C:\\logs", MESSAGE_LIMIT), 
+database(_uri)
+{
+}
+
+/*
+===============
+~Base_Unit
+
+Destructor
+===============
+*/
 Base_Unit::~Base_Unit()
 {
     //cout << "Base_Unit destructor was called" << endl;
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 
-Base_Unit::Base_Unit(FileIO* _f)
-{
-    fileHandler = _f;
-}
 
 /*
 ===============
@@ -126,13 +147,14 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
     char fileName[100];
     double speed, distance = 0, bearing;
     unsigned long int index;
+    int newVehicle = 0;
 
     //iterator that will be used to iterate thru a map
     map<int, double>::iterator itr;
     size = get_size(mine_vehicles);
     //if the size of the vector is 0, then we know we need to add the 
     // vehicle to the vector
-    if (size == 0)
+    if (size == 1)
     {
 
         mine_vehicles.at(indice)->setBearing(ptr->bearing);
@@ -143,12 +165,16 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         mine_vehicles.at(indice)->setVelocity(ptr->velocity);
         mine_vehicles.at(indice)->setPriority(3);
 
+        //add Vehicle to database
+        cout << "Call database to add vehicle " << mine_vehicles.at(indice)->getUnit() << endl;
+        database.addVehicle(mine_vehicles.at(indice));
+
     }
     // otherwise, we check to see if the vehicle id already exists
     else
     {
         // call update_data
-        thread t1 = std::thread(&Base_Unit::update_data, this, ptr, indice);
+        thread t1 = std::thread(&Base_Unit::update_data, this, ptr, indice, std::ref(newVehicle));
 
         // have the thread join again
         t1.join();
@@ -201,9 +227,21 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 2);
                 
                 //get the file path
-                fileHandler->logToFile(alertLogMessage, MessageType::alert);               
+                fileHandler.logToFile(alertLogMessage, MessageType::alert);               
             }
         }
+
+        //update the current vehicle before leaving the function
+        cout << "Here is the vehicle  we are updating: " << mine_vehicles.at(index)->getVehicleID() << endl;
+        if ((get_size(mine_vehicles) > 1) && (newVehicle == 0))
+        {
+            database.updateVehicle(mine_vehicles.at(index));
+        }
+        else if ((get_size(mine_vehicles) > 1) && (newVehicle == 1))
+        {
+            database.addVehicle(mine_vehicles.at(index));
+        }
+
         // now we need to sort the mine_vehicles
         std::sort(mine_vehicles.begin(), mine_vehicles.end(), Vehicle::compById);
     }
@@ -222,7 +260,7 @@ This function takes a pointer to a struct message that contains the data
  * updated.  
 ===============
 */
-void Base_Unit::update_data(struct message* ptr, int indice)
+void Base_Unit::update_data(struct message* ptr, int indice, int &newVehicle)
 {
     mtx_update_master.lock();
     int duplicate;
@@ -240,6 +278,7 @@ void Base_Unit::update_data(struct message* ptr, int indice)
         mine_vehicles.at(indice)->setUnit(ptr->vehicle);
         mine_vehicles.at(indice)->setVelocity(ptr->velocity);
         mine_vehicles.at(indice)->setPriority(3);
+        newVehicle = 1;
     }
     //otherwise, this is a duplicate id and we need to update
     // the Vehicle objects location data
@@ -433,6 +472,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
     int p;
     double distance;
 
+    string offline = "offline";
+
     //iterate through the master list of vehicles
     for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
     {
@@ -446,7 +487,17 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
             // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
             if (check == 1 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
             {
-                getMineVehicles().at(i)->setStatus("offline");
+                cout << "Here is the current status of vehicle " << getMineVehicles().at(i)->getUnit() << " : " << getMineVehicles().at(i)->getStatus() << endl;
+                if (getMineVehicles().at(i)->getStatus() != "offline")
+                {
+                    cout << "I am going to go ahead and set the status again " << endl;
+                    getMineVehicles().at(i)->setStatus("offline");
+                    //database.updateSingleVehicleTrait("new_velocity", 67, 50);
+                }
+                else
+                {
+                    cout << "No need to set the status again" << endl;
+                }
             }
 
             //if the vehicle has recent messages but has not moved and is not at risk, then
@@ -489,6 +540,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 0, "at_risk");
                 // a 0 priority was set, so this needs to remain
                 set0 = true;
+                //update the vehicle in the list that is at_risk
+                //database.updateVehicle(mine_vehicles.at(i));
             }
 
             else if (distance > 50 && distance <= 75)
@@ -546,6 +599,8 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                     setVehicleInMineVehicles2(v, -1, -1, -1, -1, -1, 3, "");
                 }
             }
+            //update the vehicle that was compared against in the for-loop
+            // database.updateVehicle(mine_vehicles.at(i));
         }
     }
     return listOfAlerts;
@@ -590,5 +645,5 @@ This function allows the base unit to call a fileHandler.
 */
 void Base_Unit::logToFile(std::string message, MessageType type)
 {
-    fileHandler->logToFile(message, type);
+    fileHandler.logToFile(message, type);
 }

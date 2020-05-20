@@ -16,6 +16,8 @@
  */
 void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTime, double velocity, double distance, double bearing)
 {
+    velocity = roundToOneDecimal(velocity);
+    distance = roundToOneDecimal(distance);
     string unit11 = std::to_string(unit1);
     string unit22 = std::to_string(unit2);
     string messageTime1 = std::to_string(messageTime);

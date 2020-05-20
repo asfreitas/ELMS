@@ -7,6 +7,7 @@ Provides the Database class declarations
 #define CONNECT_DATABASE_H
 
 #include "vehicle.h"
+#include "utilities.h"
 
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/types/bson_value/view.hpp>

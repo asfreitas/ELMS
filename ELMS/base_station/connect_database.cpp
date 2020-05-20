@@ -3,7 +3,7 @@
 This file provides the Database class definitions
 */
 #include "connect_database.h"
-
+static int count = 0;
 /*
 ============
 Database
@@ -45,10 +45,10 @@ create a connection pool
 */
 Database::connection Database::getConnection()
 {
+    count++;
+    std::cout << "The count is: " << count << endl;
     return pool->acquire();
 }
-
-
 
 
 /*
@@ -64,6 +64,7 @@ void Database::addVehicle(Vehicle* vehicle) {
 
     try {
         //establish pool connection
+        cout << "Going to call getConnection from addVehicle" << endl;
         auto connection = getConnection();
         //create a database connection
         auto test = connection->database("test");
@@ -95,8 +96,8 @@ void Database::addVehicle(Vehicle* vehicle) {
             << vehicle->getBearing()
             << close_array
             //<< "new_time" << bsoncxx::types::b_date{ message_time }
-            << "new_longitude" << vehicle->getLongitude()
-            << "new_latitude" << vehicle->getLatitude()
+            << "new_longitude" << roundToFourDecimals(vehicle->getLongitude())
+            << "new_latitude" << roundToFourDecimals(vehicle->getLatitude())
             << "new_velocity" << vehicle->getVelocity()
             << "new_bearing" << vehicle->getBearing()
             << "status" << vehicle->getStatus();
@@ -107,7 +108,7 @@ void Database::addVehicle(Vehicle* vehicle) {
         //insert the view of the document
         bsoncxx::stdx::optional<mongocxx::result::insert_one> result = vehicles.insert_one(view);
         if (result) {
-            std::cout << "Vehicle succuessfully created" << "\n";
+            std::cout << "Vehicle successfully created" << "\n";
         }
         else {
             std::cout << "Unsuccessful with creating" << "\n";
@@ -139,6 +140,7 @@ void Database::updateVehicle(Vehicle* vehicle)
     try
     {
         //establish pool connection
+        cout << "Going to call getConnection from updateVehicle" << endl;
         auto connection = getConnection();
         //create a database connection
         auto test = connection->database("test");
@@ -154,8 +156,8 @@ void Database::updateVehicle(Vehicle* vehicle)
             << "past_bearing" << vehicle->getBearing()
             << close_document{}
             << "$set" << open_document{}
-            << "new_longitude" << vehicle->getLongitude()
-            << "new_latitude" << vehicle->getLatitude()
+            << "new_longitude" << roundToFourDecimals(vehicle->getLongitude())
+            << "new_latitude" << roundToFourDecimals(vehicle->getLatitude())
             << "new_velocity" << vehicle->getVelocity()
             << "new_bearing" << vehicle->getBearing()
             //<< "new_time" << bsoncxx::types::b_date{ messageTime }
@@ -422,4 +424,28 @@ void Database::queryDatabase(std::string queryType, T value) {
         std::cout << "There was an exception: " << e.what();
     }
 }
+/*
+int main()
+{
+    Database newDB("mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority");
+
+
+
+
+    Vehicle* v1 = new Vehicle(9997, 152632, 1234.1234, 1223.1234, 400, 800, 1, "inactive");
+    v1->updateVehicleMap(v1, 350, 60);
+    v1->updateVehicleMap(v1, 9997, 60);
+    v1->updateVehicleMap(v1, 67, 50);
+
+
+    Vehicle* v2 = new Vehicle(350, 152632, 1010.1010, 2020.2020, 9, 9, 1, "inactive");
+
+    newDB.addVehicle(v1);
+    //newDB.updateVehicle(v2);
+
+
+   newDB.updateSingleVehicleTrait("new_velocity", 67, 50);
+
+   return 0;
+}*/
 

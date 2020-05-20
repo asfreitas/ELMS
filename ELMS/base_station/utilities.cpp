@@ -196,5 +196,48 @@ int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor)
 		return -1;
 	}
 }
+/* 
+===============
+roundToFourDecimals
+Takes a double and rounds it to four decimal places
+Reference: https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
+===============
+*/
+double roundToFourDecimals(double value)
+{
+	double temp;
+	if (value < 0)
+	{
+		temp = (int)(value * 10000 - 0.5);
+	}
+	else
+	{
+		temp = (int)(value * 10000 + 0.5);
+	}
+	temp = (double)temp / 10000;
+	return temp;
+}
 
+/*
+===============
+roundToOneDecimal
+Takes a double and rounds it to one decimal place
+Reference: https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
+===============
+*/
+double roundToOneDecimal(double value)
+{
+	double temp;
+	if (value < 0)
+	{
+		temp = (int)(value * 10 - 0.5);
+	}
+	else
+	{
+		temp = (int)(value * 10 + 0.5);
+	}
+	temp = (double)temp / 10;
+	return temp;
+
+}
 

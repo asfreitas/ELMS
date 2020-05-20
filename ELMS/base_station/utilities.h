@@ -27,6 +27,8 @@ vector<pair<int, double>>* sortMap(map<int, double>&);
 void printMap(map<int, double>* mapVehicles);
 
 int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor);
+double roundToFourDecimals(double value);
+double roundToOneDecimal(double value);
 
 /*This struct is used in the Base_Unit class to delete the pointers that are
  * stored in the mine_vehicles vector. The reference were I found this is below/

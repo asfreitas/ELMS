@@ -4,6 +4,24 @@
 #ifndef BASE_UNIT_H
 #define BASE_UNIT_H
 
+#include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/logger.hpp>
+#include <mongocxx/pool.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/exception/query_exception.hpp>
+#include <bsoncxx/types.hpp>
+
+#include <thread>
+#include <time.h>
+
+
 #include "parse_incoming.h"
 #include "outgoing.h"
 #include "utilities.h"
@@ -11,6 +29,7 @@
 #include "calculations.h"
 #include "port.h"
 #include "fileio.h"
+#include "connect_database.h"
 
 #include <iomanip>
 
@@ -24,8 +43,14 @@ using std::pair;
 using std::setprecision;
 using std::iterator;
 
+/* reference for using statement:
+ *  https://jira.mongodb.org/browse/CXX-860
+*/
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::close_array;
+using std::chrono::milliseconds;
 
-static vector<Vehicle>priority_list;
 
 class Base_Unit
 {
@@ -34,15 +59,15 @@ class Base_Unit
     //The vector of Vehicles functions as a "master list" of all the vehicles
     // that are currently in the mine
     static vector<Vehicle*>mine_vehicles;
-    FileIO* fileHandler;
-
+    FileIO fileHandler;
+    Database database;
 
     //this is the path to the folder that stores the logs. It has a set function
     // to allow the user to create the folder wherever they want.  
 public:
 
     //Constructors
-    Base_Unit(FileIO* _f);
+    Base_Unit();
 
     // class destructor will manage memory leak by deleting pointings to
     // vehicle objects in the mine_vehicles vector.
@@ -65,13 +90,14 @@ public:
     /* Functions to input, update, check for vehicle id's and distances from
      * other vehicles */
     void input_data(int index, struct message* ptr, Port& p, HANDLE& h);
-    void update_data(struct message* ptr, int indice);
+    void update_data(struct message* ptr, int indice, int &newVehicle);
     int contains_id_number(int id, unsigned long int& index);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
 
-    //constructor for fileHandler
-    Base_Unit() : fileHandler() {};
+    //constructor for Base_Unit
+    // Reference: https://www.cplusplus.com/forum/beginner/34589/
+    //Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT), database("mongodb + srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority") {};
 };
 
 #endif // !BASE_UNIT_H

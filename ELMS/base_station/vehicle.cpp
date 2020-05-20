@@ -129,6 +129,7 @@ double Vehicle::getVelocity() {
 }
 
 double Vehicle::getBearing() {
+
     return bearing;
 }
 

@@ -50,27 +50,16 @@ int main()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// declare a base class object
 	FileIO f;
-	Base_Unit b(&f);
-
+	Base_Unit b;
 
 	string fileName;
 	string incomingMessage;
 	string data;
-	//string path = b.getPathToLogs();
-	int index;
+	unsigned long int index;
 
 	 //declare the vector that will contain all of the vehicles in the mine
 	vector<Vehicle*>mineVehicles;
 
-	//This function is called to create the log directories that will be 
-	// used in the program...if they do not already exist. 
-	//b.createFolder();
-
-	// this function call creates the name of the file and the path to it. 
-	// this will be used to open the files and write to them. 
-	// add what type of file it is.  0 = incoming message, 1 = alert, 2 = network failure
-	// 3 = misc errors
-	//b.getFilePath(fileName, 0)
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
 
@@ -82,13 +71,14 @@ int main()
     // this counter is only here for testing purposes.
 	int count = 0;
 	//start an endless loop
-	while (p.isPortReady() && count < 12)
+	while (p.isPortReady() && count < 21)
 	{
 
 		if (!p.isBufferEmpty())
 		{
-			//cout << "Buffer is not empty" << endl;
+			//get the next incoming message
 			incomingMessage = p.getNextMessage();
+
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
 
@@ -101,7 +91,7 @@ int main()
                 #pragma omp section
 				{
 					cout << incomingMessage << endl;
-					//file.logToFile(incomingMessage, MessageType::incoming);
+					
 					b.logToFile(incomingMessage, MessageType::incoming);
 				}
 
@@ -109,16 +99,23 @@ int main()
 				{
 					// declare a pointer to a message struct
 					struct message* ptr = createNewMessage(data);
+
 					//declare a pointer to a vehicle object that will either be
 					// added to the vector of mine vehicles
 					vehicle = new Vehicle();
+
 					//set the index to the size of the mineVehicles
 					index = static_cast<int>(b.getMineVehicles().size());
+
 					// add the vehicle pointer to the vector
 					b.addToMineVehicles(vehicle);
+
 					//this function is going to have a mutex and lock within the input_data function
 					HANDLE h = p.getHandle();
+
+					//input the new data
 					b.input_data(index, ptr, p, h);
+
 					// free the ptr memory
 					delete ptr;
 
@@ -126,7 +123,6 @@ int main()
 			}
 			count++;
 			// only print again if we added or updated vehicles
-			//mineVehicles = b.getMineVehicles();
 			b.print_vector(b.getMineVehicles());
 		}
 		else
@@ -135,6 +131,7 @@ int main()
 		}
 
 	} /* end while loop */
+
 	/* No need to close the serial port because the class destructor automatically
 	 * does this */
     return 0;
