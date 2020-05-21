@@ -5,7 +5,8 @@ const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const uri = process.env.ATLAS_URI;
+//const uri = process.env.ATLAS_URI;
+const uri = "mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority";
 const DATABASE_NAME = "elms";
 
 const app = Express();

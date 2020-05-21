@@ -2,22 +2,7 @@ import React from "react"
 
 
 function VehicleCard(props) {
-//class VehicleCard extends React.Component{
-    
-    /*
-    constructor(){
-        super()
-        this.state = {
-            latitude: "",
-            unit: "",
-            longitude: "",
-            active_time: "",
-            at_risk_time: "",
-            nearest_vehicle: ""
-        }
-    }
-    */
-    //render(){
+
         return(
             <div className="vehicle_status_column">
                 <div className="vehicle_card">

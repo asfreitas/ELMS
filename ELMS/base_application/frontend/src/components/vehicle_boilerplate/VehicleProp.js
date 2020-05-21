@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React from "react"
 
 const Vehicle = props => (
     <div className="vehicle_status_column">

@@ -10,7 +10,7 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/offline_vehicles').get((req, res) => {
-    Vehicles.find({"status" : "offline"})
+    Vehicles.find({status : "offline"})
     .then(vehicles => res.json(vehicles))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -32,6 +32,19 @@ router.route('/active').get((req, res) => {
 
 router.route('/inactive').get((req, res) => {
     Vehicles.find({"status" : "inactive"})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/analytics').get((req, res) => {
+    Vehicles.aggregate([
+            {
+            $project: {
+                vehicle_unit: 1,
+                pastVelocityAvg: {$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]},
+                startup_time: 1
+        }
+    }])
     .then(vehicles => res.json(vehicles))
     .catch(err => res.status(400).json('Error: ' + err));
 });

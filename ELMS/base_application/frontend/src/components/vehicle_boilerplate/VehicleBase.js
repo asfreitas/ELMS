@@ -69,4 +69,3 @@ export default class VehicleBase extends Component{
     }
 
 }
-
