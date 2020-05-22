@@ -660,6 +660,8 @@ void Base_Unit::checkStatusAndUpdate(int index)
             }
 
             // check if the vehicle is offline or not
+            //uncomment the next line of code if it is a real world scenario
+            //bool check = checkOffline(getMineVehicles().at(i)->getTime());
             bool check = checkOfflineSimulate(mine_vehicles.at(index)->getTime(), getMineVehicles().at(i)->getTime());
             cout << "Here is the value of check for vehicle " << mine_vehicles.at(i)->getUnit() << " :" << check << endl;
 
