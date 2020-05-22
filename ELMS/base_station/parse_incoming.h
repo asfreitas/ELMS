@@ -4,8 +4,6 @@
 #include "utilities.h"
 
 #include <string>
-
-using std::vector;
 using std::ofstream;
 using std::string;
 
