@@ -69,7 +69,6 @@ addToMineVehicles
 Function adds a vector pointer to the master vector of mine vehicles
 ===============
 */
-
 void Base_Unit::addToMineVehicles(Vehicle* v)
 {
     mine_vehicles.push_back(v);
@@ -108,6 +107,7 @@ void Base_Unit::print_vector(vector<Vehicle*> v)
         {
             map<int, double>* mapVehicles = itr->getMapOfVehicles();
             printMap(mapVehicles);
+            
         }
     }
     cout << "***************************************" << endl << endl;
@@ -232,17 +232,33 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         }
 
         //update the current vehicle before leaving the function
-        cout << "Here is the vehicle  we are updating: " << mine_vehicles.at(index)->getVehicleID() << endl;
+        // if the mine_vehicle vector is larger than 1 and this is not a new
+        // vehicle, then we update the database with the new message information
         if ((get_size(mine_vehicles) > 1) && (newVehicle == 0))
         {
+            //if the vehicle is at risk, we need to set the flag that tracks if
+            // this is the first message about being at risk from true to false
+            if (mine_vehicles.at(index)->getPriorityNumber() == 0)
+            {
+                mine_vehicles.at(index)->setNewRisk(false);
+            }
             database.updateVehicle(mine_vehicles.at(index));
         }
+
+        // Otherwise, if this vehicle does not already exist in the database,
+        // we need to add it. 
         else if ((get_size(mine_vehicles) > 1) && (newVehicle == 1))
         {
+            if (mine_vehicles.at(index)->getPriorityNumber() == 0)
+            {
+                mine_vehicles.at(index)->setNewRisk(false);
+            }
             database.addVehicle(mine_vehicles.at(index));
         }
+        // need to update status of other vehicles and update them if necessary
+        checkStatusAndUpdate(index);
 
-        // now we need to sort the mine_vehicles
+        // now we need to sort the mine_vehicles by priority number
         std::sort(mine_vehicles.begin(), mine_vehicles.end(), Vehicle::compById);
     }
 }
@@ -381,6 +397,7 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
 
     if (status != "")
     {
+        
         mine_vehicles.at(index)->setStatus(status);
 
     }
@@ -435,6 +452,7 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
         // status to at_risk
         if (v->getPriorityNumber() == 0)
         {
+
             v->setStatus("at_risk");
         }
     }
@@ -472,8 +490,6 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
     int p;
     double distance;
 
-    string offline = "offline";
-
     //iterate through the master list of vehicles
     for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
     {
@@ -481,41 +497,6 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
         if (getMineVehicles().at(i)->getUnit() != v->getUnit())
         {
 
-            // check if the vehicle is offline or not
-            int check = secondsBetweenTime(v->getTime(), getMineVehicles().at(i)->getTime(), SECONDS_LIMIT);
-
-            // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
-            if (check == 1 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
-            {
-                cout << "Here is the current status of vehicle " << getMineVehicles().at(i)->getUnit() << " : " << getMineVehicles().at(i)->getStatus() << endl;
-                if (getMineVehicles().at(i)->getStatus() != "offline")
-                {
-                    cout << "I am going to go ahead and set the status again " << endl;
-                    getMineVehicles().at(i)->setStatus("offline");
-                    //database.updateSingleVehicleTrait("new_velocity", 67, 50);
-                }
-                else
-                {
-                    cout << "No need to set the status again" << endl;
-                }
-            }
-
-            //if the vehicle has recent messages but has not moved and is not at risk, then
-            // set to either active or inactive
-            else if (check == 0 && (getMineVehicles().at(i)->getPriorityNumber() != 0))
-            {
-                    // if the latitude and long
-                    if ((getMineVehicles().at(i)->getLatitude() == getMineVehicles().at(i)->getPreviousLatitude())
-                        && (getMineVehicles().at(i)->getLongitude() == getMineVehicles().at(i)->getPreviousLongitude()))
-                    {
-                        getMineVehicles().at(i)->setStatus("inactive");
-                    }
-                    else
-                    {
-                        getMineVehicles().at(i)->setStatus("active");
-
-                    }
-            }
             // get the distance
             distance = c.haversine(v, mine_vehicles.at(i));
 
@@ -541,7 +522,7 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
                 // a 0 priority was set, so this needs to remain
                 set0 = true;
                 //update the vehicle in the list that is at_risk
-                //database.updateVehicle(mine_vehicles.at(i));
+               //database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "at-risk");
             }
 
             else if (distance > 50 && distance <= 75)
@@ -601,6 +582,7 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
             }
             //update the vehicle that was compared against in the for-loop
             // database.updateVehicle(mine_vehicles.at(i));
+
         }
     }
     return listOfAlerts;
@@ -635,6 +617,101 @@ int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int pri
         priority = priority_number;
     }
     return priority;
+}
+
+/*
+===============
+checkStatusAndUpdate
+This function checks to see if the status of vehicles in the database has 
+changed. Status is defined by the following:
+(1) active -- the vehicle is sending messages within the SECOND_LIMIT and is 
+              moving.  Moving is determined by if there is any change in the 
+              latitude or longitude
+(2) inactive -- the vehicle is sending messages within the SECOND_LIMIT but is
+              not moving.  This means that when its current and past latitude and
+              longitude are compared, they are exactly the same
+(3) at_risk -- This means that a vehicle is 50 meters or less away from another
+              vehicle or object being tracked in the system
+(4) offline -- This means that a vehicle has not sent any messages within the
+              SECOND_LIMIT time frame. 
+The function will only update and call the database if there has been a change. 
+===============
+*/
+void Base_Unit::checkStatusAndUpdate(int index)
+{
+    //iterate thru the mine_vehicle vector
+    for (unsigned long int i = 0; i < getMineVehicles().size(); i++)
+    {
+        //if the unit ID of the vehicle is not the same as the vehicle that sent the most recent 
+        //message, then we start checking
+        if (getMineVehicles().at(i)->getUnit() != mine_vehicles.at(index)->getUnit())
+        {
+           
+            //check if the vehicle is at_risk. If the newRisk flag is true, then
+            //this means that 
+            if (getMineVehicles().at(i)->getPriorityNumber() == 0 && (getMineVehicles().at(i)->getNewRisk() == true))
+            {
+                
+                mine_vehicles.at(i)->setNewRisk(false);
+
+                cout << endl << endl << "Here is newRisk after setting it to false:    " << mine_vehicles.at(i)->getNewRisk() << endl;
+     
+                database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "at_risk");
+            }
+
+            // check if the vehicle is offline or not
+            bool check = checkOfflineSimulate(mine_vehicles.at(index)->getTime(), getMineVehicles().at(i)->getTime());
+            cout << "Here is the value of check for vehicle " << mine_vehicles.at(i)->getUnit() << " :" << check << endl;
+
+            // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
+            if (check == true && (getMineVehicles().at(i)->getPriorityNumber() != 0))
+            {
+                cout << "Here is the current status of vehicle " << getMineVehicles().at(i)->getUnit() << " : " << getMineVehicles().at(i)->getStatus() << endl;
+                if (getMineVehicles().at(i)->getStatus() != "offline")
+                {
+                    cout << "I am going to set the status to offline in the database " << endl;
+                    getMineVehicles().at(i)->setStatus("offline");
+                    getMineVehicles().at(i)->setNewRisk(true);
+                    database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "offline");
+                }
+                else
+                {
+                    cout << "No need to set the offline status again" << endl;
+                }
+            }
+
+            //if the vehicle has recent messages but has not moved and is not at risk, then
+            // set to either active or inactive
+            else if (check == false && (getMineVehicles().at(i)->getPriorityNumber() != 0))
+            {
+                // if both the latitude and longitude have not changed, then set to inactive
+                if ((getMineVehicles().at(i)->getLatitude() == getMineVehicles().at(i)->getPreviousLatitude())
+                    && (getMineVehicles().at(i)->getLongitude() == getMineVehicles().at(i)->getPreviousLongitude()))
+                {
+                    if (getMineVehicles().at(i)->getStatus() != "inactive")
+                    {
+                        getMineVehicles().at(i)->setStatus("inactive");
+                        //reset newRisk to true because the status changed. Setting
+                        // to true means that the vehicle was not just in an at_risk status. 
+                        getMineVehicles().at(i)->setNewRisk(true);
+                        database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "inactive");
+                    }
+                }
+                else
+                {
+                    //otherwise if the vehicle status is not currently active, then
+                    // set to active because this means that the vehicle moved. 
+                    if (getMineVehicles().at(i)->getStatus() != "active")
+                    {
+                        getMineVehicles().at(i)->setStatus("active");
+                        getMineVehicles().at(i)->setNewRisk(true);
+                        database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "active");
+
+                    }
+                }
+            }
+        }
+    }
 }
 
 /*

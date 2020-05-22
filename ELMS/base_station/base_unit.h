@@ -24,17 +24,16 @@
 
 #include "parse_incoming.h"
 #include "outgoing.h"
-#include "utilities.h"
 #include "vehicle.h"
 #include "calculations.h"
 #include "port.h"
 #include "fileio.h"
 #include "connect_database.h"
+#include "utilities.h"
 
 #include <iomanip>
 
 #define MESSAGE_LIMIT 5
-#define SECONDS_LIMIT 5
 
 using std::string;
 using std::vector;
@@ -94,6 +93,9 @@ public:
     int contains_id_number(int id, unsigned long int& index);
     map<int, double> checkDistancesInMasterVector1(Vehicle* v);
     int checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number);
+
+    /*Function that will check status of vehicles and update database if necessary*/
+    void checkStatusAndUpdate(int index);
 
     //constructor for Base_Unit
     // Reference: https://www.cplusplus.com/forum/beginner/34589/
