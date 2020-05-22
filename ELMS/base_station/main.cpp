@@ -7,8 +7,6 @@ References:
  * https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 */
 
-
-
 #include <omp.h>
 #include "parse_incoming.h"
 #include "base_unit.h"
@@ -23,6 +21,7 @@ using std::ofstream;
 using std::ios;
 using std::string;
 using std::thread;
+
 
 /* reference for the following -- this was an issue if you are using Visual Studio
  * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711
