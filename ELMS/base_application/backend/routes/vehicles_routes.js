@@ -9,6 +9,47 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/offline').get((req, res) => {
+    Vehicles.find({"status" : "offline"})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+router.route('/at_risk').get((req, res) => {
+    Vehicles.find({"status" : "at_risk"})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+router.route('/active').get((req, res) => {
+    Vehicles.find({"status" : "active"})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+router.route('/inactive').get((req, res) => {
+    Vehicles.find({"status" : "inactive"})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/analytics').get((req, res) => {
+    Vehicles.aggregate([
+            {
+            $project: {
+                vehicle_unit: 1,
+                pastVelocityAvg: {$round: [{$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]}, 1]},
+                time_alive: {$subtract: ["$$NOW", "$startup_time"]},
+                startup_time: {"$dateToString": {date: "$startup_time", format: "%Y-%m-%d"}}
+
+        }
+    }])
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 
 //handles post request saves to mongo db
 router.route('/add').post((req, res) => {
@@ -46,6 +87,7 @@ router.route('/add').post((req, res) => {
     .then(() => res.json('Vehicle added'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
+
 
 
 module.exports = router;
