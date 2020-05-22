@@ -1,7 +1,9 @@
+
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
 #include "utilities.h"
+#include <time.h>
 
 
 
@@ -54,12 +56,12 @@ string doubleToString(double num)
 
 }
 /* Reference for this is: https://thispointer.com/how-to-sort-a-map-by-value-in-c/
-   What this funtion does is take the address of a vector pair and map. It then 
+   What this funtion does is take the address of a vector pair and map. It then
    copies the key/values from the map into the vector of pairs, then sorts these
    pairs and returns the sorted vector of pairs.  The vector of pairs is
    sorted based on the second element which is distance.
 */
-vector<pair<int,double>> * sortMap(vector<pair<int, double>>& vehicles, map<int, double>& mapOfDistances)
+vector<pair<int, double>>* sortMap(vector<pair<int, double>>& vehicles, map<int, double>& mapOfDistances)
 {
 
 	// copy key-value pairs from the map to the vector
@@ -80,7 +82,7 @@ bool sortByVal(const pair<int, double>& a, const pair<int, double>& b)
 	return (a.second < b.second);
 }
 
-/* This function takes a pointer to a map and prints it's contents 
+/* This function takes a pointer to a map and prints it's contents
    * Reference: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
 */
 void printMap(map<int, double>* mapVehicles)
@@ -96,107 +98,6 @@ void printMap(map<int, double>* mapVehicles)
 }
 
 /*
-===============================================================================
-secondsBetweenTime
-This function takes 3 arguments.  The first is a 6 digit time in Zulu that 
-represents the most current time.  The second is a 6 digit time in Zulu that
-represents the previous time.  The 3rd represents the number of seconds to allow
-between the time intervals up to 1 hour or 3600 seconds.  
-If the difference between the current time and the previous time is more than
-the numSecondsToCheckFor then a 1 is returned for true.  If it is less, than 
-a 0 is returned for false. If the numSecondsToCheckFor is greater than 3600, than
-a -1 is returned for being invalid. 
-*/
-int secondsBetweenTime(int value1, int value2, int numSecondsToCheckFor)
-{
-	if (numSecondsToCheckFor <= 60)
-	{
-		//we are only check for 60 seconds or less so we only need to look at
-		// the last two digits of the 6 digit number.  We can get the last 2
-		// digits by using modulo 100.
-		int val1 = value1 % 100;
-		int val2 = value2 % 100;
-
-		//subtract the two values. 
-		int numSeconds = val1 - val2;
-		
-		//if it is a negative value, we add 60 seconds. 
-		if (numSeconds < 0)
-		{
-			numSeconds += 60;
-		}
-		
-		// if the numSeconds is greater than the amount we were allowing, then
-		// we return true. 
-		if (numSeconds > numSecondsToCheckFor)
-		{
-			return 1;
-		}
-		// otherwise, we return false
-		else
-		{
-			return 0;
-		}
-	}
-	// if we are checking for more than 60 seconds but less than or equal to 
-	// 1 hour or 3600 seconds, then we do a similiar thing to above. 
-	else if (numSecondsToCheckFor > 60 && numSecondsToCheckFor <= 3600)
-	{
-		//if we add 60 seconds, we will need to subtract 1 from the minutes. 
-		int flag = 0;
-		int val1 = value1 % 100;
-		
-		int val2 = value2 % 100;
-		int numSeconds = val1 - val2;
-		
-		if (numSeconds < 0)
-		{
-			numSeconds += 60;
-			//set the flag to true so that we add 1 minute to the second time
-			flag = 1;
-		}
-		//get the middle two digitis of the 6 digit number that represent the
-		// minutes by using modulo and then division
-		int val3 = (value1 % 10000)/100;
-		int val4 = (value2 % 10000)/100;
-		//if the flag was set to true, then we add 1 minute to the second number
-		if (flag)
-		{
-			//if the second number was 59, we change it to 0
-			if (val4 == 59)
-			{
-				val4 = 0;
-			}
-			else {
-				val4++;
-			}
-		}
-		//check the number of minutes between the two middle numbers
-		int numMinutes = val3 - val4;
-		//if it is a negative number, then we add 60 seconds. 
-		if (numMinutes < 0)
-		{
-			numMinutes += 60;
-		}
-		// add up the total number of seconds and compare it to the desired
-		// limit of seconds. 
-		int numTotal = numSeconds + (numMinutes * 60);
-		if (numTotal > numSecondsToCheckFor)
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	// return a -1, if the user entered a number larger than 3600. 
-	else
-	{
-		return -1;
-	}
-}
-/* 
 ===============
 roundToFourDecimals
 Takes a double and rounds it to four decimal places
@@ -240,4 +141,80 @@ double roundToOneDecimal(double value)
 	return temp;
 
 }
+
+/* This function takes a pointer to a Vehicle and converts the zulu time
+   * to a date with today's date and the zulu time and sends as time_t in seconds
+*/
+time_t zuluToDate(int messageTime) {
+	//convert time to date and time
+	int hours, mins, secs = -1;
+
+	hours = messageTime / 10000;
+	mins = (messageTime - (hours * 10000)) / 100;
+	secs = (messageTime - (hours * 10000) - (mins * 100));
+	if (hours >= 24 || mins >= 60 || secs >= 60) {
+		cout << "Invalid time" << endl;
+	}
+
+	time_t now = time(0);
+	struct tm local;
+	//set current date
+	localtime_s(&local, &now);
+	//reset time to message time
+	local.tm_hour = hours;
+	local.tm_min = mins;
+	local.tm_sec = secs;
+
+	//format mesasge date and time as string if needed
+	//char buf[80];
+	//strftime(buf, sizeof(buf), "%Y-%m-%dT%XZ", &local);
+
+	//convert into time in seconds
+	time_t messageDateTime = mktime(&local);
+	messageDateTime = messageDateTime - 25200;
+	return messageDateTime;
+}
+
+
+//checks current message time in vehicle and compares to time now. If
+//within last 10 seconds, then set vehicle status to "offline"
+bool checkOffline(int currentMessageTime) {
+	cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
+	time_t now = time(0) - 25200;
+	//get current message time
+	time_t currentTime = zuluToDate(currentMessageTime);
+	cout <<"Here is now and currentTime: " << now << " " << currentTime << endl << endl;
+	if ((now - currentTime) > SECONDS_LIMIT) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+/*
+===============
+checkOffline1
+ * checks the message time of the last message received from a vehicle compared
+ * to the message time of the most current time received from any vehicle. 
+ * This is used for testing purposes to allow script use. If
+ * If the calculated difference is greater than the SECONDS_LIMIT, then true
+ * is returned meaning that the vehicle is offline.  Otherwise, if it is
+ * within the SECONDS_LIMIT, it is not offline.
+ ===============
+ */
+bool checkOfflineSimulate(int currentMessageTime, int lastMessageReceived) {
+	cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
+	//convert Zulu times to date time in seconds for comparison
+	time_t latestMessageTime = zuluToDate(currentMessageTime);
+	time_t lastMessageTime = zuluToDate(lastMessageReceived);
+
+	cout << "Here is now and currentTime: " << latestMessageTime << " " << lastMessageTime << endl << endl;
+	if ((latestMessageTime - lastMessageTime) > SECONDS_LIMIT) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 
