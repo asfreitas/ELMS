@@ -6,8 +6,12 @@
 #include <time.h>
 
 
-
-/* Function converts a string into an integer*/
+/*
+===============
+stringToDouble
+Function converts a string into an integer
+===============
+*/
 int stringToInt(string str) {
 	int integer = -1;
 
@@ -21,7 +25,13 @@ int stringToInt(string str) {
 	return integer;
 }
 
-/* Function takes a string and returns a double*/
+/*
+===============
+stringToDouble
+
+Function takes a string and returns a double
+===============
+*/
 double stringToDouble(string str) {
 	double number = -1;
 	//size_t sz;
@@ -34,8 +44,13 @@ double stringToDouble(string str) {
 
 	return number;
 }
-/* Function takes a string and returns a pointer to a char array*/
-/*Reference https://www.geeksforgeeks.org/convert-string-char-array-cpp*/
+/*
+===============
+stringToCharPointer
+Function takes a string and returns a pointer to a char array
+Reference https://www.geeksforgeeks.org/convert-string-char-array-cpp
+===============
+*/
 char* stringToCharPointer(string& str, char* fileName)
 {
 	memset(fileName, '\0', 100);
@@ -45,8 +60,13 @@ char* stringToCharPointer(string& str, char* fileName)
 	}
 	return fileName;
 }
-/* Function takes a double and returns a string*/
-/* Reference: https://stackoverflow.com/questions/332111/how-do-i-convert-a-double-into-a-string-in-c*/
+/*
+===============
+doubleToString
+Function takes a double and returns a string
+Reference: https://stackoverflow.com/questions/332111/how-do-i-convert-a-double-into-a-string-in-c
+===============
+*/
 string doubleToString(double num)
 {
 	ostringstream str1;
@@ -55,11 +75,15 @@ string doubleToString(double num)
 	return str2;
 
 }
-/* Reference for this is: https://thispointer.com/how-to-sort-a-map-by-value-in-c/
+/*
+===============
+sortMap
+Reference for this is: https://thispointer.com/how-to-sort-a-map-by-value-in-c/
    What this funtion does is take the address of a vector pair and map. It then
    copies the key/values from the map into the vector of pairs, then sorts these
    pairs and returns the sorted vector of pairs.  The vector of pairs is
    sorted based on the second element which is distance.
+===============
 */
 vector<pair<int, double>>* sortMap(vector<pair<int, double>>& vehicles, map<int, double>& mapOfDistances)
 {
@@ -75,15 +99,24 @@ vector<pair<int, double>>* sortMap(vector<pair<int, double>>& vehicles, map<int,
 	return &vehicles;
 }
 
-/* This is a comparator function that is used in a sort for a map.*/
-// Reference: https://www.educative.io/edpresso/how-to-sort-a-map-by-value-in-cpp
+/*
+===============
+sortByVal
+This is a comparator function that is used in a sort for a map.
+Reference: https://www.educative.io/edpresso/how-to-sort-a-map-by-value-in-cpp
+===============
+*/
 bool sortByVal(const pair<int, double>& a, const pair<int, double>& b)
 {
 	return (a.second < b.second);
 }
 
-/* This function takes a pointer to a map and prints it's contents
+/*
+===============
+printMap
+This function takes a pointer to a map and prints it's contents
    * Reference: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+===============
 */
 void printMap(map<int, double>* mapVehicles)
 {
@@ -142,8 +175,12 @@ double roundToOneDecimal(double value)
 
 }
 
-/* This function takes a pointer to a Vehicle and converts the zulu time
+/*
+===============
+zuluToDate
+This function takes a pointer to a Vehicle and converts the zulu time
    * to a date with today's date and the zulu time and sends as time_t in seconds
+===============
 */
 time_t zuluToDate(int messageTime) {
 	//convert time to date and time
@@ -175,9 +212,13 @@ time_t zuluToDate(int messageTime) {
 	return messageDateTime;
 }
 
-
+/*
+===============
+checkOffline
 //checks current message time in vehicle and compares to time now. If
 //within last 10 seconds, then set vehicle status to "offline"
+===============
+*/
 bool checkOffline(int currentMessageTime) {
 	cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
 	time_t now = time(0) - 25200;
@@ -193,7 +234,7 @@ bool checkOffline(int currentMessageTime) {
 }
 /*
 ===============
-checkOffline1
+checkOfflineSimulate
  * checks the message time of the last message received from a vehicle compared
  * to the message time of the most current time received from any vehicle. 
  * This is used for testing purposes to allow script use. If
