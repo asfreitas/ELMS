@@ -17,9 +17,12 @@ export default class OfflineVehicle extends VehicleBase{
 
     //automatically get vehicle list and parse by status
     getOfflineVehicles(){
-        return this.state.vehicles.map(currentVehicle => {
-            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
-        })
+        if(this.state.vehicles.length > 0)
+        {
+            return this.state.vehicles.map(currentVehicle => {
+                return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
+            })
+        }
     }
 
     render(){

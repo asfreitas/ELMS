@@ -41,8 +41,10 @@ router.route('/analytics').get((req, res) => {
             {
             $project: {
                 vehicle_unit: 1,
-                pastVelocityAvg: {$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]},
-                startup_time: 1
+                pastVelocityAvg: {$round: [{$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]}, 1]},
+                time_alive: {$subtract: ["$$NOW", "$startup_time"]},
+                startup_time: {"$dateToString": {date: "$startup_time", format: "%Y-%m-%d"}}
+
         }
     }])
     .then(vehicles => res.json(vehicles))

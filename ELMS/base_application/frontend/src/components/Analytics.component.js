@@ -9,7 +9,7 @@ export default class Analytics extends Component {
         return (
             <div>
                 <Navbar />
-                <Table />
+                <Table /> 
                 <Footer />
             </div>
         )

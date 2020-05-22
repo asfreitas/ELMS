@@ -1,38 +1,64 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 
-const Vehicle = props => (
+const Analytics = props => (
         <tr>
-            <td>{props.vehicle.vehicle_unit}</td>
-            <td>{props.vehicle.pastVelocityAvg}</td>
-            <td>{props.vehicle.startup_time}</td>
+            <td>{props.table.vehicle_unit}</td>
+            <td>{props.table.pastVelocityAvg}</td>
+            <td>{props.table.time_alive}</td>
+            <td>{props.table.startup_time}</td>
+
         </tr>
 
 )
     
 
-class Table extends Component {
+export default class Table extends Component {
     constructor(props) {
         super(props)
-        this.state = {vehicles: []}
+        this.state = {table: []}
     }
     componentDidMount(){
         axios.get('http://localhost:8080/vehicles/analytics')
         .then(res => {
-            this.setState({vehicles: res.data})
+            this.setState({table: res.data})
             console.log(res.data);
+
         })
         
         .catch((err) => {
             console.log(err);
         })
     }
-
+    convertTime(){
+        var date, currentTime
+        for(var j = 0; j < this.state.table.length; j++)
+        {
+            date = "";
+            currentTime = this.state.table[j].time_alive
+            if(currentTime / 86400000 > 0) // get days
+            {
+                date += Math.floor(currentTime  / 86400000) + " days "
+                currentTime = currentTime % 86400000
+            }
+            if(currentTime / 3600000 > 0)
+            {
+                date += Math.floor(currentTime / 3600000) + " hours and "
+                currentTime = currentTime % 3600000
+            }
+            if( currentTime / 60000 > 0)
+            {
+                date += Math.floor(currentTime / 60000) + " minutes"
+            }
+            this.state.table[j].time_alive = date
+        }
+    }
 
      renderTableData() {
-        console.log(this.state.vehicles);
-        return this.state.vehicles.map(currentVehicle => {
-            return <Vehicle vehicle={currentVehicle} getAverageSpeed={this.getAverageSpeed} startup_time={this.getActiveTime} key={currentVehicle._id}/>;
+        this.convertTime()
+
+        return this.state.table.map(currentVehicle => {
+            return <Analytics table={currentVehicle} getAverageSpeed={this.getAverageSpeed} startup_time={this.getActiveTime} key={currentVehicle._id}/>;
         })
      }
 
@@ -45,7 +71,8 @@ class Table extends Component {
                     <tr>
                         <th>Vehicle #</th>
                         <th>Average Speed</th>
-                        <th>Total Time</th>
+                        <th>Total Running Time</th>
+                        <th>Startup time</th>
                     </tr>
                     </thead>
                 <tbody>
@@ -56,4 +83,3 @@ class Table extends Component {
         )
      }
 }
-export default Table //exporting a component make it reusable and this is the beauty of react
