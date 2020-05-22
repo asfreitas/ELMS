@@ -9,6 +9,7 @@ export default class VehicleBase extends Component{
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
         this.state={vehicles: [], nearest_vehicle: 0}
+        this.vehicleQuery = 'http://localhost:8080/vehicles'
     }
     //automatically get vehicle list and parse by status
     
@@ -18,7 +19,7 @@ export default class VehicleBase extends Component{
 
     }
     getData = () => {
-        axios.get('https://elms-base-application.uc.r.appspot.com/vehicles/')
+        axios.get(this.vehicleQuery)
         .then(res => {
             this.setState({vehicles: res.data})
             console.log(res.data);

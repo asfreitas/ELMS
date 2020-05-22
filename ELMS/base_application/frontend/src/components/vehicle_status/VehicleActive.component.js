@@ -11,20 +11,11 @@ export default class VehicleActive extends VehicleBase{
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
         this.state={vehicles: []}
+        this.vehicleQuery = 'http://localhost:8080/vehicles/active'
     }
     //get list of inactive vehicles
     getActiveVehicles(){
-        const vehicle_list_length = this.state.vehicles.length;
-        var activeVehicles = [];
-        var j = 0;
-        for(var i = 0; i < vehicle_list_length; i++){
-            if(this.state.vehicles[i].status === "active"){
-                activeVehicles[j] = this.state.vehicles[i];
-                j++;
-            }
-        }
-        console.log(activeVehicles);
-        return activeVehicles.map(currentVehicle => {
+        return this.state.vehicles.map(currentVehicle => {
             return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
         })
     }

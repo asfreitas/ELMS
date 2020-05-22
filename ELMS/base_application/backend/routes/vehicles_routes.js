@@ -9,8 +9,8 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/offline_vehicles').get((req, res) => {
-    Vehicles.find({status : "offline"})
+router.route('/offline').get((req, res) => {
+    Vehicles.find({"status" : "offline"})
     .then(vehicles => res.json(vehicles))
     .catch(err => res.status(400).json('Error: ' + err));
 });

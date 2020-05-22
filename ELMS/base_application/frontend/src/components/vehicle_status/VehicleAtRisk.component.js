@@ -10,22 +10,14 @@ export default class VehicleAtRisk extends VehicleBase{
         this.getAtRiskVehicles = this.getAtRiskVehicles.bind(this);
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
-        this.state={vehicles: [], nearest_vehicle: 0}
+        this.state={vehicles: []}
+        this.vehicleQuery = 'http://localhost:8080/vehicles/at_risk'
+
     }
 
     //get list of at risk vehicles
     getAtRiskVehicles(){
-        const vehicle_list_length = this.state.vehicles.length;
-        var atRiskVehicles = [];
-        var j = 0;
-        for(var i = 0; i < vehicle_list_length; i++){
-            if(this.state.vehicles[i].status === "at_risk"){
-                atRiskVehicles[j] = this.state.vehicles[i];
-                j++;
-            }
-        }
-        console.log(atRiskVehicles);
-        return atRiskVehicles.map(currentVehicle => {
+        return this.state.vehicles.map(currentVehicle => {
             return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
         })
     }
