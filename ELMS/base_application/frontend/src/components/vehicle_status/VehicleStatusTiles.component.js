@@ -1,3 +1,10 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the structure for displaying the 
+* vehicle status page.
+*/
+
 import React from "react"
 import VehicleRow from "./VehicleRow.component"
 import VehicleAtRisk from "./VehicleAtRisk.component"

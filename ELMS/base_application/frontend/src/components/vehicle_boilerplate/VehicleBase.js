@@ -1,3 +1,10 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains some basic components that every vehicle
+* tile will possess. 
+*/
+
 import React, { Component } from "react"
 import axios from 'axios'
 import Vehicle from "./VehicleProp.js"
@@ -13,7 +20,6 @@ export default class VehicleBase extends Component{
         this.state={vehicles: [], nearest_vehicle: 0}
         this.vehicleQuery = 'http://localhost:8080/vehicles'
     }
-    //automatically get vehicle list and parse by status
     
     componentDidMount() {
         this.getData()

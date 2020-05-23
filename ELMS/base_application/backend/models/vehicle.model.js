@@ -1,3 +1,11 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the schema for vehicles that are inserted
+* into the database.
+*/
+
+
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;

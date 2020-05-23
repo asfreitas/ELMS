@@ -1,3 +1,10 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the html structure for the 
+* navigation bar.
+*/
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
