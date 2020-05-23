@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for the login component.
+*/
+
 import React, { Component } from "react"
 import axios from 'axios';
 
@@ -90,6 +96,13 @@ export default class Login extends Component{
                                 onChange={this.onSubmitPassword}/>
                         <input type="submit" value="Login" id="Submit" className="Submit"/>
                     </form>
+                    <div className="bottom_container">
+                        <div className="row">
+                            <div className="column">
+                                <a href="/AddUser">Create profile</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )

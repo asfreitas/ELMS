@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the vehicle active tiles.
+*/
+
 import React, { Component } from "react"
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
@@ -10,12 +16,12 @@ export default class VehicleActive extends VehicleBase{
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
         this.state={vehicles: []}
-        this.vehicleQuery = 'http://localhost:8080/vehicles/active'
+        this.vehicleQuery = 'http://localhost:8080/vehicles/active' // this will be used in the base class query
     }
-    //get list of inactive vehicles
     getActiveVehicles(){
         return this.state.vehicles.map(currentVehicle => {
-            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
+            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} isAtRisk={false}
+            getActiveTime={this.getActiveTime} key={currentVehicle._id} typeClass="active_time" typeText="Active time: "/>;
         })
     }
 
@@ -25,7 +31,6 @@ export default class VehicleActive extends VehicleBase{
                 <hr className="active_line"/>
                     <p className="active_text">Active</p>
                 <hr className="active_line"/>
-
                 { this.getActiveVehicles() }
             </div>
         )

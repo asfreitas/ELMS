@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the structure for the vehicle status page.
+*/
+
 import React from "react"
 
 import Footer from "./components/Footer.js"

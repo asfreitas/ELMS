@@ -292,7 +292,7 @@ input[type=submit] {
     width: 100%;
   }
   
-  #vehicles td, #students th {
+  #vehicles td, #vehicles th {
     border: 1px solid #ddd;
     padding: 8px;
   }

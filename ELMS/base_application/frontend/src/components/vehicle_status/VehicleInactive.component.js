@@ -1,15 +1,19 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the vehicle inactive tiles.
+*/
+
 import React, { Component } from "react"
-import axios from 'axios'
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
-
 
 export default class VehicleInactive extends VehicleBase{
     constructor(props){
         super(props)
         this.getInactiveVehicles = this.getInactiveVehicles.bind(this);
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
-        this.getActiveTime = this.getActiveTime.bind(this);
+        this.getInactiveTime = this.getInactiveTime.bind(this);
         this.state={vehicles: []}
         this.vehicleQuery = 'http://localhost:8080/vehicles/inactive'
     }
@@ -17,7 +21,8 @@ export default class VehicleInactive extends VehicleBase{
     //get list of inactive vehicles
     getInactiveVehicles(){
         return this.state.vehicles.map(currentVehicle => {
-            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
+            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getInactiveTime} key={currentVehicle._id}
+            isatRisk={false} typeClass="active_time" typeText="Inactive time: " />;
         })
     }
 

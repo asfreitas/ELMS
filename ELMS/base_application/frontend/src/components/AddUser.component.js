@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the add user component.
+*/
+
 import React, { Component } from 'react';
 import axios from 'axios'
 
@@ -68,12 +74,9 @@ export default class AddUser extends Component {
             last_name: this.state.last_name
         }
 
-        console.log(user);
-
         axios.post('https://elms-base-application.uc.r.appspot.com/users/add', user)
         .then(res => console.log(res.data));
 
-        
         this.setState({
             username: '',
             email:'',
@@ -81,6 +84,8 @@ export default class AddUser extends Component {
             first_name: '',
             last_name: ''
         })
+
+        window.location.href = "/"
 
     }
 
