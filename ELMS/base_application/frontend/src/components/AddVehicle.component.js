@@ -10,7 +10,7 @@ import axios from 'axios'
 import Navbar from './Navbar.component'
 import Footer from "./Footer.component.js"
 
-
+//class used to add vehicle and information
 export default class AddVehicle extends Component {
     constructor(props) {
         super(props);
@@ -188,7 +188,7 @@ export default class AddVehicle extends Component {
 
     }
 
-
+    //form used for creating a vehicle
     render(){
         return (
             <div>

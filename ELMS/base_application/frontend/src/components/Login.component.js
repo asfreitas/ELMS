@@ -53,7 +53,7 @@ export default class Login extends Component{
         })
     }
 
-
+    //function that validates username and password match what's in database.
     validateLogin(event){
         event.preventDefault();
 
@@ -77,7 +77,7 @@ export default class Login extends Component{
             }
         }
     }
-
+    //loginbox rendering
     render() {
         return(
             <div className="login_parent">
