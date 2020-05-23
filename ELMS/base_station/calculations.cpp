@@ -65,7 +65,7 @@ int Calculations::getBearing(Vehicle* vehicle1, Vehicle* vehicle2)
 	y = std::sin(longDelta) * std::cos(vehicle2->getLatitude());
 	x = std::cos(vehicle1->getLatitude()) * std::sin(vehicle2->getLatitude())
 		- std::sin(vehicle1->getLatitude()) * std::cos(vehicle2->getLatitude()) * std::cos(longDelta);
-	bearing = radians_to_degrees(std::atan2(y, 2));
+	bearing = radians_to_degrees(std::atan2(y, x));
 	
 	return normalizeBearing(bearing);
 }
