@@ -8,6 +8,8 @@ export default class VehicleBase extends Component{
         super(props);
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
+        this.getAtRiskTime = this.getAtRiskTime.bind(this);
+        this.getInactiveTime = this.getInactiveTime.bind(this);
         this.state={vehicles: [], nearest_vehicle: 0}
         this.vehicleQuery = 'http://localhost:8080/vehicles'
     }
@@ -38,6 +40,44 @@ export default class VehicleBase extends Component{
 
     getActiveTime(vehicle){
         var date1 = vehicle.startup_time;
+        //Convert dates into javascript readable date format and
+        //get difference between dates/times in milliseconds
+        var diff_in_milliseconds = Math.abs(new Date(date1) - new Date(Date.now()));
+        
+        //Get milliseconds, seconds, minutes, and hours
+        var milliseconds = parseInt((diff_in_milliseconds % 1000) / 100);
+        var seconds = Math.floor((diff_in_milliseconds / 1000) % 60);
+        var minutes = Math.floor((diff_in_milliseconds / (1000 * 60)) % 60);
+        var hours = Math.floor((diff_in_milliseconds / (1000 * 60 * 60)) % 24);
+
+        //To format single digit hours with a "0" 
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+        return hours + ":" + minutes + ":" + seconds;
+    }
+    getInactiveTime(vehicle){
+        var date1 = vehicle.last_received_time;
+        //Convert dates into javascript readable date format and
+        //get difference between dates/times in milliseconds
+        var diff_in_milliseconds = Math.abs(new Date(date1) - new Date(Date.now()));
+        
+        //Get milliseconds, seconds, minutes, and hours
+        var milliseconds = parseInt((diff_in_milliseconds % 1000) / 100);
+        var seconds = Math.floor((diff_in_milliseconds / 1000) % 60);
+        var minutes = Math.floor((diff_in_milliseconds / (1000 * 60)) % 60);
+        var hours = Math.floor((diff_in_milliseconds / (1000 * 60 * 60)) % 24);
+
+        //To format single digit hours with a "0" 
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+        return hours + ":" + minutes + ":" + seconds;
+    }
+    getAtRiskTime(vehicle){
+        var date1 = vehicle.last_received_time;
         //Convert dates into javascript readable date format and
         //get difference between dates/times in milliseconds
         var diff_in_milliseconds = Math.abs(new Date(date1) - new Date(Date.now()));
