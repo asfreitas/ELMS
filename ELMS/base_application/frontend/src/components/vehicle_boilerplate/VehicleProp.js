@@ -4,6 +4,7 @@
 * This file contains the skeleton html code for a vehicle tile.
 */
 
+
 import React from "react"
 
 const Vehicle = props => (
@@ -21,13 +22,42 @@ const Vehicle = props => (
                 <p>Longitude</p>
                 {props.vehicle.new_longitude}
             </div>
-            <div className="active_time">
-                Active time: 
+            <div className={props.typeClass}>
+                {props.typeText}
                 {props.getActiveTime(props.vehicle)}
             </div>
-            <div className="at_risk_time">
-                At risk time: 
-                {props.vehicle.at_risk_time}
+            {props.isAtRisk &&
+            <div className={props.riskClass}>
+                {props.riskText}
+                {props.getAtRiskTime(props.vehicle)}
+            </div>}
+            <div className="nearest_vehicle">
+                Nearest vehicle: 
+                {props.getNearestVehicle(props.vehicle)}
+            </div>
+        </div>
+    </div>
+)
+
+
+const InactiveVehicle = props => (
+    <div className="vehicle_status_column">
+        <div className="vehicle_card">
+            <div className="latitude">
+                <p>Latitude</p>
+                {props.vehicle.new_latitude}
+            </div>
+            <div className="unit">
+                <p>Unit</p>
+                {props.vehicle.vehicle_unit}
+            </div>
+            <div className="longitude">
+                <p>Longitude</p>
+                {props.vehicle.new_longitude}
+            </div>
+            <div className="active_time">
+                Inactive time: 
+                {props.getInactiveTime(props.vehicle)}
             </div>
             <div className="nearest_vehicle">
                 Nearest vehicle: 
@@ -36,5 +66,7 @@ const Vehicle = props => (
         </div>
     </div>
 )
+
+
     
 export default Vehicle;

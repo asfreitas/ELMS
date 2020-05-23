@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the vehicle active tiles.
+*/
+
 import React from "react"
 
 function VehicleCard(props) {

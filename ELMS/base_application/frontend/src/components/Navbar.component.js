@@ -1,17 +1,10 @@
-/*
-* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
-*
-* This file contains the html structure for the 
-* navigation bar.
-*/
-
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 export default class Navbar extends Component {
     render() {
         return (
-            <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
+            <nav className="navbar navbar-dark bg-dark navbar-expand">
                 <Link to="/" className="navbar-brand">Home</Link>
                 <ul className="navbar-nav mr-auto">
                     <li className="navbar-item">

@@ -3,6 +3,9 @@
 *
 * This file contains the code for displaying the 
 * analytics page.
+* 
+* Utilized code from this source for building and stylizing table: 
+* https://dev.to/abdulbasit313/an-easy-way-to-create-a-customize-dynamic-table-in-react-js-3igg
 */
 
 import React, { Component } from 'react'
@@ -18,7 +21,7 @@ const Analytics = props => (
 
 )
     
-export default class Table extends Component {
+export class Table extends Component {
     constructor(props) {
         super(props)
         this.state = {table: []}

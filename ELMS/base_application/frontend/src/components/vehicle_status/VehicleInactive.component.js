@@ -5,35 +5,8 @@
 */
 
 import React, { Component } from "react"
-//import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
+import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
-
-const Vehicle = props => (
-    <div className="vehicle_status_column">
-        <div className="vehicle_card">
-            <div className="latitude">
-                <p>Latitude</p>
-                {props.vehicle.new_latitude}
-            </div>
-            <div className="unit">
-                <p>Unit</p>
-                {props.vehicle.vehicle_unit}
-            </div>
-            <div className="longitude">
-                <p>Longitude</p>
-                {props.vehicle.new_longitude}
-            </div>
-            <div className="active_time">
-                Inactive time: 
-                {props.getInactiveTime(props.vehicle)}
-            </div>
-            <div className="nearest_vehicle">
-                Nearest vehicle: 
-                {props.getNearestVehicle(props.vehicle)}
-            </div>
-        </div>
-    </div>
-)
 
 export default class VehicleInactive extends VehicleBase{
     constructor(props){
@@ -48,7 +21,8 @@ export default class VehicleInactive extends VehicleBase{
     //get list of inactive vehicles
     getInactiveVehicles(){
         return this.state.vehicles.map(currentVehicle => {
-            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getInactiveTime={this.getInactiveTime} key={currentVehicle._id}/>;
+            return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getInactiveTime} key={currentVehicle._id}
+            isatRisk={false} typeClass="active_time" typeText="Inactive time: " />;
         })
     }
 
