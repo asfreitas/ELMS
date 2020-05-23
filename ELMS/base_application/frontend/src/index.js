@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file crenders the file to the DOM.
+*/
+
 import React from "react"
 import ReactDOM from "react-dom"
 

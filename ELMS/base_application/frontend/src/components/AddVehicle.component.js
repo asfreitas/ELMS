@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for handling the add vehicle component.
+*/
+
 import React, { Component } from 'react';
 import axios from 'axios'
 

@@ -1,5 +1,11 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the offline
+* vehicles page.
+*/
+
 import React, { Component } from "react"
-import axios from 'axios'
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
 

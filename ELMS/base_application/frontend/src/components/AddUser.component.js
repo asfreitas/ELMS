@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the add user component.
+*/
+
 import React, { Component } from 'react';
 import axios from 'axios'
 

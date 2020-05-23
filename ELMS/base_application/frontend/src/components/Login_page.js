@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the html for the login page.
+*/
+
 import React from "react"
 
 import Login from "./components/Login.js"

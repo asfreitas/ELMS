@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the skeleton html code for a vehicle tile.
+*/
+
 import React from "react"
 
 const Vehicle = props => (

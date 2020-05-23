@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the vehicle inactive tiles.
+*/
+
 import React, { Component } from "react"
 import axios from 'axios'
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"

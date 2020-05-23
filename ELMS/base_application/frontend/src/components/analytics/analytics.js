@@ -1,3 +1,10 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for displaying the 
+* analytics page.
+*/
+
 import React, { Component } from 'react'
 import axios from 'axios'
 
@@ -7,12 +14,10 @@ const Analytics = props => (
             <td>{props.table.pastVelocityAvg}</td>
             <td>{props.table.time_alive}</td>
             <td>{props.table.startup_time}</td>
-
         </tr>
 
 )
     
-
 export default class Table extends Component {
     constructor(props) {
         super(props)
