@@ -5,7 +5,9 @@
 */
 
 import React, { Component } from "react"
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+
 
 export default class Login extends Component{
     
@@ -97,11 +99,7 @@ export default class Login extends Component{
                         <input type="submit" value="Login" id="Submit" className="Submit"/>
                     </form>
                     <div className="bottom_container">
-                        <div className="row">
-                            <div className="column">
-                                <a href="/AddUser">Create profile</a>
-                            </div>
-                        </div>
+                        <Link className="create_user" to='/AddUser' >Create profile</Link>
                     </div>
                 </div>
             </div>

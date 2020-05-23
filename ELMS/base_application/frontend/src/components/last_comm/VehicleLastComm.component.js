@@ -8,7 +8,7 @@
 import React, { Component } from "react"
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
-
+import VehicleRow from "../vehicle_status/VehicleRow.component"
 
 
 export default class OfflineVehicle extends VehicleBase{
@@ -26,18 +26,22 @@ export default class OfflineVehicle extends VehicleBase{
         if(this.state.vehicles.length > 0)
         {
             return this.state.vehicles.map(currentVehicle => {
-                return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}/>;
+                return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getActiveTime} key={currentVehicle._id}
+                typeClass="active_time" typeText="Offline time: "/>;
             })
         }
     }
 
     render(){
         return(
-            <div className="offline_vehicles">
-                <hr className="offline_vehicles_line"/>
-                    <p className="offline_vehicles_text">Offline</p>
-                <hr className="offline_vehicles_line"/>
-                { this.getOfflineVehicles() }
+            <div className="vehicle_status_tiles">
+                <div className="offline_vehicles">
+                    <hr className="offline_vehicles_line"/>
+                        <p className="offline_vehicles_text">Offline</p>
+                    <hr className="offline_vehicles_line"/>
+                    { this.getOfflineVehicles() }
+                </div>
+                <VehicleRow />
             </div>
         )
     }

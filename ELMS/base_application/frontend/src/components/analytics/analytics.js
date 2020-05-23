@@ -9,6 +9,7 @@
 */
 
 import React, { Component } from 'react'
+import VehicleRow from "../vehicle_status/VehicleRow.component"
 import axios from 'axios'
 
 const Analytics = props => (
@@ -80,13 +81,14 @@ export class Table extends Component {
                         <th>Vehicle #</th>
                         <th>Average Speed</th>
                         <th>Total Running Time</th>
-                        <th>Startup time</th>
+                        <th>Startup date</th>
                     </tr>
                     </thead>
                 <tbody>
                     {this.renderTableData()}
                 </tbody>
             </table>
+            <VehicleRow />
            </div>
         )
      }
