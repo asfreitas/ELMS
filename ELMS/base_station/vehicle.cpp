@@ -60,14 +60,17 @@ void Vehicle::setUnit(int vehicleUnit) {
 }
 
 void Vehicle::setTime(int vehicleTime) {
+    previous_time = time;
     time = vehicleTime;
 }
 
 void Vehicle::setLatitude(double vehicleLatitude) {
+    previous_latitude = latitude;
     latitude = vehicleLatitude;
 }
 
 void Vehicle::setLongitude(double vehicleLongitude) {
+    previous_longitude = longitude;
     longitude = vehicleLongitude;
 }
 
@@ -84,20 +87,6 @@ void Vehicle::setPriority(int p)
     priority = p;
 }
 
-void Vehicle::setPreviousTime(int prev_time)
-{
-    previous_time = prev_time;
-}
-
-void Vehicle::setPreviousLatitude(double prev_latitude)
-{
-    previous_latitude = prev_latitude;
-}
-
-void Vehicle::setPreviousLongitude(double prev_longitude)
-{
-    previous_longitude = prev_longitude;
-}
 
 void Vehicle::setStatus(string status_string)
 {

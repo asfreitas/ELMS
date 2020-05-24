@@ -59,9 +59,6 @@ public:
     void setVelocity(double);
     void setBearing(double);
     void setPriority(int);
-    void setPreviousTime(int);
-    void setPreviousLatitude(double);
-    void setPreviousLongitude(double);
     void setStatus(string);
     void setNewRisk(bool);
 

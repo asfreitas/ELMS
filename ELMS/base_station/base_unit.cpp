@@ -361,18 +361,19 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
     {
         //set the previous time first using the current time before updating
         // the system. 
-        mine_vehicles.at(index)->setPreviousTime(mine_vehicles.at(index)->getTime());
         mine_vehicles.at(index)->setTime(time);
  
     }
     if (latitude != -1)
     {
-        mine_vehicles.at(index)->setPreviousLatitude(mine_vehicles.at(index)->getLatitude());
+        //call to setLatitude will both update the previous_latitude as well
+        //as set the new latitude
         mine_vehicles.at(index)->setLatitude(latitude);
     }
     if (longitude != -1)
     {
-        mine_vehicles.at(index)->setPreviousLongitude(mine_vehicles.at(index)->getLongitude());
+        //call to setLongitude will both update the previous_longitude as well
+        //as set the new longtiude
         mine_vehicles.at(index)->setLongitude(longitude);
     }
     if (velocity != -1)
@@ -418,21 +419,20 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
 {
     if (time != -1)
     {
-        //first we set the previous time with the current time.
-        v->setPreviousTime(v->getTime());
-
-        //next we set the current time to the new input time
+        //call to setTime will both change the previous_time and set the new time
         v->setTime(time);
  
     }
     if (latitude != -1)
     {
-        v->setPreviousLatitude(v->getLatitude());
+        //call to setLatitude will both update the previous_latitude as well as
+        //set the new latitude
         v->setLatitude(latitude);
     }
     if (longitude != -1)
     {
-        v->setPreviousLongitude(v->getLongitude());
+        //call to setLongitude will both update the previous_longitude as well 
+        // as set the new longitude
         v->setLongitude(longitude);
     }
     if (velocity != -1)
