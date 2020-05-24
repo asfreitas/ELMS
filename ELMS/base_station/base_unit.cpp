@@ -166,7 +166,6 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
         mine_vehicles.at(indice)->setPriority(3);
 
         //add Vehicle to database
-        cout << "Call database to add vehicle " << mine_vehicles.at(indice)->getUnit() << endl;
         database.addVehicle(mine_vehicles.at(indice));
 
     }
@@ -653,8 +652,6 @@ void Base_Unit::checkStatusAndUpdate(int index)
             {
                 
                 mine_vehicles.at(i)->setNewRisk(false);
-
-                cout << endl << endl << "Here is newRisk after setting it to false:    " << mine_vehicles.at(i)->getNewRisk() << endl;
      
                 database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "at_risk");
             }
@@ -663,22 +660,15 @@ void Base_Unit::checkStatusAndUpdate(int index)
             //uncomment the next line of code if it is a real world scenario
             //bool check = checkOffline(getMineVehicles().at(i)->getTime());
             bool check = checkOfflineSimulate(mine_vehicles.at(index)->getTime(), getMineVehicles().at(i)->getTime());
-            cout << "Here is the value of check for vehicle " << mine_vehicles.at(i)->getUnit() << " :" << check << endl;
 
             // if the vehicle has no recent messages and is not a priority 0, set status to offline. 
             if (check == true && (getMineVehicles().at(i)->getPriorityNumber() != 0))
             {
-                cout << "Here is the current status of vehicle " << getMineVehicles().at(i)->getUnit() << " : " << getMineVehicles().at(i)->getStatus() << endl;
                 if (getMineVehicles().at(i)->getStatus() != "offline")
                 {
-                    cout << "I am going to set the status to offline in the database " << endl;
                     getMineVehicles().at(i)->setStatus("offline");
                     getMineVehicles().at(i)->setNewRisk(true);
                     database.updateSingleVehicleTrait<string>("status", getMineVehicles().at(i)->getUnit(), "offline");
-                }
-                else
-                {
-                    cout << "No need to set the offline status again" << endl;
                 }
             }
 
