@@ -1,7 +1,7 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 *
-* This file contains the structure of the login page.
+* This file contains the html for the login page.
 */
 
 import React from "react"
