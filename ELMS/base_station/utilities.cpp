@@ -220,11 +220,9 @@ checkOffline
 ===============
 */
 bool checkOffline(int currentMessageTime) {
-	cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
 	time_t now = time(0) - 25200;
 	//get current message time
 	time_t currentTime = zuluToDate(currentMessageTime);
-	cout <<"Here is now and currentTime: " << now << " " << currentTime << endl << endl;
 	if ((now - currentTime) > SECONDS_LIMIT) {
 		return true;
 	}
@@ -244,12 +242,12 @@ checkOfflineSimulate
  ===============
  */
 bool checkOfflineSimulate(int currentMessageTime, int lastMessageReceived) {
-	cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
+	//cout << endl << endl << "Here is the currentMessageTime sent in: " << currentMessageTime << endl;
 	//convert Zulu times to date time in seconds for comparison
 	time_t latestMessageTime = zuluToDate(currentMessageTime);
 	time_t lastMessageTime = zuluToDate(lastMessageReceived);
 
-	cout << "Here is now and currentTime: " << latestMessageTime << " " << lastMessageTime << endl << endl;
+	//cout << "Here is now and currentTime: " << latestMessageTime << " " << lastMessageTime << endl << endl;
 	if ((latestMessageTime - lastMessageTime) > SECONDS_LIMIT) {
 		return true;
 	}
