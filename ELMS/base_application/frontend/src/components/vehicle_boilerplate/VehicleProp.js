@@ -40,33 +40,6 @@ const Vehicle = props => (
 )
 
 
-const InactiveVehicle = props => (
-    <div className="vehicle_status_column">
-        <div className="vehicle_card">
-            <div className="latitude">
-                <p>Latitude</p>
-                {props.vehicle.new_latitude}
-            </div>
-            <div className="unit">
-                <p>Unit</p>
-                {props.vehicle.vehicle_unit}
-            </div>
-            <div className="longitude">
-                <p>Longitude</p>
-                {props.vehicle.new_longitude}
-            </div>
-            <div className="active_time">
-                Inactive time: 
-                {props.getInactiveTime(props.vehicle)}
-            </div>
-            <div className="nearest_vehicle">
-                Nearest vehicle: 
-                {props.getNearestVehicle(props.vehicle)}
-            </div>
-        </div>
-    </div>
-)
-
 
     
 export default Vehicle;
