@@ -12,14 +12,16 @@ Database::Database(std::string _uri)
 //desctructor
 Database::~Database()
 {
-    std::cout << "This can't go out of scope until the"
-        "program closes otherwise we lose the connection";
+    //std::cout << "This can't go out of scope until the"
+        //"program closes otherwise we lose the connection";
+    cout << "Final count for database connections is " << count << endl;
     delete pool;
 }
 
 //create a connection pool
 Database::connection Database::getConnection()
 {
+    count++;
     return pool->acquire();
 }
 
@@ -79,7 +81,7 @@ void Database::addVehicle(Vehicle* vehicle) {
         //insert the view of the document
         bsoncxx::stdx::optional<mongocxx::result::insert_one> result = vehicles.insert_one(view);
         if (result) {
-            std::cout << "Vehicle successfully created" << "\n";
+            //std::cout << "Vehicle successfully created" << "\n";
         }
         else {
             std::cout << "Unsuccessful with creating" << "\n";
