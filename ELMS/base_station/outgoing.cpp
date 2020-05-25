@@ -28,6 +28,37 @@ void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTi
             distance1 + ',' + bearing1 + "*" + "\n";
 }
 
+/*
+===============
+createAlert
+
+This function creates the alert messages that will be sent out through the
+serial port. It also creates the string that will be used for the log file that
+will be created in association with the 
+*/
+void createAlert(string & alertMessage, string & alertLogMessage, char* fileName, 
+    double velocity, Vehicle *v1, Vehicle * v2, double distance, int time)
+{
+    //declare a Calculations class member
+    Calculations calc;
+
+    // first calculate the speed which is in meters per second
+    double speed = calc.knots_to_mps(velocity);
+
+    // now we get the bearing
+    int bearing = calc.getBearing(v1, v2);
+
+    // we create the outgoing message;
+    outgoing_message(alertMessage, v1->getUnit(), v2->getUnit(), time, speed,
+        distance, bearing);
+
+    //copy the message to use to create the log file for the alert
+    alertLogMessage = alertMessage;
+
+    //convert the outgoing message to a char * so that it can be transmitted
+    stringToCharPointer(alertMessage, fileName);
+}
+
 /*This is a placeholder function that will be used to create network failure messages.*/
 void network_failure_message(string& networkFailureMsg)
 {
