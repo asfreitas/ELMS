@@ -12,7 +12,7 @@ struct message {
 	int time;
 	double latitude;
 	double longitude;
-	int velocity;
+	double velocity;
 	int bearing;
 };
 
