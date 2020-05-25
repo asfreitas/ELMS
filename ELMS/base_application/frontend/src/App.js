@@ -12,8 +12,8 @@ import VehicleStatus from './components/VehicleStatus.component';
 import Login from './components/Login.component';
 import LastCommunications from './components/LastCommunications.component';
 import Analytics from './components/Analytics.component';
-import CreateVehicle from './components/AddVehicle.component';
 import AddUser from './components/AddUser.component';
+import TaPage from './components/TaPage.component'
 
 function App() {
     return (
@@ -22,8 +22,8 @@ function App() {
                 <Route path='/VehicleStatus' component={VehicleStatus} />
                 <Route path='/LastCommunications' component={LastCommunications} />
                 <Route path='/Analytics' component={Analytics} />
-                <Route path='/AddVehicle' component={CreateVehicle} />
                 <Route path='/AddUser' component={AddUser} />
+                <Route path='/TaPage' component={TaPage} />
         </Router>
     )
 }

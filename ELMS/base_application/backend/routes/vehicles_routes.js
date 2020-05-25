@@ -8,7 +8,7 @@
 
 const router = require('express').Router();
 let Vehicles = require('../models/vehicle.model.js');
-
+const auth = require('../middleware/auth')
 
 //get all vehicles in the database
 router.route('/').get((req, res) => {
@@ -45,6 +45,12 @@ router.route('/inactive').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// get all vehicles whose status is inactive
+router.route('/deleteall').delete((req, res) => {
+    Vehicles.remove({})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 /*
 * get all vehicle_unit, average all velocities and set to pastVelocityAvg,
 * time the vehicle has been running (in milliseconds), and the startup time
@@ -56,9 +62,8 @@ router.route('/analytics').get((req, res) => {
             $project: {
                 vehicle_unit: 1,
                 pastVelocityAvg: {$round: [{$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]}, 1]},
-                time_alive: {$subtract: ["$$NOW", "$startup_time"]},
+                max_speed: {"$max": "$past_velocity"},
                 startup_time: {"$dateToString": {date: "$startup_time", format: "%Y-%m-%d"}}
-
         }
     }])
     .then(vehicles => res.json(vehicles))
@@ -66,7 +71,7 @@ router.route('/analytics').get((req, res) => {
 });
 
 //handles post request saves to mongo db
-router.route('/add').post((req, res) => {
+router.route('/add').post(auth, (req, res) => {
     const vehicle_unit = req.body.vehicle_unit;
     const startup_time = Date.parse(req.body.startup_time);
     const last_received_time = Date.parse(req.body.last_received_time);
@@ -79,6 +84,7 @@ router.route('/add').post((req, res) => {
     const new_latitude = req.body.new_latitude;
     const new_velocity = req.body.new_velocity;
     const new_bearing = req.body.new_bearing;
+    const status = req.body.status;
     const distance_to_vehicles = req.body.distance_to_vehicles;
 
     const new_vehicle = new Vehicles({
@@ -95,6 +101,7 @@ router.route('/add').post((req, res) => {
         new_velocity,
         new_bearing,
         distance_to_vehicles,
+        status
     });
 
     new_vehicle.save()

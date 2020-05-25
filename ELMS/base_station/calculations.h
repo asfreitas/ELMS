@@ -1,5 +1,8 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ * 
+ * This file contains the calculations necessary
+ * for calculating bearing and haversine.
 */
 
 #ifndef CALCULATIONS_H

@@ -1,5 +1,7 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the functions for port handling. 
 */
 #include "port.h"
 
@@ -83,7 +85,9 @@ void Port::openSerialPort(LPCSTR portname)
 readFromSerialPort
 
 hSerial		File HANDLE to the serial port
-returns the amount of data that was read
+
+Reads the amount of data from the serial port 
+and then returns the amount read.
 =============
 */
 DWORD Port::readFromSerialPort(char* buffer, int buffersize)
@@ -106,6 +110,9 @@ readFromSerialPort
 hSerial		File HANDLE to the serial port
 length is for how much data is going to be written
 returns the amount of data that was written
+
+Reads a certain amount of data from the serial port and returns the amount
+of data read
 =============
 */
 DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
@@ -123,6 +130,8 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
 /*
 =============
 closeSerialPort
+
+Closes the current serial port.
 =============
 */
 void Port::closeSerialPort(HANDLE hSerial)
@@ -237,7 +246,6 @@ Shuts down the port and makes sure all data has been sent before closing
 */
 Port::~Port()
 {
-    //std::cout << "I am in the port destructor" << std::endl;
     stillReceiving = false;
     if (messageThread.joinable())
         messageThread.join();
@@ -289,6 +297,8 @@ void Port::removeMessageFromBuffer(std::string* mystring)
 /*
 =============
 receiveMessage
+
+Gets new data from the port and puts them into the buffer.
 =============
 */
 void Port::receiveMessage()
@@ -389,7 +399,10 @@ void Port::startPortThread()
 
 /*
 =============
-startMessageThread
+getNextMessage
+
+Waits to ensure that it gets the entire message without interrupting
+buffer and returns next element in queue.
 =============
 */
 std::string Port::getNextMessage()
@@ -402,7 +415,9 @@ std::string Port::getNextMessage()
 
 /*
 =============
-startMessageThread
+startTimer
+
+Starts up the timer for checking network failure
 =============
 */
 void Port::startTimer(int numSeconds)
@@ -454,6 +469,8 @@ void Port::netFailureCheck(int numSeconds)
 setCommMask
 
 // https://docs.microsoft.com/en-us/windows/win32/devio/monitoring-communications-events
+
+Sets up a comm mask 
 =============
 */
 void Port::setCommMask(DWORD mask)

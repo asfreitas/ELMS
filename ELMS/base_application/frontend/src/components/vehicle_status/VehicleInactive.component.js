@@ -8,6 +8,7 @@ import React, { Component } from "react"
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
 
+//class used to render inactive vehicles
 export default class VehicleInactive extends VehicleBase{
     constructor(props){
         super(props)
@@ -18,7 +19,7 @@ export default class VehicleInactive extends VehicleBase{
         this.vehicleQuery = 'http://localhost:8080/vehicles/inactive'
     }
 
-    //get list of inactive vehicles
+    //get list of inactive vehicles with nearest vehicle and inactive time
     getInactiveVehicles(){
         return this.state.vehicles.map(currentVehicle => {
             return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} getActiveTime={this.getInactiveTime} key={currentVehicle._id}

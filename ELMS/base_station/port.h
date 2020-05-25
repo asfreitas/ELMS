@@ -1,12 +1,11 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+* 
+* This file contains the headers for port handling.
 */
 
-/* This is from https://github.com/waynix/SPinGW
- * The original code had enums to define baudrates, stopbits, and parity.
- * I removed them because Visual Studio required enum classes since
- * it is felt that enums can lead to "surprises" or bugs versus an
- * enum class. */
+// This is from https://github.com/waynix/SPinGW
+
 #ifndef SERIALPORT_HPP
 #define SERIALPORT_HPP
 

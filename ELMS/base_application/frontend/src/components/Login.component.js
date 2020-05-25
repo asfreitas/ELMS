@@ -5,7 +5,9 @@
 */
 
 import React, { Component } from "react"
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+
 
 export default class Login extends Component{
     
@@ -26,7 +28,7 @@ export default class Login extends Component{
 
     //when page renders, get list of users in mongodb
     componentDidMount(){
-        axios.get('https://elms-base-application.uc.r.appspot.com/users/')
+        axios.get('http://localhost:8080/users')
             .then(res => {
                 this.setState({ users: res.data})
                 console.log(res.data);
@@ -51,17 +53,18 @@ export default class Login extends Component{
         })
     }
 
-
+    //function that validates username and password match what's in database.
     validateLogin(event){
         event.preventDefault();
 
+        
         const login_info = {
             username: this.state.username,
             password: this.state.password
         }
 
         console.log(login_info);
-
+        /*
         const userListLength = this.state.users.length;
         for(var i = 0; i < userListLength; i++){
             if(this.state.username === this.state.users[i].username && this.state.password === this.state.users[i].password){
@@ -74,8 +77,20 @@ export default class Login extends Component{
                 }
             }
         }
-    }
+        */
 
+        axios.post('http://localhost:8080/users/auth', login_info)
+        .then((res) => {
+            console.log(res.data);
+            window.location.href = "/VehicleStatus"
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Invalid login attempt!");
+        });
+
+    }
+    //loginbox rendering
     render() {
         return(
             <div className="login_parent">
@@ -97,11 +112,7 @@ export default class Login extends Component{
                         <input type="submit" value="Login" id="Submit" className="Submit"/>
                     </form>
                     <div className="bottom_container">
-                        <div className="row">
-                            <div className="column">
-                                <a href="/AddUser">Create profile</a>
-                            </div>
-                        </div>
+                        <Link className="create_user" to='/AddUser' >Create profile</Link>
                     </div>
                 </div>
             </div>

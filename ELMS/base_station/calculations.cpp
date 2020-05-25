@@ -1,5 +1,8 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ *
+ * This file contains the function declarations 
+ * for performing calculations.
 */
 
 #include "calculations.h"
@@ -7,6 +10,8 @@
 /*
 =============
 knots_to_mps
+
+Converts knots to meters per second.
 =============
 */
 double Calculations::knots_to_mps(double knots){
@@ -22,6 +27,8 @@ double Calculations::knots_to_mps(double knots){
 /*
 =============
 degrees_to_radians
+
+Converts degrees to radians
 =============
 */
 double Calculations::degrees_to_radians(double degreeMinutes){
@@ -43,6 +50,8 @@ double Calculations::degrees_to_radians(double degreeMinutes){
 /*
 =============
 radians_to_degrees
+
+Converts radians to degrees.
 =============
 */
 double Calculations::radians_to_degrees(double radians)
@@ -55,6 +64,8 @@ double Calculations::radians_to_degrees(double radians)
 getBearing
 
 //https://www.movable-type.co.uk/scripts/latlong.html
+
+Gets the bearing between two vehicles
 =============
 */
 int Calculations::getBearing(Vehicle* vehicle1, Vehicle* vehicle2)
@@ -77,6 +88,8 @@ int Calculations::getBearing(Vehicle* vehicle1, Vehicle* vehicle2)
 haversine
 
 //https://community.esri.com/groups/coordinate-reference-systems/blog/2017/10/05/haversine-formula
+
+Gets the distance between two vehicles using coordinates
 =============
 */
 double Calculations::haversine(Vehicle *vehicle1, Vehicle *vehicle2){
@@ -105,6 +118,10 @@ double Calculations::haversine(Vehicle *vehicle1, Vehicle *vehicle2){
 /*
 =============
 normalizeBearing
+
+This normalizes the bearing for use with our 
+program to ensure that it wraps around and we
+don't get bogus values.
 =============
 */
 int Calculations::normalizeBearing(double bearing)

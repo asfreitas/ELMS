@@ -10,7 +10,7 @@ import axios from 'axios'
 import Navbar from './Navbar.component'
 import Footer from "./Footer.component.js"
 
-
+//class used to create a user
 export default class AddUser extends Component {
     constructor(props) {
         super(props);
@@ -74,9 +74,8 @@ export default class AddUser extends Component {
             last_name: this.state.last_name
         }
 
-        axios.post('https://elms-base-application.uc.r.appspot.com/users/add', user)
+        axios.post('https:localhost:8080/users/add', user)
         .then(res => console.log(res.data));
-
         this.setState({
             username: '',
             email:'',
@@ -84,11 +83,10 @@ export default class AddUser extends Component {
             first_name: '',
             last_name: ''
         })
-
         window.location.href = "/"
 
     }
-
+    //form used to create a user
     render(){
         return (
             <div>

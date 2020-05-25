@@ -1,0 +1,4 @@
+{
+    "mongoURI" : "mongodb+srv://framet:ZrNw96fstw9cutR@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority",
+    "jwtSecret" : "sl_JWTSecret"
+}
