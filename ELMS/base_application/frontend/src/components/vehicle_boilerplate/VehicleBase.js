@@ -65,18 +65,14 @@ export default class VehicleBase extends Component{
 
     getActiveTime(vehicle){
         var date1 = vehicle.startup_time;
-        
         return convertTime(date1)
     }
     getInactiveTime(vehicle){
         var date1 = vehicle.last_received_time;
-
         return convertTime(date1)
-
     }
     getAtRiskTime(vehicle){
         var date1 = vehicle.last_received_time;
-
         return convertTime(date1)
     }
     //set nearest vehicle
@@ -92,5 +88,4 @@ export default class VehicleBase extends Component{
         }
         return nearest;
     }
-
 }

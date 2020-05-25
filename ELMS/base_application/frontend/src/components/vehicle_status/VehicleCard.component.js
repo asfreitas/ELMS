@@ -8,7 +8,6 @@ import React from "react"
 
 //function used to display a vehicles latitude, longitude, unit number, active time, at risk time, and nearest vehicle
 function VehicleCard(props) {
-
         return(
             <div className="vehicle_status_column">
                 <div className="vehicle_card">

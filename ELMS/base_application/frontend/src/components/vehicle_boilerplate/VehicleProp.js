@@ -12,7 +12,7 @@ const Vehicle = props => (
         <div className="vehicle_card">
             <div className="latitude">
                 <p>Latitude</p>
-                {props.vehicle.new_latitude}
+                {Number(props.vehicle.new_latitude).toFixed(4)}
             </div>
             <div className="unit">
                 <p>Unit</p>
@@ -20,7 +20,7 @@ const Vehicle = props => (
             </div>
             <div className="longitude">
                 <p>Longitude</p>
-                {props.vehicle.new_longitude}
+                {Number(props.vehicle.new_longitude).toFixed(4)}
             </div>
             <div className={props.typeClass}>
                 {props.typeText}

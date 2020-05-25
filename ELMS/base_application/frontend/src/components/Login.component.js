@@ -28,7 +28,7 @@ export default class Login extends Component{
 
     //when page renders, get list of users in mongodb
     componentDidMount(){
-        axios.get('https://elms-base-application.uc.r.appspot.com/users/')
+        axios.get('http://localhost:8080/users')
             .then(res => {
                 this.setState({ users: res.data})
                 console.log(res.data);
@@ -57,13 +57,14 @@ export default class Login extends Component{
     validateLogin(event){
         event.preventDefault();
 
+        
         const login_info = {
             username: this.state.username,
             password: this.state.password
         }
 
         console.log(login_info);
-
+        /*
         const userListLength = this.state.users.length;
         for(var i = 0; i < userListLength; i++){
             if(this.state.username === this.state.users[i].username && this.state.password === this.state.users[i].password){
@@ -76,6 +77,18 @@ export default class Login extends Component{
                 }
             }
         }
+        */
+
+        axios.post('http://localhost:8080/users/auth', login_info)
+        .then((res) => {
+            console.log(res.data);
+            window.location.href = "/VehicleStatus"
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Invalid login attempt!");
+        });
+
     }
     //loginbox rendering
     render() {
