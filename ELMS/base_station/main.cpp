@@ -41,8 +41,6 @@ void printf_notice();
 
 int main()
 {
-	//getPort();
-	//startWindow();
 
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
@@ -69,8 +67,9 @@ int main()
 
     // this counter is only here for testing purposes.
 	int count = 0;
+
 	//start an endless loop
-	while (p.isPortReady() && count < 40)
+	while (p.isPortReady() && count < 25)
 	{
 
 		if (!p.isBufferEmpty())
@@ -80,6 +79,10 @@ int main()
 
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
+
+			// this variable checks to see if the incoming message is properly separated
+	        // by commas.  
+			size_t number = countCommas(incomingMessage);
 
 			// This line of code declares two threads that will be used in 
 			// the parallel section
@@ -96,27 +99,36 @@ int main()
 
                 #pragma omp section
 				{
-					// declare a pointer to a message struct
-					struct message* ptr = createNewMessage(data);
+					//if the number of commas is 6, then the message is correctly
+					// formed.
+					if (number == 5)
+					{
+						// declare a pointer to a message struct
+						struct message* ptr = createNewMessage(data);
 
-					//declare a pointer to a vehicle object that will either be
-					// added to the vector of mine vehicles
-					vehicle = new Vehicle();
+						//declare a pointer to a vehicle object that will either be
+						// added to the vector of mine vehicles
+						vehicle = new Vehicle();
 
-					//set the index to the size of the mineVehicles
-					index = static_cast<int>(b.getMineVehicles().size());
+						//set the index to the size of the mineVehicles
+						index = static_cast<int>(b.getMineVehicles().size());
 
-					// add the vehicle pointer to the vector
-					b.addToMineVehicles(vehicle);
+						// add the vehicle pointer to the vector
+						b.addToMineVehicles(vehicle);
 
-					//this function is going to have a mutex and lock within the input_data function
-					HANDLE h = p.getHandle();
+						//this function is going to have a mutex and lock within the input_data function
+						HANDLE h = p.getHandle();
 
-					//input the new data
-					b.input_data(index, ptr, p, h);
+						//input the new data
+						b.input_data(index, ptr, p, h);
 
-					// free the ptr memory
-					delete ptr;
+						// free the ptr memory
+						delete ptr;
+					}
+					else
+					{
+						cout << "There was an error in the incoming message" << endl;
+					}
 
 				}
 			}
