@@ -114,11 +114,11 @@ int Vehicle::getTime() {
 }
 
 double Vehicle::getLatitude() {
-    return roundToFourDecimals(latitude);
+    return latitude;
 }
 
 double Vehicle::getLongitude() {
-    return roundToFourDecimals(longitude);
+    return longitude;
 }
 
 double Vehicle::getVelocity() {
@@ -142,12 +142,12 @@ int Vehicle::getPreviousTime()
 
 double Vehicle::getPreviousLatitude()
 {
-    return roundToFourDecimals(previous_latitude);
+    return (previous_latitude);
 }
 
 double Vehicle::getPreviousLongitude()
 {
-    return roundToFourDecimals(previous_longitude);
+    return (previous_longitude);
 }
 
 string Vehicle::getStatus()
