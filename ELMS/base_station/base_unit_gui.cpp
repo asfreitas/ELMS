@@ -69,8 +69,8 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		break;
 
 	case WM_CREATE:
-		AddMenus(hWnd);
-		AddControls(hWnd);
+		//AddMenus(hWnd);
+		//AddControls(hWnd);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -197,6 +197,7 @@ Tutorial is above -- Program code is below.
 ================================================================================
 */
 
+
 /*
 ============================================================================
 getPort
@@ -250,8 +251,7 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdcStatic, RGB(255, 0, 0)); // text color
 		//SetBkColor(hdcStatic, RGB(255, 255, 224));
 		return (LRESULT)GetStockObject(WHITE_BRUSH);
-		//return (INT_PTR)hBrush;
-		//return (INT_PTR)CreateSolidBrush(RGB(255, 255, 255));
+
 	}
 	break;
 
@@ -259,7 +259,6 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 		if (LOWORD(wParam) == ID_SELF_DESTROY_BUTTON) {
 			//if the select port button is pushed
-			//char buffer[50];
 			// reset buffer and comPort
 			memset(buffer, '\0', 50);
 			memset(comPort, '\0', 50);
