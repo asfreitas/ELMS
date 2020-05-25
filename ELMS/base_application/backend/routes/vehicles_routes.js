@@ -45,6 +45,12 @@ router.route('/inactive').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// get all vehicles whose status is inactive
+router.route('/deleteall').delete((req, res) => {
+    Vehicles.remove({})
+    .then(vehicles => res.json(vehicles))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 /*
 * get all vehicle_unit, average all velocities and set to pastVelocityAvg,
 * time the vehicle has been running (in milliseconds), and the startup time
@@ -58,7 +64,6 @@ router.route('/analytics').get((req, res) => {
                 pastVelocityAvg: {$round: [{$divide: [{$sum: "$past_velocity"}, {$size: "$past_velocity"}]}, 1]},
                 time_alive: {$subtract: ["$$NOW", "$startup_time"]},
                 startup_time: {"$dateToString": {date: "$startup_time", format: "%Y-%m-%d"}}
-
         }
     }])
     .then(vehicles => res.json(vehicles))

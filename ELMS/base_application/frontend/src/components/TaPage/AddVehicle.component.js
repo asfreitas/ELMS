@@ -7,8 +7,8 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 
-import Navbar from './Navbar.component'
-import Footer from "./Footer.component.js"
+import Navbar from '../Navbar.component'
+import Footer from "../Footer.component.js"
 
 //class used to add vehicle and information
 export default class AddVehicle extends Component {
@@ -192,7 +192,6 @@ export default class AddVehicle extends Component {
     render(){
         return (
             <div>
-                <Navbar />
                 <h3>Create Vehicle</h3>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
@@ -330,7 +329,6 @@ export default class AddVehicle extends Component {
                         <input type="submit" value="Create Vehicle" className="btn btn-primary"/> 
                     </div>
                 </form>
-                <Footer />
             </div>
         )
     }
