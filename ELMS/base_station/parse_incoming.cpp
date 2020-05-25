@@ -50,7 +50,7 @@ message* createNewMessage(string incomingMessage)
 		case 1: newMessage->time = stringToInt(temp); break;
 		case 2: newMessage->latitude = stringToDouble(temp); break;
 		case 3: newMessage->longitude = stringToDouble(temp); break;
-		case 4: newMessage->velocity = stringToInt(temp); break;
+		case 4: newMessage->velocity = stringToDouble(temp); break;
 		case 5: newMessage->bearing = stringToInt(temp); break;
 		default: break;
 		}
