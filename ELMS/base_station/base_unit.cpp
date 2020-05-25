@@ -139,14 +139,18 @@ This function takes the new message and either inputs a new vehicle or
 */
 void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 {
-    Calculations calc;
     size_t size = -1;
+    //strings used to create alert messages and log files
     string alertMessage;
+    string alertMessage1;
     string alertLogMessage;
+    string alertLogMessage1;
     string alertFileName;
+    string alertFileName1;
     char fileName[100];
-    double speed, distance = 0, bearing;
+    char fileName1[100];
     unsigned long int index;
+    //flag used to represent if a vehicle is new or already exists
     int newVehicle = 0;
 
     //iterator that will be used to iterate thru a map
@@ -190,43 +194,40 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 
         map<int, double>list = checkDistancesInMasterVector1(mine_vehicles.at(index));
         //next we iterate through the map with the distances and send out alerts
+        //each pair of vehicles in risk of collision will receive an alert
         if (list.size() > 0)
         {
             for (itr = list.begin(); itr != list.end(); ++itr)
-            {
-                //need to send out an alert message
-                // first calculate the speed which is in meters per second
-                speed = calc.knots_to_mps(ptr->velocity);
-
+            { 
                 //The list contains the index in the master list of vehicles that is
-                // in immediate danger of collision. Set the second vehicle to this
-                // index
+               // in immediate danger of collision. Set second vehicle to this index
                 Vehicle* v1 = mine_vehicles.at(itr->first);
 
-                // now we get the bearing
-                // bearing = calc.getBearing(&mine_vehicles.at(index), &v1);
-                bearing = calc.getBearing(mine_vehicles.at(index), v1);
+                //this function call creates the alert messages that will be
+                //sent out to each individual vehicle
+                createAlert(alertMessage, alertLogMessage, fileName, ptr->velocity,
+                    mine_vehicles.at(index), v1, itr->second, ptr->time);
 
-                // we create the outgoing message;
-                outgoing_message(alertMessage, ptr->vehicle, v1->getUnit(), ptr->time, speed,
-                    itr->second, bearing);
-
-                //copy the message to use to create the log file for the alert
-                alertLogMessage = alertMessage;
-
-                //convert the outgoing message to a char * so that it can be transmitted
-                stringToCharPointer(alertMessage, fileName);
+                createAlert(alertMessage1, alertLogMessage1, fileName1, v1->getVelocity(),
+                    v1, mine_vehicles.at(index), itr->second, ptr->time);
 
                 // send the alerts
                 auto len = static_cast<int>(alertMessage.length());
                 p.writeToSerialPort(fileName, len + 1, h);
 
+                len = static_cast<int>( alertMessage1.length());
+                p.writeToSerialPort(fileName1, len + 1, h);
+
                 //we also need to create the alert message
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 2);
+
+                alertLogMessage1 = alertLogMessage1.substr(0, alertLogMessage1.length() - 2);
                 
                 //get the file path
-                fileHandler.logToFile(alertLogMessage, MessageType::alert);               
+                fileHandler.logToFile(alertLogMessage, MessageType::alert); 
+
+                fileHandler.logToFile(alertLogMessage1, MessageType::alert);
             }
         }
 
