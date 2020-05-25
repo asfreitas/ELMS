@@ -1,10 +1,16 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the code for the navbar component.
+*/
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 export default class Navbar extends Component {
     render() {
         return (
-            <nav className="navbar navbar-dark bg-dark navbar-expand">
+            <nav className="navbar navbar-custom navbar-expand">
                 <Link to="/" className="navbar-brand">Home</Link>
                 <ul className="navbar-nav mr-auto">
                     <li className="navbar-item">
@@ -17,10 +23,7 @@ export default class Navbar extends Component {
                         <Link to="/Analytics" className="nav-link">Analytics</Link>
                     </li>
                     <li className="navbar-item">
-                        <Link to="/AddVehicle" className="nav-link">Add Vehicle</Link>
-                    </li>
-                    <li className="navbar-item">
-                        <Link to="/AddUser" className="nav-link">Add User</Link>
+                        <Link to="/TaPage" className="nav-link">TA Page</Link>
                     </li>
                 </ul>
             </nav>

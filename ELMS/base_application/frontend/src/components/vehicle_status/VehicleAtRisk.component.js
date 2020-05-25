@@ -8,7 +8,7 @@ import React, { Component } from "react"
 import Vehicle from "../vehicle_boilerplate/VehicleProp.js"
 import VehicleBase from "../vehicle_boilerplate/VehicleBase"
 
-
+//class used to render vehicles at risk
 export default class VehicleAtRisk extends VehicleBase{
     constructor(props){
         super(props);
@@ -21,7 +21,7 @@ export default class VehicleAtRisk extends VehicleBase{
 
     }
 
-    //get list of at risk vehicles
+    //get list of at risk vehicles with nearest vehicle, active time, and risk time
     getAtRiskVehicles(){
         return this.state.vehicles.map(currentVehicle => {
             return <Vehicle vehicle={currentVehicle} getNearestVehicle={this.getNearestVehicle} typeClass="active_time" typeText="Active time: " riskClass="at_risk_time"
@@ -29,6 +29,7 @@ export default class VehicleAtRisk extends VehicleBase{
         })
     }
 
+    //Render the page with header of at risk and cards of vehicles at risk
     render(){
         return(
             <div className="at_risk">

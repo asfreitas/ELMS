@@ -11,12 +11,12 @@ import Footer from "./Footer.component.js"
 import VehicleLastComm from "./last_comm/VehicleLastComm.component"
 
 
-
 export default class LastCommunications extends Component {
     render(){
         return (
-            <div>
+            <div className="page-container">
                 <Navbar />
+                <main>Last Communications</main>
                 <VehicleLastComm />
                 <Footer />
             </div>

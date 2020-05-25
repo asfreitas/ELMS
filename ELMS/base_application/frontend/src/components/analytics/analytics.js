@@ -9,13 +9,14 @@
 */
 
 import React, { Component } from 'react'
+import VehicleRow from "../vehicle_status/VehicleRow.component"
 import axios from 'axios'
 
 const Analytics = props => (
         <tr>
             <td>{props.table.vehicle_unit}</td>
             <td>{props.table.pastVelocityAvg}</td>
-            <td>{props.table.time_alive}</td>
+            <td>{props.table.max_speed}</td>
             <td>{props.table.startup_time}</td>
         </tr>
 
@@ -38,35 +39,12 @@ export class Table extends Component {
             console.log(err);
         })
     }
-    convertTime(){
-        var date, currentTime
-        for(var j = 0; j < this.state.table.length; j++)
-        {
-            date = "";
-            currentTime = this.state.table[j].time_alive
-            if(currentTime / 86400000 > 0) // get days
-            {
-                date += Math.floor(currentTime  / 86400000) + " days "
-                currentTime = currentTime % 86400000
-            }
-            if(currentTime / 3600000 > 0)
-            {
-                date += Math.floor(currentTime / 3600000) + " hours and "
-                currentTime = currentTime % 3600000
-            }
-            if( currentTime / 60000 > 0)
-            {
-                date += Math.floor(currentTime / 60000) + " minutes"
-            }
-            this.state.table[j].time_alive = date
-        }
-    }
+
 
      renderTableData() {
-        this.convertTime()
-
+        console.log(this.state.table.max_speed)
         return this.state.table.map(currentVehicle => {
-            return <Analytics table={currentVehicle} getAverageSpeed={this.getAverageSpeed} startup_time={this.getActiveTime} key={currentVehicle._id}/>;
+            return <Analytics table={currentVehicle} getAverageSpeed={this.pastVelocityAvg} max_speed={this.max_speed} startup_time={this.getActiveTime} key={currentVehicle._id}/>;
         })
      }
 
@@ -79,14 +57,15 @@ export class Table extends Component {
                     <tr>
                         <th>Vehicle #</th>
                         <th>Average Speed</th>
-                        <th>Total Running Time</th>
-                        <th>Startup time</th>
+                        <th>Max Speed</th>
+                        <th>Startup date</th>
                     </tr>
                     </thead>
                 <tbody>
                     {this.renderTableData()}
                 </tbody>
             </table>
+            <VehicleRow />
            </div>
         )
      }
