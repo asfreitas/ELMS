@@ -27,7 +27,7 @@ class Calculations
     public:
         double degrees_to_radians(double degreeMinutes);
         double radians_to_degrees(double radians);
-        double knots_to_mps(int knots);
+        double knots_to_mps(double knots);
         double haversine(Vehicle* vehicle1, Vehicle* vehicle2);
         int getBearing(Vehicle* vehicle1, Vehicle* vehicle2);
         int normalizeBearing(double);
