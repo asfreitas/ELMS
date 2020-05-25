@@ -1,5 +1,8 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ *
+ * This file contains the headers for the functions for 
+ * file handling.
 */
 
 #ifndef FILEIO_H
@@ -53,7 +56,6 @@ class FileIO
         bool checkMessageCount(MessageType);
         int& getMessageCount(MessageType);
         void logToFile(std::string inputMessage, MessageType);
-        void logToExistingFile(std::string existingFile, string inputMessage, MessageType);
         void resetMessageCount(MessageType);
         std::string createFileName(MessageType);
         void createFolders();
