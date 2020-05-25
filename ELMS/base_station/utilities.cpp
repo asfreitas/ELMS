@@ -256,4 +256,16 @@ bool checkOfflineSimulate(int currentMessageTime, int lastMessageReceived) {
 	}
 }
 
+/*
+===============
+countNumCommas
+Function counts the number of commas in a string
+and returns the number
+Reference: https://www.geeksforgeeks.org/std-count-cpp-stl/
+*/
+size_t countCommas(string str)
+{	
+	size_t number = std::count(str.begin(), str.end(), ',');
+	return number;
+}
 
