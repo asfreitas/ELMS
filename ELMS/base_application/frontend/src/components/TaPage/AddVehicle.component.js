@@ -192,143 +192,149 @@ export default class AddVehicle extends Component {
     render(){
         return (
             <div>
+                           <div>
                 <h3>Create Vehicle</h3>
-                <form onSubmit={this.onSubmit}>
-                    <div className="form-group">
-                        <label>Vehicle unit: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.vehicle_unit}
-                        onChange={this.onChangeUnit}
-                        />
+                <div class="addVehicle">
+                    <form onSubmit={this.onSubmit}>
+                        <div className="form-group">
+                            <label>Vehicle unit: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.vehicle_unit}
+                            onChange={this.onChangeUnit}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Startup Time: </label>
+                            <input type="datetime-local"
+                            required
+                            className="form-control"
+                            value={this.state.startup_time}
+                            onChange={this.onChangeStartTime}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Last Received Time: </label>
+                            <input type="datetime-local"
+                            required
+                            className="form-control"
+                            value={this.state.last_received_time}
+                            onChange={this.onChangeLastReceivedTime}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Last Longitude: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.last_longitude}
+                            onChange={this.onChangeLastLongitude}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Last Latitude: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.last_latitude}
+                            onChange={this.onChangeLastLatitude}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Past Velocity: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.past_velocity}
+                            onChange={this.onChangePastVelocity}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Past Bearing: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.past_bearing}
+                            onChange={this.onChangePastBearing}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>New Time: </label>
+                            <input type="datetime-local"
+                            required
+                            className="form-control"
+                            value={this.state.new_time}
+                            onChange={this.onChangeNewTime}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>New Longitude: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.new_longitude}
+                            onChange={this.onChangenewLongitude}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>New Latitude: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.new_latitude}
+                            onChange={this.onChangeNewLatitude}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>New Velocity: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.new_velocity}
+                            onChange={this.onChangeNewVelocity}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>New Bearing: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.new_bearing}
+                            onChange={this.onChangeNewBearing}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Distance to Vehicle 12: </label>
+                            <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.distance_to_vehicles}
+                            onChange={this.onChangeDistanceToVehicles}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Status: </label>
+                            <select ref="status"
+                            required
+                            className="form-control"
+                            value={this.state.status}
+                            onChange={this.onChangeStatus}>
+                            <option >Select...</option>
+                            <option value="at_risk">At risk</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="offline">Offline</option>
+                            </select>
+                        </div>
+                        <div class="form-button">
+                            <button type="submit" value="Create Vehicle" class="btn btn-primary">Submit</button>
+
+                        </div>
+                    </form>
+
                     </div>
-                    <div className="form-group">
-                        <label>Startup Time: </label>
-                        <input type="datetime-local"
-                        required
-                        className="form-control"
-                        value={this.state.startup_time}
-                        onChange={this.onChangeStartTime}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Last Received Time: </label>
-                        <input type="datetime-local"
-                        required
-                        className="form-control"
-                        value={this.state.last_received_time}
-                        onChange={this.onChangeLastReceivedTime}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Last Longitude: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.last_longitude}
-                        onChange={this.onChangeLastLongitude}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Last Latitude: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.last_latitude}
-                        onChange={this.onChangeLastLatitude}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Past Velocity: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.past_velocity}
-                        onChange={this.onChangePastVelocity}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Past Bearing: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.past_bearing}
-                        onChange={this.onChangePastBearing}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>New Time: </label>
-                        <input type="datetime-local"
-                        required
-                        className="form-control"
-                        value={this.state.new_time}
-                        onChange={this.onChangeNewTime}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>New Longitude: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.new_longitude}
-                        onChange={this.onChangenewLongitude}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>New Latitude: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.new_latitude}
-                        onChange={this.onChangeNewLatitude}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>New Velocity: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.new_velocity}
-                        onChange={this.onChangeNewVelocity}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>New Bearing: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.new_bearing}
-                        onChange={this.onChangeNewBearing}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Distance to Vehicle 12: </label>
-                        <input type="number"
-                        required
-                        className="form-control"
-                        value={this.state.distance_to_vehicles}
-                        onChange={this.onChangeDistanceToVehicles}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Status: </label>
-                        <select ref="status"
-                        required
-                        className="form-control"
-                        value={this.state.status}
-                        onChange={this.onChangeStatus}>
-                        <option >Select...</option>
-                        <option value="at_risk">At risk</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="offline">Offline</option>
-                        </select>
-                    </div>
-                    <div className="form-button">
-                        <input type="submit" value="Create Vehicle" className="btn btn-primary"/> 
-                    </div>
-                </form>
+            </div>
             </div>
         )
     }

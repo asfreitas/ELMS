@@ -22,6 +22,9 @@ export default class Navbar extends Component {
                     <li className="navbar-item">
                         <Link to="/Analytics" className="nav-link">Analytics</Link>
                     </li>
+                    <li className="navbar-item">
+                        <Link to="/TaPage" className="nav-link">TA Page</Link>
+                    </li>
                 </ul>
             </nav>
         )

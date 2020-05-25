@@ -23,8 +23,8 @@ page-container {
 }
 
 #footer {
-    position: absolute;
-    padding-top: 10em;
+    position: relative;
+    padding-top: 5em;
     bottom: 2em;
     font-size: 1.2em;
     height: 2.5rem;
@@ -316,7 +316,21 @@ input[type=submit] {
 }
 
 .form-button {
-    padding-top: 60px;
+    padding-top: 15px;
+    padding-bottom: 50px;
+    float: left;
+    
+}
+
+.deleteText{
+    padding-top: 100px;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+.deleteButton{
+    padding-top: 10px;
+    padding-bottom: 15px;
 }
 
 .active_time {
@@ -346,4 +360,8 @@ input[type=submit] {
     text-align: center;
     background-color: #4CAF50;
     color: white;
+  }
+
+  #addVehicle {
+      padding-bottom:1000px;
   }
