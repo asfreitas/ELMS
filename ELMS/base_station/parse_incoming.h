@@ -1,11 +1,17 @@
+/*
+ * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ *
+ * This file contains the message structure and function
+ * header for creating new messages from that.
+*/
+
+
 #ifndef PARSE_INCOMING_H
 #define PARSE_INCOMING_H
 
-#include <fstream>
-#include <string>
-#include <vector>
 #include "utilities.h"
-using std::vector;
+
+#include <string>
 using std::ofstream;
 using std::string;
 
@@ -18,8 +24,6 @@ struct message {
 	int bearing;
 };
 
-void storeMessage(string& fileName, string& message);
-//int stringToInt(string str);
 message* createNewMessage(string incomingMessage);
 
 #endif

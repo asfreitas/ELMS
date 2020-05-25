@@ -20,10 +20,15 @@ Vehicle::Vehicle() {
     velocity = -1;
     bearing = -1;
     priority = 4; //initialize the priority to 4
+    status = "active";
+    newRisk = true;
+    previous_latitude = 0.0;
+    previous_longitude = 0.0;
 }
 
 //construct vehicle
-Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude, double vehicleVelocity, double vehicleBearing, int priorityNum) {
+Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, double vehicleLongitude,
+    double vehicleVelocity, double vehicleBearing, int priorityNum, string statusString) {
     unit = vehicleUnit;
     time = vehicleTime;
     latitude = vehicleLatitude;
@@ -31,9 +36,14 @@ Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, doubl
     velocity = vehicleVelocity;
     bearing = vehicleBearing;
     priority = priorityNum;
+    status = statusString;
+    newRisk = true;
+    previous_latitude = 0.0;
+    previous_longitude = 0.0;
+    previous_time = 0;
 }
 
-//desctructor
+//destructor
 Vehicle::~Vehicle() {
     //std::cout << "Vehicle destructor called " << std::endl;
 
@@ -50,14 +60,17 @@ void Vehicle::setUnit(int vehicleUnit) {
 }
 
 void Vehicle::setTime(int vehicleTime) {
+    previous_time = time;
     time = vehicleTime;
 }
 
 void Vehicle::setLatitude(double vehicleLatitude) {
+    previous_latitude = latitude;
     latitude = vehicleLatitude;
 }
 
 void Vehicle::setLongitude(double vehicleLongitude) {
+    previous_longitude = longitude;
     longitude = vehicleLongitude;
 }
 
@@ -74,6 +87,18 @@ void Vehicle::setPriority(int p)
     priority = p;
 }
 
+
+void Vehicle::setStatus(string status_string)
+{
+    status = status_string;
+}
+
+void Vehicle::setNewRisk(bool value)
+{
+    newRisk = value;
+}
+
+
 /*
 =============
 get...()
@@ -89,11 +114,11 @@ int Vehicle::getTime() {
 }
 
 double Vehicle::getLatitude() {
-    return latitude;
+    return roundToFourDecimals(latitude);
 }
 
 double Vehicle::getLongitude() {
-    return longitude;
+    return roundToFourDecimals(longitude);
 }
 
 double Vehicle::getVelocity() {
@@ -101,6 +126,7 @@ double Vehicle::getVelocity() {
 }
 
 double Vehicle::getBearing() {
+
     return bearing;
 }
 
@@ -108,6 +134,33 @@ int Vehicle::getPriorityNumber()
 {
     return priority;
 }
+
+int Vehicle::getPreviousTime()
+{
+    return previous_time;
+}
+
+double Vehicle::getPreviousLatitude()
+{
+    return roundToFourDecimals(previous_latitude);
+}
+
+double Vehicle::getPreviousLongitude()
+{
+    return roundToFourDecimals(previous_longitude);
+}
+
+string Vehicle::getStatus()
+{
+    return status;
+}
+
+bool Vehicle::getNewRisk()
+{
+    return newRisk;
+}
+
+
 
 map<int, double>* Vehicle::getMapOfVehicles()
 {
@@ -134,7 +187,7 @@ void Vehicle::sortVehicleVector(vector<Vehicle*>v)
 }
 
 /* reference on updating maps
-   https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method  
+   https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method
    This function updates the vehicles map which contains the distances it is
    from other vehicles */
 void Vehicle::updateVehicleMap(Vehicle* v, int vehicle_id, double distance)
@@ -164,7 +217,7 @@ double Vehicle::findSmallestDistance(Vehicle* v)
     map<int, double>* temp = v->getMapOfVehicles();
     // declare a map iterator to iterate thru the map.
     map<int, double>::iterator itr;
-    for(itr = temp->begin(); itr != temp->end(); itr++)
+    for (itr = temp->begin(); itr != temp->end(); itr++)
     {
         if ((*itr).second <= min_distance)
             min_distance = (*itr).second;
@@ -172,4 +225,3 @@ double Vehicle::findSmallestDistance(Vehicle* v)
     return min_distance;
 
 }
-

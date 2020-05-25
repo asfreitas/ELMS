@@ -1,14 +1,24 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+*
+* This file contains the file writing functions.
 */
 
 #include "fileio.h"
-// all instances of the class need to use the same path to a message so that
-// a file is correctly filled by any class object.  
+
 
 // current message counts are initialized to 1 and 5 for the message limitint FileIO::messageCount = 1;
 
 
+/*
+=============
+constructor
+
+Constructs a file handler that takes in a path to the 
+directory where it is being written to and a limit on
+the number of messages allowed per file.
+=============
+*/
 FileIO::FileIO(std::string path, int limit)
 {
     pathToLogs = path;
@@ -21,8 +31,15 @@ FileIO::FileIO(std::string path, int limit)
 
     createFolders();
 }
-/*Default constructor sets both the messageLimit and pathToLogs if the
-  user does not provide one. */
+
+/*
+=============
+constructor (No Parameters)
+
+Sets default paths and creates folders for starting
+up the program.
+=============
+*/
 FileIO::FileIO() 
 {
     messageLimit = 5;
@@ -35,12 +52,21 @@ FileIO::FileIO()
     createFolders();
 
 } 
+
+/*
+=============
+destructor
+
+Checks to see if the thread doing the writing has completed
+and joins it if necessary.
+=============
+*/
 FileIO::~FileIO()
 {
     if (writing_thread.joinable())
         writing_thread.join();
-    std::cout << "I am in the FileIO destructor" << endl;
 }
+
 /*
 =============
 checkMessageCount
@@ -82,6 +108,16 @@ int& FileIO::getMessageCount(MessageType type)
     return messageCount;
 
 }
+
+/*
+=============
+getFilePath
+
+Gets the appropriate file path dependent on
+which message type we are using.
+=============
+
+*/
 string FileIO::getFilePath(MessageType type)
 {
     switch (type)
@@ -96,7 +132,35 @@ string FileIO::getFilePath(MessageType type)
 }
 
 /*
- * Function logFile
+=============
+setPathToLogs
+
+Sets a new path to the logs
+=============
+
+*/
+void FileIO::setPathToLogs(string path)
+{
+    pathToLogs = path;
+}
+
+/*
+=============
+setMessageLimit
+
+Sets a new limit for the number of messages
+per file.
+=============
+*/
+void FileIO::setMessageLimit(int limit)
+{
+    messageLimit = limit;
+}
+
+/*
+=============
+logFile
+
  * This function checks the message count. If it is < MESSAGE_LIMIT, then the inputMessage
  * is written to a log file and the message count is incremented. If the
  * message count is >= MESSAGE_LIMIT, then this last message is written to the log file
@@ -108,54 +172,36 @@ string FileIO::getFilePath(MessageType type)
  * https://cplusplus.com/forum/general/194132
  * Important to use a reference wrapper when passing in threads.
  * https://stackoverflow.com/questions/34078208/passing-object-by-reference-to-stdthread-in-c11
- */
+ =============
+*/
+
 void FileIO::logToFile(std::string inputMessage, MessageType type)
 {
-    bool needNewFile = false;
-
-    // flag that will be true when both writing and closing to a file have finished. 
-    bool done = false;
-
-
     bool messageCountAtLimit = checkMessageCount(type);
-
     string fileName = getFilePath(type);
 
-    if (messageCountAtLimit || fileName.size() == 0)
+    if (messageCountAtLimit || fileName.size() == 0) /// check if the file exists or if we are at the limit
     {
-        getNewFilePath(type);
+        getNewFilePath(type); // make a new file otherwise
         fileName = getFilePath(type);
     }
 
-
-    //check to see if the number of messages written to the file is at the limit
-    // It checks for the message type to determine if more should be written to
-    // that particular log file. 
     if (writing_thread.joinable())
         writing_thread.join(); // check to join previous write before wriing again 
     // in the future we can setup a thread pool for a potential speedup
     writing_thread = std::thread(&FileIO::lockWriteFile, this, fileName, inputMessage);
-
-
-}
-
-/*This function accepts the fileName for a file that is currently being written
- to and writes to it. */
-void FileIO::logToExistingFile(std::string fileName, string inputMessage, MessageType)
-{
-    //increment the alert message count;
-    alertCount++;
-
-    if (writing_thread.joinable())
-        writing_thread.join(); // check to join previous write before wriing again 
-    // in the future we can setup a thread pool for a potential speedup
-    writing_thread = std::thread(&FileIO::lockWriteFile, this, fileName, inputMessage);
-    
 }
 
 
- /* Function lockWriteFile locks any other part of the program writing to
-  * log files while another process is writing to it. */
+/*
+=============
+lockWriteFile
+
+This function is called by the thread to
+instantiate a lock to protect the file from being 
+overwritten.
+=============
+*/
 void FileIO::lockWriteFile(string filePath, string inputMessage)
 {
     //lock writing to a log file
@@ -166,11 +212,14 @@ void FileIO::lockWriteFile(string filePath, string inputMessage)
     mtx_write.unlock();
 
 }
-/* This function sets the file name for a log file when it is newly opened.
- *  An example of it's use would be if a previous log file was full and
- * closed and a new name created for a new file, then this function would
- * be called to set the file name for that particular type of log file.
- */
+/*
+=============
+setFileName
+
+Creates a new file name and updates
+the current filename.
+=============
+*/
 void FileIO::setFileName(MessageType type)
 {
     std::string tempName = createFileName(type);
@@ -184,13 +233,13 @@ void FileIO::setFileName(MessageType type)
     default: break;
     }
 }
+
 /*
 =============
 resetMessageCount
 
 Resets the current count of messages for a particular file
 =============
-
 */
 void FileIO::resetMessageCount(MessageType type)
 {
@@ -203,6 +252,7 @@ void FileIO::resetMessageCount(MessageType type)
     default: break;
     }
 }
+
 /*
 =============
 createFileName
@@ -257,15 +307,10 @@ std::string FileIO::createFileName(MessageType type)
 =============
 createFolders
 
-Creates all of the folders being used for the program
+Source: https://www.youtube.com/watch?v=B999K9yztnI
+Creates all of the folders being used for the program.
 =============
-
 */
-/*This function first checks to see if a directory exists, then it creates the
- * logs directory and the 4 subfolders (1) incoming_messages (2) alerts (3) network_failure
- * (4) misc_errors. It will create the main logs file in the location that the user
- * specified. */
- // https://www.youtube.com/watch?v=B999K9yztnI
 void FileIO::createFolders()
 {
     // create various folders for use in program
@@ -281,7 +326,7 @@ void FileIO::createFolders()
 createFolder
 
 Takes in a string and then creates a new folder based on
-the name taken in
+the name taken in.
 =============
 
 */
@@ -314,24 +359,18 @@ bool FileIO::createFolder(const string folderName)
     }
     return true;
 }
+
 /*
 =============
 directoryExists
 
-Checks to see if a directory exists 
-=============
-
-*/
-/*This function first checks to see if the directories exist before creating them
- * The GetFileAttributesA function returns attributes for specific file or
- * directory. If the call is successful, then the attribute is returned.
- * In this case we are looking for it to return "ERROR_PATH_NOT_FOUND" ,
- * "ERROR_FILE_NOT_FOUND", "ERROR_INVALID_NAME", or "ERROR_BAD_NETPATH" in order
- * to know that the file does not exist. */
+Checks to see if a directory exists.
  // reference
  // https://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
  //https://www.youtube.com/watch?v=B999K9yztnI
  //https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesa
+=============
+*/
 bool FileIO::directoryExists(const std::string& directoryName)
 {
     DWORD directory_attribute = GetFileAttributesA(directoryName.c_str());
@@ -367,7 +406,6 @@ getNewFilePath
 
 Creates a new file path for the files being written to 
 =============
-
 */
 void FileIO::getNewFilePath(MessageType type)
 {

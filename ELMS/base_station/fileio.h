@@ -1,8 +1,14 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ *
+ * This file contains the headers for the functions for 
+ * file handling.
 */
+
+#ifndef FILEIO_H
+#define FILEIO_H
+
 #include <fstream>
-#include <istream>
 #include <Windows.h>
 #include <string>
 #include <thread>
@@ -13,8 +19,6 @@
 using std::string;
 using std::cout;
 using std::endl;
-#ifndef FILEIO_H
-#define FILEIO_H
 
 enum class MessageType { incoming, alert, network_failure, misc };
 
@@ -52,10 +56,8 @@ class FileIO
         bool checkMessageCount(MessageType);
         int& getMessageCount(MessageType);
         void logToFile(std::string inputMessage, MessageType);
-        void logToExistingFile(std::string existingFile, string inputMessage, MessageType);
         void resetMessageCount(MessageType);
         std::string createFileName(MessageType);
-        void setFileName(MessageType);
         void createFolders();
         bool createFolder(string);
         bool directoryExists(const std::string&);
@@ -73,5 +75,9 @@ class FileIO
         string getPathToMessages() { return pathToMessages; }
         string getPathToLogs() { return pathToLogs; }
 
+        //set functions
+        void setFileName(MessageType);
+        void setPathToLogs(string path);
+        void setMessageLimit(int limit);
 };
 #endif

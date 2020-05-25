@@ -1,5 +1,7 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ *
+ * This file contains the function for creating a new message.
 */
 #include <iostream>
 #include <cstdio>
@@ -18,20 +20,7 @@ using std::stringstream;
 using std::remove_if;
 
 
-/* This function take the file path and message and opens the file and appends
- *  the current message. Once it is finished it closes the file. */
-void storeMessage(string & filePath, string &message) {
-	ofstream inputFile;
-	inputFile.open(filePath, std::ios::out | std::ios::app);
 
-	// if the log file is open, then write to it. 
-	if (inputFile.is_open())
-	{
-		inputFile << message;
-		inputFile << "\n";
-	}
-	inputFile.close();
-}
 
 /* This function parses the incoming message and creates a struct message which
  * will be used to load data into vehicle objects. 
