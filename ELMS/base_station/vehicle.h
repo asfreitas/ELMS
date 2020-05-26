@@ -27,6 +27,7 @@ class Vehicle
 private:
     int unit;
     int time;
+
     double latitude;
     double longitude;
     double velocity;
@@ -37,6 +38,7 @@ private:
     double previous_latitude;
     double previous_longitude;
     int previous_time;
+    int startUpTime;
     // this map holds the unit number of another vehicle and the distance
     // it is away from this vehicle object
     map<int, double>distance_to_other_vehicles;
@@ -61,6 +63,7 @@ public:
     void setPriority(int);
     void setStatus(string);
     void setNewRisk(bool);
+    void setStartupTime(int start);
 
     //create getter functions
     int getUnit();
@@ -75,6 +78,7 @@ public:
     double getPreviousLongitude();
     string getStatus();
     bool getNewRisk();
+    int getStartupTime();
     map<int, double>* getMapOfVehicles();
     size_t getMapSize(Vehicle& v);
     int getVehicleID() { return unit; }

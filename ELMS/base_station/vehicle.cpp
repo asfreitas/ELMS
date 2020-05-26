@@ -24,6 +24,7 @@ Vehicle::Vehicle() {
     newRisk = true;
     previous_latitude = 0.0;
     previous_longitude = 0.0;
+    startUpTime = NULL;
 }
 
 //construct vehicle
@@ -41,6 +42,7 @@ Vehicle::Vehicle(int vehicleUnit, int vehicleTime, double vehicleLatitude, doubl
     previous_latitude = 0.0;
     previous_longitude = 0.0;
     previous_time = 0;
+    startUpTime = NULL;
 }
 
 //destructor
@@ -96,6 +98,11 @@ void Vehicle::setStatus(string status_string)
 void Vehicle::setNewRisk(bool value)
 {
     newRisk = value;
+}
+
+void Vehicle::setStartupTime(int start)
+{
+    startUpTime = start;
 }
 
 
@@ -158,6 +165,11 @@ string Vehicle::getStatus()
 bool Vehicle::getNewRisk()
 {
     return newRisk;
+}
+
+int Vehicle::getStartupTime()
+{
+    return startUpTime;
 }
 
 
