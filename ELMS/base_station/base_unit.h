@@ -22,7 +22,12 @@ control the primary functions of the base station.
 
 #include <thread>
 #include <time.h>
-
+#include <iostream>
+#include <stdbool.h>
+#include <mutex>
+#include <string>
+#include <cstdio>
+#include <cstring>
 
 #include "parse_incoming.h"
 #include "outgoing.h"
@@ -45,6 +50,9 @@ using std::map;
 using std::pair;
 using std::setprecision;
 using std::iterator;
+using std::thread;
+using std::cout;
+using std::endl;
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860

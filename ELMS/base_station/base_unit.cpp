@@ -1,23 +1,10 @@
 /*
  * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+ * Contains the function definitions for the class BASE_UNIT
 */
 
 #include "base_unit.h"
 
-#include <iostream>
-#include <stdbool.h>
-#include <thread>
-#include <mutex>
-#include <fstream>
-#include <string>
-#include <ctime>
-#include <cstdio>
-#include <cstring>
-#include <time.h>
-
-using std::thread;
-using std::cout;
-using std::endl;
 
 //This string is the uri to the test database
 string _uri = "mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority";
@@ -26,9 +13,6 @@ string _uri = "mongodb+srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mo
 std::mutex mtx_close;
 std::mutex mtx_update_master;
 std::mutex mtx_udate_vehicle;
-
-//static count so that vehicles in mine are only updated in the database, periodically
-static int countTime = 0;
 
 /* Static members must be initialized outside of the class
  * Since mine_vehicles is a static member, it must be initialized outside of
@@ -41,6 +25,7 @@ vector<Vehicle*> Base_Unit::mine_vehicles;
 Base_Unit
 
 Default Constructor for Base_Unit
+Reference: https://www.cplusplus.com/forum/beginner/34589/
 ===============
 */
 Base_Unit::Base_Unit() :  fileHandler("C:\\logs", MESSAGE_LIMIT), 
@@ -53,11 +38,13 @@ database(_uri)
 ~Base_Unit
 
 Destructor
+deleteVector is a template struct that is defined in the utilities.h file. 
+Reference for it's use is:
+https://stackoverflow.com/questions/891913/c-stdvector-of-pointers-deletion-and-segmentation-faults#891924
 ===============
 */
 Base_Unit::~Base_Unit()
 {
-    //cout << "Base_Unit destructor was called" << endl;
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 
@@ -89,6 +76,7 @@ void Base_Unit::print_vector(vector<Vehicle*> v)
 
     cout << "**********************************" << endl << endl;
 
+    //this for-loop iterates through the vector and prints all the values
     for (auto itr : v)
     {
         cout << "*****VEHICLE " << itr->getUnit() << " *****" << endl;
@@ -133,7 +121,7 @@ vector<Vehicle*> Base_Unit::getMineVehicles()
 input_data
 
 This function takes the new message and either inputs a new vehicle or
- updates a current one The reference to use maps is the following:
+ updates a current one. The reference to use maps is the following:
  https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
 ===============
 */
@@ -189,10 +177,11 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 
 
         //this map holds vehicles that are within 50 meters or less of the input
-        // vehicle.  The int is the index in the master list of that vehicle and
-        // the double is the distance.
+        // vehicle.  The int (key) is the index in the master list of that vehicle
+        //and the double (value) is the distance.
 
         map<int, double>list = checkDistancesInMasterVector1(mine_vehicles.at(index));
+
         //next we iterate through the map with the distances and send out alerts
         //each pair of vehicles in risk of collision will receive an alert
         if (list.size() > 0)
@@ -204,7 +193,7 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 Vehicle* v1 = mine_vehicles.at(itr->first);
 
                 //this function call creates the alert messages that will be
-                //sent out to each individual vehicle
+                //sent out to each individual vehicle. We call it twice. 
                 createAlert(alertMessage, alertLogMessage, fileName, ptr->velocity,
                     mine_vehicles.at(index), v1, itr->second, ptr->time);
 
@@ -218,13 +207,13 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 len = static_cast<int>( alertMessage1.length());
                 p.writeToSerialPort(fileName1, len + 1, h);
 
-                //we also need to create the alert message
+                //we also need to create the alert log message
                 // remove the \n from the end of the message
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 2);
 
                 alertLogMessage1 = alertLogMessage1.substr(0, alertLogMessage1.length() - 2);
                 
-                //get the file path
+                //get the file path and write to the alert log
                 fileHandler.logToFile(alertLogMessage, MessageType::alert); 
 
                 fileHandler.logToFile(alertLogMessage1, MessageType::alert);
@@ -398,7 +387,7 @@ void Base_Unit::setVehicleInMineVehicles(int index, int time, double latitude, d
 
     if (status != "")
     {
-        
+        //if the status had a value, then set the status to the new value
         mine_vehicles.at(index)->setStatus(status);
 
     }
@@ -459,6 +448,7 @@ void Base_Unit::setVehicleInMineVehicles2(Vehicle* v, int time, double latitude,
 
     if (status != "")
     {
+        //if status is not empty, then set the value
         v->setStatus(status);
 
     }
@@ -591,27 +581,38 @@ map<int, double> Base_Unit::checkDistancesInMasterVector1(Vehicle* v)
 /*
 ===============
 checkOtherVehiclesPriorityNumbers
-his function checks the vehicle at the index of the mine_vehicle to see what
-   the smallest distance is to any other vehicle.  It returns this distance
+this function checks the vehicle at the index of the mine_vehicle to see what
+   the smallest distance is to any other vehicle.It returns this distance.
 ===============
 */
 int Base_Unit::checkOtherVehiclesPriorityNumbers(Vehicle* v1, int index, int priority_number)
 {
     double d;
     int priority = 3;
+    
+    //if the smallest distance from a vehicle is 50 or less meters, then the
+    // priority value is 0
     d = v1->findSmallestDistance(mine_vehicles.at(index));
     if (d <= 50)
     {
         priority = 0;
     }
+
+    // if the smallest distance is between 51 to 75, and the priority is not
+    //0 or already 1, the set the priority to 1
     else if (d > 50 && d <= 75 && priority_number > 1)
     {
         priority = 1;
     }
+
+    // if the smallest distance is between 76 and 100 and the priority number
+    // is 3 then set the priority to 2
     else if (d > 75 && d <= 100 && priority_number > 2)
     {
         priority = 2;
     }
+
+    // otherwise, the priority number remains unchanged. 
     else
     {
         priority = priority_number;
@@ -634,6 +635,15 @@ changed. Status is defined by the following:
               vehicle or object being tracked in the system
 (4) offline -- This means that a vehicle has not sent any messages within the
               SECOND_LIMIT time frame. 
+
+Explanation of newRisk flag: 
+If the newRisk flag is true, this means that the vehicle is not currently at
+risk.  When a vehicle becomes at_risk, then the flag should be false because
+it is no longer new. When a vehicles status changes back from being at_risk
+to another status, such as active, then the flag will be reset to true. 
+
+The reason for the flag system is to avoid making database calls if the status
+is not new.
 The function will only update and call the database if there has been a change. 
 ===============
 */

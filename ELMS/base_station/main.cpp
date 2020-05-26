@@ -88,7 +88,7 @@ int main()
 	int count = 0;
 
 	//start an endless loop
-	while (p.isPortReady() && count < 85)
+	while (p.isPortReady() && count < 10)
 	{
 
 		if (!p.isBufferEmpty())
