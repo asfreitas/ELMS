@@ -49,7 +49,8 @@ using std::thread;
  /* To use OpenMP if you are using Visual Studio you may need to change your
   * configuration Properties-> C/C++ -> Language -> Language -> OpenMP Support
   * to "Yes(/openmp)".   Reference for this is CS 475 Parallel Programming
-  * Notes OpenMP Lecture Slide 6 written by Professor Bailey */
+  * Notes OpenMP Lecture Slide 6 written by Professor Bailey from Oregon
+  * State University */
 
 #ifndef _OPENMP
 void printf_notice();
