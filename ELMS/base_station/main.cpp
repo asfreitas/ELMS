@@ -11,6 +11,15 @@ number on a 0 - 3 scale.
 
 If a vehicle is priority 0, then an alert message is sent to the mobile units
 involved. 
+
+When the program starts, a directory called logs is created, if it does not exit, 
+with subdirectories (1) alerts, (2) incoming_messages, (3) misc_errors, (4) 
+network_failure.  Each incoming message is stored in the incoming_messages folder,
+alerts are stored in the alerts folder, and possible network_failure in the
+network_failure folder. 
+
+The data is also stored and in a database that allows for analytics.. 
+
 References:
  * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API
  * https://github.com/xanthium-enterpreises/Serial-Programming-Win32API-C
