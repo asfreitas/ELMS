@@ -8,10 +8,9 @@
 
 //https://www.youtube.com/watch?v=8GCvZs55mEM
 //You tube reference called:
-// Windows GUI Programming with C/C++ ( Win32 API ) | Part -1 | Creating a window
+// Windows GUI Programming with C/C++ ( Win32 API ) | Parts 1 - 9 |
 
 //These are Win32 API handlers used.
-HWND hEdit;
 HWND hList;
 HWND settingsText, settingsText1, settingsText2;
 static HBRUSH hBrush = CreateSolidBrush(RGB(230, 230, 230));
@@ -20,183 +19,6 @@ HWND hLogo, hLogo1;
 
 //This char array holds the COM port. 
 char comPort[50];
-
-/*
-TOP PART OF THIS FILE IS TUTORIAL -- BOTTOM HALF HAS PROGRAM CODE
-
-*/
-
-/*
-===================================================================
-LRESULT CALLBACK WindowProcedure
-
-This function calls back to the send message sent by the window. 
-===================================================================
-*/
-LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-	switch (msg)
-	{
-	case WM_COMMAND:
-		switch (wp)
-		{
-
-		case CHANGE_TITLE:
-			wchar_t text[100];
-            /*This is a predefined function that gets the text inside the
-			 * control. First argument is the handler of the control. The 
-			 * second is where we want to store the text that is received, and
-			 * the third argument is the maximum length */
-			GetWindowTextW(hEdit, text, 100);
-
-			/* First argument is the handler of the window that we want to
-			 *  change the text. In this case, it is the parent window. The 
-			 *  second argument is the text.
-			 */
-			SetWindowTextW(hWnd, text);
-			break;
-
-		case FILE_MENU_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		case FILE_MENU_NEW:
-			MessageBeep(MB_ICONINFORMATION);
-			break;
-		case FILE_MENU_OPEN:
-			MessageBeep(MB_ICONWARNING);
-			break;
-		}
-		break;
-
-	case WM_CREATE:
-		//AddMenus(hWnd);
-		//AddControls(hWnd);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProcW(hWnd, msg, wp, lp);
-	}
-	return DefWindowProcW(hWnd, msg, wp, lp);
-}
-/*                           
-====================================================
-startWindow
-This function declares and opens a very rudimentary
-window.
-===================================================
-*/
-void startWindow()
-{
-	WNDCLASSW wc = { 0 };
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hInstance = GetModuleHandle(NULL);
-	wc.lpszClassName = L"myWindowClass";
-	wc.lpfnWndProc = WindowProcedure;
-
-	if (RegisterClassW(&wc) == 0)
-		printf("The class failed to register\n");
-
-	CreateWindowW(L"myWindowClass", L"My Window", WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZEBOX,
-		100, 100, 500, 500, NULL, NULL, NULL, NULL);
-	MSG msg = { 0 };
-
-	while (GetMessage(&msg, NULL, NULL, NULL))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-}
-
-/*
-===================================================================
-AddMenus
-This function is part of a tutorial to create a basic window
-===================================================================
-*/
-void AddMenus(HWND handle)
-{
-	HMENU hMenu = CreateMenu();
-	HMENU hFileMenu = CreateMenu();
-	HMENU hSubMenu = CreateMenu();
-
-	AppendMenuA(hSubMenu, MF_STRING, NULL, "SumMenu Item");
-
-	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_NEW, "New");
-	AppendMenu(hFileMenu, MF_POPUP, (UINT_PTR)hSubMenu, "Open Submenu");
-	AppendMenu(hFileMenu, MF_SEPARATOR, NULL, NULL);
-	AppendMenu(hFileMenu, MF_STRING, FILE_MENU_EXIT, "Exit");
-
-	AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFileMenu, "File");
-	AppendMenu(hMenu, MF_STRING, NULL, "Help");
-	SetMenu(handle, hMenu);
-
-}
-
-/*
-===========================================================================
-AddControls
-This function is part of a tutorial to add a text box that allows the user
-to enter text. The parameter is the window handler. 
-==============================================================================
-*/
-void AddControls(HWND hWnd)
-{
-	/* Win32 api has predefined classes of static and edit. First argument is the
-	 * class, second argument is the name of the window or the text inside the 
-	 * control. Third argument is style. Important to make sure that you use 
-	 * WS_VISIBLE | WS_CHILD because a control is a child of the parent window.
-	 * WS stands for Window Style. SS means static style which gives the 
-	 * alignment of the text. 
-	 * The 4th and 5th arguments are the x and y coordinates in the window. 
-	 * The top left coordinate is (0,0), The bottom left coordinate is (0, size of parent)
-	 * The top right is (size of parent, 0) and the bottom right is (size of parent, size of 
-	 * parent). The 6th and 7 arguments are the width and the height. In this case,
-	 * the width and height are 100 and 50. The 8th argument is the parent. hWnd 
-	 * is the parent widow of this static box. 9th argument is any menu which in
-	 * this case is NULL, 10th argument is the hInstance, but this is a child so
-	 * it is a NULL.  The last argument is another argument which in this case
-	 * is also not needed. 
-	*/
-	CreateWindowW(L"static", L"Enter Text In The Box Below ", WS_VISIBLE | WS_CHILD |
-		WS_BORDER | SS_CENTER, 200, 100, 100, 50, hWnd, NULL, NULL, NULL);
-
-	/* edit is the predined class for windows api which allows the user to 
-	 * edit in the window. Note that 152 was used in this child because the 
-	 * first box is (200, 100), so we want it to start a couple of pixels below
-	 * the top box. The width and height are the same as the box above. The
-	 * styles of ES_MULTILINE and AUTOVSCROLL allows the user to type in 
-	 * multilines and also for the window to scroll.
-	 * Whenever the CreateWindowW function is called, a handler is returned. 
-	 * This handler is stored in hEdit. 
-	 */
-	hEdit = CreateWindowW(L"edit", L" ", WS_VISIBLE | WS_CHILD | WS_BORDER |
-		ES_MULTILINE | ES_AUTOVSCROLL, 200, 152, 100, 50, hWnd, NULL, NULL, NULL);
-
-	/* To create a button, use the windows class button. The second argument is 
-	   the text present in the button, the 3rd argument is the style, the 4th 
-	   and 5th arguments are the window coordinates. In this case we use 204 and
-	   100 because the area above was 152 + 50 and then we add 2 pixels more for
-	   spacing. The 6th and 7th arguments are the width and height which are 
-	   kept the same. 8th argument is the handler of the parent window. The 9th
-	   argument is for HMenu, CHANGE_TITLE but we also need to cast it.
-	   The 10th and 11th arguments are NULL. 
-	 */
-	CreateWindowW(L"button", L"Change title", WS_VISIBLE | WS_CHILD, 204, 100, 100, 50,
-		hWnd, (HMENU)CHANGE_TITLE, NULL, NULL);
-}
-
-/*
-Tutorial is above -- Program code is below. 
-================================================================================
-===============================================================================
-================================================================================
-*/
-
 
 /*
 ============================================================================
@@ -226,8 +48,8 @@ https://stackoverflow.com/questions/42438135/c-winapi-listbox-getting-selected-i
 
 First Argument -- Window handler
 Second Argument -- Message which have been sent
-Third Argument -- 
-Fourth Argument -- 
+Third and Forth arguments contain addtional data that pertains to the message. 
+LRESULT is an integer value returned as a response to the message. 
 =============================================================================
 */
 LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -249,7 +71,6 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	{
 		HDC hdcStatic = (HDC)wParam; // or obtain the static handle in some other way
 		SetTextColor(hdcStatic, RGB(255, 0, 0)); // text color
-		//SetBkColor(hdcStatic, RGB(255, 255, 224));
 		return (LRESULT)GetStockObject(WHITE_BRUSH);
 
 	}
@@ -326,7 +147,6 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hInstance = hInstance;
 	wc.hbrBackground = CreateSolidBrush(0xFF6633);
-	//wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);//(HBRUSH)GetStockObject(LTGRAY_BRUSH);
 	wc.lpszClassName = "SelectPort";
 
 	if (!RegisterClass(&wc))
@@ -341,12 +161,26 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 	hWnd = CreateWindowW(L"SelectPort", L"Select a Port", WS_OVERLAPPEDWINDOW |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,800, 600, NULL, NULL, hInstance, NULL);
 	loadImages();
+
 	/*this creates the button in the window that the user will use to select the
-	 * COM port. */
+	 * COM port.
+	 * To create a button, use the windows class button. The second argument is
+	 * the text present in the button, the 3rd argument is the style, the 4th
+	 * and 5th arguments are the window coordinates. In this case we use 400 and
+	 * 250. If the top left corner is (0,0), and the bottom right corner is 
+	 * (width of window, height of window), then (400, 250) will be placed 400 
+	 * pixel from the top left corner and down 250 pixels. The 6th and 7th
+	 * arguments are the width and height of the button. The 8th argument is
+	 * the handler of the parent window. The 9th argument is for HMenu ID_SELF_
+	 * _DESTROY_BUTTON which we need to cast. The 10th argument is the hInstance,
+	 * 11th is set to NULL.
+	  */
 
 	hButton = CreateWindowW(L"button", NULL, WS_TABSTOP |
 		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP | WS_BORDER , 400, 250, 100, 60, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
 		hInstance, 0);
+
+	// send a message to the button to put the image map on its face
 	SendMessageW(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage1);
 
 	/*Create a button that will be used to close the window once the COM port 
@@ -357,9 +191,6 @@ BOOL getPort1(vector<string>* listOfPorts, string & name)
 		NULL, NULL);
 	SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
 
-
-	//hLogo = CreateWindowW(L"static", L"Exit", WS_VISIBLE | WS_CHILD | SS_BITMAP, 100, 50, 98, 500, hWnd, NULL, NULL, NULL);
-	//SendMessageW(hLogo, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
 
 	hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE |
 		WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY | WS_THICKFRAME, 400, 40, 200, 200, 
