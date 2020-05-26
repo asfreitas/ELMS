@@ -1,8 +1,19 @@
 /*
+ELMS Project
+This program tracks the location of vehicles by receiving GPS coordinates through
+a radio transceiver. It stores the locations and determines the distance the
+vehicle is from other vehicles or equipment. The vehicle receives a priority
+number on a 0 - 3 scale.
+0 = The vehicle is within 50 or less meters from another vehicle or piece of equipment
+1 = The vehicle is 51 - 75 meters away from another vehicle or piece of equipment
+2 = The vehicle is 76 - 100 meters away from another vehicle or piece of equipment
+3 - The vehicle is 101 or greater meters away from another vehicle or piece of equipment
+
+If a vehicle is priority 0, then an alert message is sent to the mobile units
+involved. 
 References:
  * https://www.xanthium.in/Serial-Port-Programming-using-Win32-API
  * https://github.com/xanthium-enterpreises/Serial-Programming-Win32API-C
- * https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/strtok-s-strtok-s-l-wcstok-s-wcstok-s-l-mbstok-s-mbstok-s-l?view=vs-2019
  * Reference used to get the current time and date to name the files
  * https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 */
@@ -12,7 +23,10 @@ References:
 #include "base_unit.h"
 #include "port.h"
 
-
+/*
+ * reference for how to look for memory leaks in windows.
+ * Youtube video. https://www.youtube.com/watch?v=t1wqj6J6Vhs
+ */
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 using std::cout;
@@ -22,12 +36,6 @@ using std::ios;
 using std::string;
 using std::thread;
 
-
-/* reference for the following -- this was an issue if you are using Visual Studio
- * https://stackoverflow.com/questions/22210546/whats-the-difference-between-strtok-and-strtok-r-in-c/22210711
- * reference for how to look for memory leaks in windows.
- * Youtube video. https://www.youtube.com/watch?v=t1wqj6J6Vhs
- */
 
  /* To use OpenMP if you are using Visual Studio you may need to change your
   * configuration Properties-> C/C++ -> Language -> Language -> OpenMP Support
@@ -45,7 +53,8 @@ int main()
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	// declare a base class object
+
+	// declare a FILEIO and Base_Unit object
 	FileIO f;
 	Base_Unit b;
 
@@ -69,7 +78,7 @@ int main()
 	int count = 0;
 
 	//start an endless loop
-	while (p.isPortReady() && count < 25)
+	while (p.isPortReady() && count < 85)
 	{
 
 		if (!p.isBufferEmpty())
