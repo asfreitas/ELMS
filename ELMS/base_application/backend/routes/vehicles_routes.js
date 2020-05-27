@@ -71,7 +71,7 @@ router.route('/analytics').get((req, res) => {
 });
 
 //handles post request saves to mongo db
-router.route('/add').post(auth, (req, res) => {
+router.route('/add').post((req, res) => {
     const vehicle_unit = req.body.vehicle_unit;
     const startup_time = Date.parse(req.body.startup_time);
     const last_received_time = Date.parse(req.body.last_received_time);
