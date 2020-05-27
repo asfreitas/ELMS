@@ -1,5 +1,7 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+This file contains the class declaration for the class BASE_UNIT. These functions
+control the primary functions of the base station. 
 */
 #ifndef BASE_UNIT_H
 #define BASE_UNIT_H
@@ -20,7 +22,12 @@
 
 #include <thread>
 #include <time.h>
-
+#include <iostream>
+#include <stdbool.h>
+#include <mutex>
+#include <string>
+#include <cstdio>
+#include <cstring>
 
 #include "parse_incoming.h"
 #include "outgoing.h"
@@ -33,6 +40,8 @@
 
 #include <iomanip>
 
+//this defines the number of messages that will be written to each log and 
+//alert file. 
 #define MESSAGE_LIMIT 5
 
 using std::string;
@@ -41,6 +50,9 @@ using std::map;
 using std::pair;
 using std::setprecision;
 using std::iterator;
+using std::thread;
+using std::cout;
+using std::endl;
 
 /* reference for using statement:
  *  https://jira.mongodb.org/browse/CXX-860
@@ -53,7 +65,8 @@ using std::chrono::milliseconds;
 
 class Base_Unit
 {
-    // using static variables will be the same value for all class objects.
+    // A static variable for the mine_vehicles so that it will be the same
+    // for all class objects. 
 
     //The vector of Vehicles functions as a "master list" of all the vehicles
     // that are currently in the mine
@@ -61,8 +74,6 @@ class Base_Unit
     FileIO fileHandler;
     Database database;
 
-    //this is the path to the folder that stores the logs. It has a set function
-    // to allow the user to create the folder wherever they want.  
 public:
 
     //Constructors
@@ -80,7 +91,9 @@ public:
     /* returns the size of the mine_vehicle vector*/
     size_t get_size(const vector<Vehicle*>& v);
 
-    /*Set Functions for the Master Vector Containing Vehicle Objects */
+    /*Set Functions for the Master Vector Containing Vehicle Objects. The first
+      version uses the index in the vector that a vehicle is located and the 
+      second version uses a pointer to the actual vehicle. */
     void setVehicleInMineVehicles(int indice, int time, double latitude, double longitude,
         double velocity, double bearing, int priority, string status);
     void setVehicleInMineVehicles2(Vehicle* v, int time, double latitude, double longitude,
@@ -97,9 +110,6 @@ public:
     /*Function that will check status of vehicles and update database if necessary*/
     void checkStatusAndUpdate(int index);
 
-    //constructor for Base_Unit
-    // Reference: https://www.cplusplus.com/forum/beginner/34589/
-    //Base_Unit() : fileHandler("C:\\logs", MESSAGE_LIMIT), database("mongodb + srv://asfreitas:b8_i7miJdVLAHFN@elms-cluster-k27n4.gcp.mongodb.net/test?retryWrites=true&w=majority") {};
 };
 
 #endif // !BASE_UNIT_H

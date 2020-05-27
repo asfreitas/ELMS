@@ -343,7 +343,7 @@ void Port::receiveMessage()
             int sec = gmtm.tm_sec;
 
             mystring = "There was network failure from: " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec);
-            std::cout << mystring;
+            std::cout << mystring << std::endl;
             auto start = std::chrono::system_clock::now();
 
             waitCommMask(EV_RXCHAR);

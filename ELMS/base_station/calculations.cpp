@@ -14,7 +14,7 @@ knots_to_mps
 Converts knots to meters per second.
 =============
 */
-double Calculations::knots_to_mps(int knots){
+double Calculations::knots_to_mps(double knots){
 
 	double mps = -1;
 
