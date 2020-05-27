@@ -1,3 +1,9 @@
+/*
+* ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
+* Contains functions for conencting to MongoDB Atlas,
+* Create and add vehicle information, and update vehicle information.
+*/
+
 #include "connect_database.h"
 static int count = 0;
 

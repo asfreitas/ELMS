@@ -1,7 +1,7 @@
-
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 */
+
 #include "utilities.h"
 #include <time.h>
 
