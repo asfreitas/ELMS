@@ -64,8 +64,7 @@ public:
     void updateVehicle(Vehicle*);
 
     //Template functions
-    //Function for updating single vehicle trait. Can take in any type of variable
-    //Must include unit number and variable name in mongodb
+
     template<typename T>
     void updateSingleVehicleTrait(std::string queryType, int unit, T value) {
         try {
@@ -105,8 +104,7 @@ public:
 
     }
 
-    //Pushes data onto an array. Can take in any type of variable
-    //Must include unit number and variable name in mongodb
+
     template<typename T>
     void pushNewData(std::string queryType, int unit, T value) {
         try {
@@ -149,7 +147,81 @@ public:
         }
     }
 
-    //Queries database vehicle collection
+    template<typename T>
+    void getPastData(std::string queryType, int unit, T value) {
+        try {
+            //establish pool connection
+            auto connection = getConnection();
+            database test = connection->database("test");
+            //create vehicles
+            collection vehicles = test["vehicles"];
+            //before updating new latitude, longitude, velocity, bearing, times, grab current
+            //variables and store into last latitude, longitude, velocity, bearing, times.
+            bsoncxx::stdx::optional<bsoncxx::document::value> find_result =
+                vehicles.find_one({ document{}
+                    << "vehicle_unit" << unit
+                    << finalize
+                    });
+            //get the document values, set value to view mode, and get element of
+            //the document view mode.
+            bsoncxx::document::value doc_value = *find_result;
+            bsoncxx::document::view doc_view = doc_value.view();
+            bsoncxx::document::element ele{ doc_view[queryType] };
+            if (ele.type() == bsoncxx::type::k_utf8) {
+                auto eleView = ele.get_utf8().value;
+                std::string eleValue = eleView.to_string();
+                updatePastData(queryType, unit, eleValue);
+            }
+            else if (ele.type() == bsoncxx::type::k_int32) {
+                auto eleView = ele.get_int32();
+                updatePastData(queryType, unit, eleView);
+            }
+            else if (ele.type() == bsoncxx::type::k_double) {
+                auto eleView = ele.get_double();
+                updatePastData(queryType, unit, eleView);
+            }
+            else if (ele.type() == bsoncxx::type::k_date) {
+                auto eleView = ele.get_date();
+                updatePastData(queryType, unit, eleView);
+            }
+        }
+        catch (mongocxx::exception& e)
+        {
+            std::cout << "There was an exception: " << e.what();
+        }
+    }
+
+
+    template<typename T>
+    void updatePastData(std::string queryType, int unit, T eleView) {
+        try {
+            //establish pool connection
+            auto connection = getConnection();
+            database test = connection->database("test");
+            //create vehicles
+            collection vehicles = test["vehicles"];
+            //replace "new" with "last" to update
+            size_t index = 0;
+            index = queryType.find("new", index);
+            queryType.replace(index, 3, "last");
+            //update past data
+            bsoncxx::stdx::optional<mongocxx::result::update> result
+                = vehicles.update_one(document{} << "vehicle_unit" << unit << finalize,
+                    document{} << "$set" << open_document{} <<
+                    queryType << eleView << close_document{} << finalize);
+            if (result) {
+                std::cout << "Successfully updated\n";
+            }
+            else {
+                std::cout << "There was a problem updating\n";
+            }
+        }
+        catch (mongocxx::exception& e)
+        {
+            std::cout << "There was an exception: " << e.what();
+        }
+    }
+
     template <typename T>
     void queryDatabase(std::string queryType, T value) {
         try {
