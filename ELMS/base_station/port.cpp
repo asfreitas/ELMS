@@ -534,14 +534,16 @@ void Port::SelectComPort(vector <string>& comPortList) //added function to find 
     char lpTargetPath[5000]; // buffer to store the path of the COM PORTS
     bool isComPort = false; // represents if a COM port is available or not
     std::string str = "";
-    for (int i = 0; i < 255; i++) // checking ports from COM0 to COM20
+    for (int i = 0; i < 256; i++) // checking ports from COM0 to COM20
     {
+        str = "";
         if (i > 9)
         {
             str += "\\\\.\\";
         }
         str += "COM" + std::to_string(i); // converting to COM0, COM1....
-
+        
+        //std::string str = "COM" + std::to_string(i);
         // queries if there is a MS-DOS device.  Serial ports are this type
         // of device. 
 
