@@ -4,6 +4,7 @@
 * This file contains the functions for port handling. 
 */
 #include "port.h"
+using std::wcout;
 
 
 /* Reference for this code and serialport.hpp is https://github.com/waynix/SPinGW */
@@ -195,6 +196,7 @@ Attempts to open a port with a particular portname
 */
 HANDLE Port::createPort(LPCSTR portname)
 {
+    
     HANDLE hSerial;
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
 
@@ -534,7 +536,7 @@ void Port::SelectComPort(vector <string>& comPortList) //added function to find 
     char lpTargetPath[5000]; // buffer to store the path of the COM PORTS
     bool isComPort = false; // represents if a COM port is available or not
 
-    for (int i = 0; i < 20; i++) // checking ports from COM0 to COM20
+    for (int i = 0; i < 256; i++) // checking ports from COM0 to COM20
     {
         std::string str = "COM" + std::to_string(i); // converting to COM0, COM1....
 

@@ -76,7 +76,7 @@ int main()
 	 //declare the vector that will contain all of the vehicles in the mine
 	vector<Vehicle*>mineVehicles;
 
-	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
+	LPCSTR portname = "\\\\.\\COM26";//NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
 
 	bool startNewLog = false;
