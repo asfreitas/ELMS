@@ -208,7 +208,7 @@ time_t zuluToDate(int messageTime) {
 
 	//convert into time in seconds
 	time_t messageDateTime = mktime(&local);
-	messageDateTime = messageDateTime - 25200;
+	messageDateTime = messageDateTime;
 	return messageDateTime;
 }
 
