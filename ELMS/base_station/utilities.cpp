@@ -8,7 +8,7 @@
 
 /*
 ===============
-stringToDouble
+stringToInt
 Function converts a string into an integer
 ===============
 */
@@ -33,15 +33,15 @@ Function takes a string and returns a double
 ===============
 */
 double stringToDouble(string str) {
-	double number = -1;
-	//size_t sz;
+	double number = -1.0000;
+
 	try {
-		number = stof(str);
+		std::setprecision(9);
+		number = stod(str);
 	}
 	catch (exception& ex) {
 		cout << "ERROR: " << ex.what() << endl;
 	}
-
 	return number;
 }
 /*
