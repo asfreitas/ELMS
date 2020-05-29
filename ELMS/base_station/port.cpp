@@ -163,6 +163,14 @@ HANDLE Port::setupPort(LPCSTR portname)
         //call getPort to get the available ports
         getPort(&listOfPorts, temp);
 
+        //if a COM port is greater than 9, than "\\\\.\\" needs to be
+        //prepended to the COM port name.
+        // References: https://support.microsoft.com/en-us/help/115831/howto-specify-serial-ports-larger-than-com9
+        // https://stackoverflow.com/questions/11775185/open-a-com-port-in-c-with-number-higher-that-9
+        if (temp.length() > 4) {
+            temp = "\\\\.\\" + temp;
+        }
+
         //convert temp to LPCSTR
         portname = temp.c_str();
         //if the first letter of portname is 0, then this means portname 
@@ -536,18 +544,12 @@ void Port::SelectComPort(vector <string>& comPortList) //added function to find 
     char lpTargetPath[5000]; // buffer to store the path of the COM PORTS
     bool isComPort = false; // represents if a COM port is available or not
 
-    std::string str = "";
-    for (int i = 0; i < 255; i++) // checking ports from COM0 to COM20
+    for (int i = 0; i < 256; i++) // checking ports from COM0 to COM20
     {
-        if (i > 9)
-        {
-            str += "\\\\.\\";
-        }
-        str += "COM" + std::to_string(i); // converting to COM0, COM1....
+        std::string str = "COM" + std::to_string(i); // converting to COM0, COM1....
 
         // queries if there is a MS-DOS device.  Serial ports are this type
         // of device. 
-
 
         DWORD test = QueryDosDevice(str.c_str(), lpTargetPath, 5000);
 
