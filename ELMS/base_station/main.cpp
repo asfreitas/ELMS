@@ -79,7 +79,7 @@ int main()
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
 
-	bool startNewLog = false;
+	//bool startNewLog = false;
 
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
@@ -88,7 +88,7 @@ int main()
 	int count = 0;
 
 	//start an endless loop
-	while (p.isPortReady() && count < 10)
+	while (p.isPortReady() && count < 50)
 	{
 
 		if (!p.isBufferEmpty())

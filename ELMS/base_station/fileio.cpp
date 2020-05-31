@@ -79,9 +79,30 @@ has exceeded the limit or increments and returns false
 bool FileIO::checkMessageCount(MessageType type)
 {
     int& messageCount = getMessageCount(type); // get it by reference so we can increment it after
+
     if (messageCount < messageLimit)
     {
-        messageCount++; // increment the message type that is passed into the function
+        //check to see if the type is incoming and increment if it s
+        if (type == MessageType::incoming)
+        {
+            messageCount++;
+
+        }
+        //check to see if the type is alert and increment if it is
+        else if (type == MessageType::alert)
+        {
+            alertCount++;
+        }
+        //check to see if the type is network_failure and increment if it is
+        else if (type == MessageType::network_failure)
+        {
+            networkFailureCount++;
+        }
+        //otherwise increment misc count.
+        else
+        {
+            miscCount++;
+        }
         return false;
     }
     return true;
