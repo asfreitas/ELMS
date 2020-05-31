@@ -79,8 +79,6 @@ int main()
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
 
-	//bool startNewLog = false;
-
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
