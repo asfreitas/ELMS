@@ -31,6 +31,7 @@ Reference: https://www.cplusplus.com/forum/beginner/34589/
 Base_Unit::Base_Unit() :  fileHandler("C:\\logs", MESSAGE_LIMIT), 
 database(_uri)
 {
+    mine_vehicles = fileHandler.getSavedVehicles();
 }
 
 /*
@@ -45,6 +46,8 @@ https://stackoverflow.com/questions/891913/c-stdvector-of-pointers-deletion-and-
 */
 Base_Unit::~Base_Unit()
 {
+    fileHandler.saveAllVehicles(mine_vehicles);
+
     std::for_each(mine_vehicles.begin(), mine_vehicles.end(), deleteVector());
 }
 
