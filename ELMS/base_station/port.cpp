@@ -227,7 +227,6 @@ Port::Port(FileIO* _f)
 
     fileHandler = _f;
 
-
 }
 
 /*
@@ -375,7 +374,23 @@ void Port::receiveMessage()
             min = gmtm.tm_min;
             sec = gmtm.tm_sec;
 
-            mystring += " to " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec) + " for " + std::to_string(diff.count()) + " seconds.\n";
+            mystring += " to " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec) + " for " + std::to_string(diff.count()) + " seconds";
+            
+            //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
+            int results = possibleNetworkFailure(mystring);
+
+            //either way, the event will be logged. If results = 1, then the user confirmed event.
+            // confirmed is appended to the log.
+            if (results == 1)
+            {
+                mystring += " - Confirmed.\n";
+            }
+            // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
+            else
+            {
+                mystring  += " - Unconfirmed.\n";
+            }
+
 
             fileHandler->logToFile(mystring, MessageType::network_failure);
 
