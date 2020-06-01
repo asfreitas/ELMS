@@ -357,6 +357,7 @@ void Port::receiveMessage()
 
             waitCommMask(EV_RXCHAR);
 
+            
             waitCommMask(EV_RXCHAR);
 
 
@@ -394,7 +395,7 @@ void Port::receiveMessage()
 
             fileHandler->logToFile(mystring, MessageType::network_failure);
 
-
+            networkFailure = false;
         }
     }
 
@@ -481,7 +482,6 @@ void Port::netFailureCheck(int numSeconds)
 
             if (!isBufferEmpty())
             {
-                networkFailure = false;
                 currentNetworkFailure = false;
             }
         }
