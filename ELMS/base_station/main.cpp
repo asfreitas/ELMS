@@ -83,10 +83,6 @@ int main()
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
-    // this counter is only here for testing purposes.
-	int quit = -1;
-
-
 	//start an endless loop
 	while (p.isPortReady())
 	{
@@ -98,8 +94,8 @@ int main()
 			// the user if they wish to quit will keep appearing. Cases were
 			// not used here because the program will accept any keystroke
 			char command = _getch();
-			int result = closeProgram();
-			if (result > 0)
+			BOOL result = closeProgram1();
+			if (result)
 				return 0;				
 		}
 

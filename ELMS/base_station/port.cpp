@@ -1,7 +1,7 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
 *
-* This file contains the functions for port handling. 
+* This file contains the functions for port handling.
 */
 #include "port.h"
 using std::wcout;
@@ -25,11 +25,9 @@ using std::wcout;
  /*
  =============
  openSerialPort
-
  portname contains name of serial port and stopbits may be either [1, 1.5, 2]
  returns the handle of the port
  =============
-
  */
 void Port::openSerialPort(LPCSTR portname)
 {
@@ -84,10 +82,8 @@ void Port::openSerialPort(LPCSTR portname)
 /*
 =============
 readFromSerialPort
-
 hSerial		File HANDLE to the serial port
-
-Reads the amount of data from the serial port 
+Reads the amount of data from the serial port
 and then returns the amount read.
 =============
 */
@@ -107,11 +103,9 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
 /*
 =============
 readFromSerialPort
-
 hSerial		File HANDLE to the serial port
 length is for how much data is going to be written
 returns the amount of data that was written
-
 Reads a certain amount of data from the serial port and returns the amount
 of data read
 =============
@@ -131,7 +125,6 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
 /*
 =============
 closeSerialPort
-
 Closes the current serial port.
 =============
 */
@@ -143,7 +136,6 @@ void Port::closeSerialPort(HANDLE hSerial)
 /*
 =============
 detectHandle
-
 Check for a handle until we find one that doesn't return an error
 =============
 */
@@ -198,13 +190,12 @@ HANDLE Port::setupPort(LPCSTR portname)
 /*
 =============
 testPort
-
 Attempts to open a port with a particular portname
 =============
 */
 HANDLE Port::createPort(LPCSTR portname)
 {
-    
+
     HANDLE hSerial;
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
 
@@ -215,7 +206,6 @@ HANDLE Port::createPort(LPCSTR portname)
 /*
 =============
 Contructor - No Parameters
-
 Opens a new port and attempts to find the port automatically
 =============
 */
@@ -232,7 +222,6 @@ Port::Port(FileIO* _f)
 /*
 =============
 Contructor - Portname provided
-
 Opens a new port and attempts to open the port passed into the constructor
 =============
 */
@@ -249,7 +238,6 @@ Port::Port(LPCSTR portname, FileIO* _f)
 /*
 =============
 Destructor
-
 Shuts down the port and makes sure all data has been sent before closing
 =============
 */
@@ -290,7 +278,6 @@ void Port::addToMessageBuffer(std::string message)
 /*
 =============
 removeTopMessage
-
 Removes the top message from the buffer and returns it
 =============
 */
@@ -306,7 +293,6 @@ void Port::removeMessageFromBuffer(std::string* mystring)
 /*
 =============
 receiveMessage
-
 Gets new data from the port and puts them into the buffer.
 =============
 */
@@ -351,15 +337,27 @@ void Port::receiveMessage()
             int min = gmtm.tm_min;
             int sec = gmtm.tm_sec;
 
-            mystring = "There was network failure from: " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec);
-            std::cout << mystring << std::endl;
+            struct tm ltm;
+
+            localtime_s(&ltm, &now);
+
+            int localHour = ltm.tm_hour;
+            int localMin = ltm.tm_min;
+            int localSec = ltm.tm_sec;
+
+            std::string displayString = "There was network failure from: " + std::to_string(localHour) + ":" + std::to_string(localMin) +
+                ":" + std::to_string(localSec);
+
+            mystring = "There was network failure from: " + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec);
+
+            std::cout << displayString << std::endl;
+
             auto start = std::chrono::system_clock::now();
 
             waitCommMask(EV_RXCHAR);
 
+
             waitCommMask(EV_RXCHAR);
-
-
 
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
@@ -374,27 +372,40 @@ void Port::receiveMessage()
             min = gmtm.tm_min;
             sec = gmtm.tm_sec;
 
+            localtime_s(&ltm, &now);
+
+            localHour = ltm.tm_hour;
+            localMin = ltm.tm_min;
+            localSec = ltm.tm_sec;
+
+
             mystring += " to " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec) + " for " + std::to_string(diff.count()) + " seconds";
-            
+
+
+            displayString += " to " + std::to_string(localHour) + ":" + std::to_string(localMin) +
+                ":" + std::to_string(localSec);
+
+            std::cout << displayString << std::endl;
+
             //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
-            int results = possibleNetworkFailure(mystring);
+            BOOL results = confirmNetworkFailure(displayString);
 
             //either way, the event will be logged. If results = 1, then the user confirmed event.
             // confirmed is appended to the log.
-            if (results == 1)
+            if (results)
             {
                 mystring += " - Confirmed.\n";
             }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-                mystring  += " - Unconfirmed.\n";
+                mystring += " - Unconfirmed.\n";
             }
 
 
             fileHandler->logToFile(mystring, MessageType::network_failure);
 
-
+            networkFailure = false;
         }
     }
 
@@ -413,7 +424,6 @@ bool Port::isBufferEmpty()
 /*
 =============
 receiveDataFromSerialPort
-
 Starts up the main thread that will continuously receive data from serial port
 =============
 */
@@ -425,7 +435,6 @@ void Port::startPortThread()
 /*
 =============
 getNextMessage
-
 Waits to ensure that it gets the entire message without interrupting
 buffer and returns next element in queue.
 =============
@@ -441,7 +450,6 @@ std::string Port::getNextMessage()
 /*
 =============
 startTimer
-
 Starts up the timer for checking network failure
 =============
 */
@@ -454,7 +462,6 @@ void Port::startTimer(int numSeconds)
 /*
 =============
 netFailureCheck
-
 Check for network failure and set the networkFailure variable
 =============
 */
@@ -481,7 +488,6 @@ void Port::netFailureCheck(int numSeconds)
 
             if (!isBufferEmpty())
             {
-                networkFailure = false;
                 currentNetworkFailure = false;
             }
         }
@@ -492,10 +498,8 @@ void Port::netFailureCheck(int numSeconds)
 /*
 =============
 setCommMask
-
 // https://docs.microsoft.com/en-us/windows/win32/devio/monitoring-communications-events
-
-Sets up a comm mask 
+Sets up a comm mask
 =============
 */
 void Port::setCommMask(DWORD mask)
@@ -510,7 +514,7 @@ void Port::setCommMask(DWORD mask)
         TRUE,   // manual-reset event 
         FALSE,  // not signaled 
         NULL    // no name
-        );
+    );
 
 
     // Initialize the rest of the OVERLAPPED structure to zero.
@@ -530,7 +534,6 @@ void Port::setCommMask(DWORD mask)
 /*
 =============
 waitCommMask
-
 Wait for a particular mask
 =============
 */
@@ -545,13 +548,11 @@ bool Port::waitCommMask(DWORD mask)
 /*
 =============================================================================
 SelectComPort
-
 This function is from the following two references
  https://stackoverflow.com/questions/2674048/what-is-proper-way-to-detect-all-available-serial-ports-on-windows
  https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
   It will find the available COM ports and adds them to a vector list that is
   sent in by reference.
-
   ==========================================================================
   */
 void Port::SelectComPort(vector <string>& comPortList) //added function to find the present serial 

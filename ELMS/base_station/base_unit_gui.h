@@ -26,6 +26,10 @@ using std::endl;
 #define ID_LISTBOX 101
 #define ID_CLOSE 102
 #define ID_OKAY 103
+#define ID_CONTINUE 104
+#define ID_QUIT 105
+#define ID_CONFIRM 106
+#define ID_UNCONFIRMED 107
 
 
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
@@ -44,6 +48,10 @@ BOOL getPort1(vector<string>* listOfPorts, string& name);
 int closeProgram();
 int possibleNetworkFailure(string name);
 std::wstring stringToWString(const std::string& s);
+BOOL closeProgram1();
+LRESULT CALLBACK CloseHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL confirmNetworkFailure(string string);
+LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 
 #endif // !BASE_UNIT_GUI_H

@@ -17,10 +17,14 @@
 HWND hList;
 HWND hWnd;
 HWND settingsText, settingsText1, settingsText2, settingsText3, settingsText4;
-HBITMAP hLogoImage, hLogoImage1, hLogoImage2, hLogoImage3;
+HBITMAP hLogoImage, hLogoImage1, hLogoImage2, hLogoImage3, hLogoImage4, hLogoImage5;
+HBITMAP hLogoImage6, hLogoImage7;
 HWND hLogo, hLogo1, hButtonOkay;
 //This char array holds the COM port. 
 char comPort[50];
+BOOL quit = false;
+BOOL failure = false;
+
 
 /*
 ============================================================================
@@ -135,7 +139,7 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		break;
 
 	}
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
 /*
@@ -152,7 +156,7 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 	HWND hWnd;
 	HWND hButton;
 	HWND hButtonClose;
-	WNDCLASS wc = { 0 };
+	WNDCLASSW wc = { 0 };
 	MSG msg;
 
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -161,9 +165,9 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 	wc.hInstance = hInstance;
 	//This code gives the solid blue background color
 	wc.hbrBackground = CreateSolidBrush(0xFF6633);
-	wc.lpszClassName = "SelectPort";
+	wc.lpszClassName = L"SelectPort";
 
-	if (!RegisterClass(&wc))
+	if (!RegisterClassW(&wc))
 		std::cout << "Failed to register" << std::endl;
 
 	/*this creates the parent windows and sets it position on the screen
@@ -315,8 +319,9 @@ void AddText_Serial(HWND hWnd)
 /*
 ===========================================================================
 loadImages()
-This loads the two .bmp files that are used to color the buttons. It is 
-important that they be placed in the same location as the .exe files
+This loads the .bmp files that are used to color the buttons. It is 
+important that they be placed in the same location as the .exe files or else
+the images will not load. 
 ===========================================================================
 */
 void loadImages()
@@ -325,6 +330,10 @@ void loadImages()
 	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"selectionPort1.bmp", IMAGE_BITMAP, 205, 100, LR_LOADFROMFILE);
 	hLogoImage2 = (HBITMAP)LoadImageW(NULL, L"okay3.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 	hLogoImage3 = (HBITMAP)LoadImageW(NULL, L"exit.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage4 = (HBITMAP)LoadImageW(NULL, L"confirm.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage5 = (HBITMAP)LoadImageW(NULL, L"ignore.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage6 = (HBITMAP)LoadImageW(NULL, L"quit.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
+	hLogoImage7 = (HBITMAP)LoadImageW(NULL, L"continue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 }
 
 
@@ -369,6 +378,8 @@ int possibleNetworkFailure(string str)
 ====================
 closeProgram
 This uses the Win32 message box to determine if the user wishes to quit the program. 
+This was not used but is available for use if the user prefers a Win32 pop up style
+message box. 
 ====================
 */
 int closeProgram()
@@ -383,6 +394,9 @@ int closeProgram()
 		break;
 	case IDNO:
 		value = 0;
+		break;
+	default:
+		value = 1;
 		break;
 	}
 
@@ -407,4 +421,246 @@ std::wstring stringToWString(const std::string& s)
 	std::wstring result(buffer);
 	delete[] buffer;
 	return result;
+}
+
+/*
+================
+CloseHandler
+This is the call back handler for the window that the user can use
+to exit the program. 
+================
+*/
+LRESULT CALLBACK CloseHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg) {
+	case WM_CLOSE:
+		DestroyWindow(hWnd);
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	case WM_COMMAND:
+		switch (wp)
+		{
+		case ID_QUIT:
+			quit = true;
+			DestroyWindow(hWnd);
+			break;
+
+		case ID_CONTINUE:
+
+			quit = false;
+			DestroyWindow(hWnd);
+			break;
+		}
+
+	break;
+	default:
+		return DefWindowProcW(hWnd, msg, wp, lp);
+
+	}
+	return DefWindowProcW(hWnd, msg, wp, lp);
+}
+
+/*
+===============
+closeProgram1 
+This is an alternative for closing the program
+This was utilized instead of the windows standard
+close box. 
+===============
+*/
+
+BOOL closeProgram1()
+{
+	HINSTANCE hInstance = GetModuleHandle(0);
+	HWND h;
+	HWND hButtonQuit;
+	HWND hButtonContinue;
+	WNDCLASSW window = { 0 };
+	MSG msg = {0};
+
+	window.style = CS_HREDRAW | CS_VREDRAW;
+	window.lpfnWndProc = CloseHandler;
+	window.hCursor = LoadCursor(NULL, IDC_ARROW);
+	window.hInstance = hInstance;
+	//This code gives the solid blue background color
+	window.hbrBackground = CreateSolidBrush(0xFF6633);
+	window.lpszClassName = L"CloseProgram";
+
+	if (!RegisterClassW(&window))
+		std::cout << "Failed to register" << std::endl;
+
+	loadImages();
+
+	h = CreateWindowW(L"CloseProgram", L"Quit Program", WS_OVERLAPPEDWINDOW |
+		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 400, 400, NULL, NULL, hInstance, NULL);
+
+	hButtonQuit = CreateWindowW(L"button", L"Quit", WS_TABSTOP | WS_THICKFRAME |
+		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 77, 125, 110, 60, h, (HMENU)ID_QUIT,
+		hInstance, 0);
+	SendMessageW(hButtonQuit, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage6);
+
+	hButtonContinue = CreateWindowW(L"button", L"Continue", WS_TABSTOP | WS_THICKFRAME |
+		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 207, 125, 110, 60, h, (HMENU)ID_CONTINUE,
+		hInstance, 0);
+	SendMessageW(hButtonContinue, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage7);
+
+
+	while (GetMessage(&msg, NULL, NULL, NULL))
+	{
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+	}
+	return quit;
+}
+/*
+================
+FailureHandler
+This is the call back handler for the window that notifies the user
+that network failure has occurred. The bool failure will be set to true
+or false in this callback. 
+Reference: https://stackoverflow.com/questions/31749262/setting-background-color-of-child-window-using-windows-handle
+================
+*/
+LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg) {
+	case WM_CLOSE:
+		DestroyWindow(hWnd);
+		break;
+
+	break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	/*Reference:https://www.cplusplus.com/forum/windows/176612/ */
+	case WM_CTLCOLORSTATIC:
+	{
+		HDC hdcStatic = (HDC)wp; // or obtain the static handle in some other way
+		SetTextColor(hdcStatic, RGB(255, 0, 0)); // text color
+		SetBkColor(hdcStatic, RGB(250, 250, 210));
+		HBRUSH yellow = CreateSolidBrush(RGB(250, 250, 210));
+		return (LRESULT)yellow;
+		//return (LRESULT)GetStockObject(WHITE_BRUSH);
+
+	}
+	break;
+
+	case WM_COMMAND:
+		switch (wp)
+		{
+		case ID_CONFIRM:
+			//set failure to true.  The user confirmed it.
+			failure = true;
+			DestroyWindow(hWnd);
+			break;
+
+		case ID_UNCONFIRMED:
+			// set failure to false because the user ignored it. 
+			failure = false;
+			DestroyWindow(hWnd);
+			break;
+		}
+
+		break;
+	default:
+		return DefWindowProcW(hWnd, msg, wp, lp);
+
+	}
+	return DefWindowProcW(hWnd, msg, wp, lp);
+}
+
+
+/*
+===============
+confirmNetworkFailure
+This is the function that brings up a windows and
+allows the user to confirm network failure or not
+
+Reference: In order to bring this window to the
+forefront, I used this reference and code snippet
+from stackoverflow. 
+https://stackoverflow.com/questions/916259/win32-bring-a-window-to-top/34414846
+==============
+*/
+BOOL confirmNetworkFailure(string str)
+{
+	//this is a temporary string that will be used to convert the
+	//input string parameter to a wstring string and then ultimately
+	// converted to a LPCWSTR type
+	string tempString = str;
+	tempString = "Network Failure - Confirm or Ignore\r\n\r\n\r\n" + str;
+
+	//this calls a function that converts a string to a wstring
+	std::wstring temp = stringToWString(tempString);
+	LPCWSTR newString = temp.c_str();
+
+	//declaring the necessary parts of the Window class
+	HINSTANCE hInstance = GetModuleHandle(0);
+	HWND h;
+	HWND hButtonConfirm;
+	HWND hButtonIgnore;
+	HWND hText;
+	WNDCLASSW window = { 0 };
+	MSG msg = { 0 };
+
+	window.style = CS_HREDRAW | CS_VREDRAW;
+	window.lpfnWndProc = FailureHandler;
+	window.hCursor = LoadCursor(NULL, IDC_ARROW);
+	window.hInstance = hInstance;
+	//This code gives the solid blue background color
+	window.hbrBackground = CreateSolidBrush(0xFF6633);
+	window.lpszClassName = L"FailureProgram";
+
+	if (!RegisterClassW(&window))
+		std::cout << "Failed to register" << std::endl;
+
+	h = CreateWindowW(L"FailureProgram", L"Confirm Network Failure", WS_OVERLAPPEDWINDOW |WS_POPUP |
+		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
+
+	//this is the code snippet from the reference above that was used
+	//to bring the window to the foreground process
+	HWND hCurWnd = ::GetForegroundWindow();
+	DWORD dwMyID = ::GetCurrentThreadId();
+	DWORD dwCurID = ::GetWindowThreadProcessId(hCurWnd, NULL);
+	::AttachThreadInput(dwCurID, dwMyID, TRUE);
+	::SetWindowPos(h, HWND_TOPMOST, 100, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	::SetWindowPos(h, HWND_NOTOPMOST, 100, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+	::SetForegroundWindow(h);
+	::SetFocus(h);
+	::SetActiveWindow(h);
+	::AttachThreadInput(dwCurID, dwMyID, FALSE);
+
+	//bitmap images are loaded and available for the buttons
+	loadImages();
+
+    //load the text and buttons
+	hText = settingsText4 = CreateWindowW(TEXT(L"STATIC"), TEXT(newString), WS_VISIBLE | WS_CHILD | WS_THICKFRAME | SS_CENTER
+		, 100, 70, 555, 100, h, NULL, NULL, NULL);
+
+	hButtonConfirm = CreateWindowW(L"button", L"Confirm", WS_TABSTOP | WS_THICKFRAME |
+		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 260, 200, 100, 60, h, (HMENU)ID_CONFIRM,
+		hInstance, 0);
+	SendMessageW(hButtonConfirm, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage4);
+
+	hButtonIgnore = CreateWindowW(L"button", L"Ignore", WS_TABSTOP | WS_THICKFRAME | 
+		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 390, 200, 100, 60, h, (HMENU)ID_UNCONFIRMED,
+		hInstance, 0);
+	SendMessageW(hButtonIgnore, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage5);
+
+	//this while loop continues while the windows waits for input from the user 
+	//via clicking on a button
+	while (GetMessage(&msg, NULL, NULL, NULL))
+	{
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	//if the user confirmed failure that the variable was set to true in the callback procedure,
+	// otherwise it remained false.  This value is returned. 
+	return failure;
 }
