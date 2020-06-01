@@ -354,6 +354,7 @@ void Port::receiveMessage()
 
             auto start = std::chrono::system_clock::now();
 
+            
             waitCommMask(EV_RXCHAR);
 
 
