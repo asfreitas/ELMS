@@ -31,6 +31,8 @@ References:
 #include "parse_incoming.h"
 #include "base_unit.h"
 #include "port.h"
+#include <conio.h>
+#include "base_unit_gui.h"
 
 /*
  * reference for how to look for memory leaks in windows.
@@ -59,7 +61,6 @@ void printf_notice();
 
 int main()
 {
-
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -83,11 +84,24 @@ int main()
 	Vehicle* vehicle;
 
     // this counter is only here for testing purposes.
-	int count = 0;
+	int quit = -1;
+
 
 	//start an endless loop
-	while (p.isPortReady() && count < 50)
+	while (p.isPortReady())
 	{
+        //_kbhit returns a non-zero value if a key stroke was made
+		if (_kbhit())
+		{
+			//define a char to capture the ASCII for the keystroke entered
+			//if is important to keep this line in or else the pop-up asking
+			// the user if they wish to quit will keep appearing. Cases were
+			// not used here because the program will accept any keystroke
+			char command = _getch();
+			int result = closeProgram();
+			if (result > 0)
+				return 0;				
+		}
 
 		if (!p.isBufferEmpty())
 		{
@@ -149,9 +163,8 @@ int main()
 
 				}
 			}
-			count++;
 			// only print again if we added or updated vehicles
-			b.print_vector(b.getMineVehicles());
+			//b.print_vector(b.getMineVehicles());
 		}
 		else
 		{
