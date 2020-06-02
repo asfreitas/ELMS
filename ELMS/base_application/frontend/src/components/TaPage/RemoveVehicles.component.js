@@ -30,9 +30,9 @@ export default class RemoveVehicles extends Component {
     //form used for creating a vehicle
     render(){
         return (
-            <div>    
+            <div className="deleteVehicle">    
                 <div>
-                <h3 class="deleteText">Delete All Vehicles</h3>
+                    <h3 className="deleteText">Delete All Vehicles</h3>
 
                 </div>
                 <div class="deleteButton">

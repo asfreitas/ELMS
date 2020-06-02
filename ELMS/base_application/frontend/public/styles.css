@@ -365,3 +365,7 @@ input[type=submit] {
   #addVehicle {
       padding-bottom:1000px;
   }
+
+  .deleteVehicle, .deleteText{
+    text-align: center;
+  }
