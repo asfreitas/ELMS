@@ -357,9 +357,6 @@ void Port::receiveMessage()
             
             waitCommMask(EV_RXCHAR);
 
-
-            waitCommMask(EV_RXCHAR);
-
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
             //get the current time
