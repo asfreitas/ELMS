@@ -541,10 +541,10 @@ BOOL closeProgram1()
 	int ret = UnregisterClassW(L"CloseProgram", hInstance);
 	if (ret == 0)
 	{
-		std::error_code err_code(GetLastError(), std::system_category());
-		throw std::system_error(err_code);
+		cout << "There was an error unregistering the class" << endl;
 
 	}
+
 	return quit;
 }
 /*
@@ -639,10 +639,10 @@ BOOL confirmNetworkFailure(string str)
 	WNDCLASSW window = { 0 };
 	MSG msg = { 0 };
 
-	//static const wchar_t* className;
+	static const wchar_t* className;
 
-	//if (nullptr == className)
-	//{
+	 if (nullptr == className)
+	{
 		window.style = CS_HREDRAW | CS_VREDRAW;
 		window.lpfnWndProc = FailureHandler;
 		window.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -658,8 +658,8 @@ BOOL confirmNetworkFailure(string str)
 			std::error_code err_code(GetLastError(), std::system_category());
 			throw std::system_error(err_code);
 		}
-		//className = L"FailureProgram";
-	//}
+		className = L"FailureProgram";
+	}
 
 	h = CreateWindowW(L"FailureProgram", L"Confirm Network Failure", WS_OVERLAPPEDWINDOW |WS_POPUP |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
@@ -704,12 +704,12 @@ BOOL confirmNetworkFailure(string str)
 	}
 	//if the user confirmed failure that the variable was set to true in the callback procedure,
 	// otherwise it remained false.  This value is returned.
-	int ret = UnregisterClassW(L"FailureProgram", hInstance);
-	if (ret == 0)
-	{
-		std::error_code err_code(GetLastError(), std::system_category());
-		throw std::system_error(err_code);
+	//int ret = UnregisterClassW(L"FailureProgram", hInstance);
+	//if (ret == 0)
+	//{
+		//std::error_code err_code(GetLastError(), std::system_category());
+		//throw std::system_error(err_code);
 		
-	}
+	//}
 	return failure;
 }

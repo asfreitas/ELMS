@@ -389,19 +389,19 @@ void Port::receiveMessage()
             std::cout << displayString << std::endl;
 
             //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
-            //BOOL results = confirmNetworkFailure(displayString);
+            BOOL results = confirmNetworkFailure(displayString);
 
             //either way, the event will be logged. If results = 1, then the user confirmed event.
             // confirmed is appended to the log.
-            //if (results)
-           // {
-               // mystring += " - Confirmed.\n";
-            //}
+            if (results)
+            {
+               mystring += " - Confirmed.\n";
+            }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
-           // else
-           // {
-               // mystring += " - Unconfirmed.\n";
-           // }
+            else
+            {
+               mystring += " - Unconfirmed.\n";
+            }
             cout << "Here is mystring: " << mystring << endl;
             cout << "Here is displayString" << displayString << endl;
 
