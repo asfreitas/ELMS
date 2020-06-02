@@ -395,14 +395,15 @@ void Port::receiveMessage()
             // confirmed is appended to the log.
             if (results)
             {
-                mystring += " - Confirmed.\n";
+               mystring += " - Confirmed.\n";
             }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-                mystring += " - Unconfirmed.\n";
+               mystring += " - Unconfirmed.\n";
             }
-
+            cout << "Here is mystring: " << mystring << endl;
+            cout << "Here is displayString" << displayString << endl;
 
             fileHandler->logToFile(mystring, MessageType::network_failure);
 

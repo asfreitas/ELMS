@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string.h>
 #include <conio.h>
+#include <system_error>
 
 using std::vector;
 using std::ofstream;
