@@ -62,6 +62,7 @@ public:
     //These two functions add an existing vehicle either with out without a pointer to the Vehicle. 
     void addVehicle(Vehicle* v);
     void updateVehicle(Vehicle*);
+    vector<int> getAllVehicleID();
 
     //Template functions
 
