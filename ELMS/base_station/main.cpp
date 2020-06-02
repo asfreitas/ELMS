@@ -33,6 +33,7 @@ References:
 #include "port.h"
 #include <conio.h>
 #include "base_unit_gui.h"
+#include <csignal>
 
 /*
  * reference for how to look for memory leaks in windows.
@@ -57,13 +58,20 @@ using std::thread;
 #ifndef _OPENMP
 void printf_notice();
 #endif
+void signalHandler(int signum)
+{
+	
+	//Port::~Port();
 
+	exit(signum);
+}
 
 int main()
 {
 	//used to check for memory leak. When the program exists, it will dump all
 	// any memory leaks that are present.  You must run in debug to see them. 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 
 	// declare a FILEIO and Base_Unit object
 	FileIO f;
@@ -79,12 +87,15 @@ int main()
 
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
+	signal(SIGINT, signalHandler);
 
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
+	int count = 0;
+
 	//start an endless loop
-	while (p.isPortReady())
+	while (p.isPortReady() )
 	{
         //_kbhit returns a non-zero value if a key stroke was made
 		if (_kbhit())
@@ -96,7 +107,8 @@ int main()
 			char command = _getch();
 			BOOL result = closeProgram1();
 			if (result)
-				return 0;				
+				//return 0;
+				raise(SIGINT);
 		}
 
 		if (!p.isBufferEmpty())
@@ -164,6 +176,7 @@ int main()
 		}
 		else
 		{
+			count++;
 			//cout << "The buffer is empty" << endl;
 		}
 

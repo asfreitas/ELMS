@@ -352,13 +352,15 @@ void Port::receiveMessage()
 
             std::cout << displayString << std::endl;
 
+   
+
             auto start = std::chrono::system_clock::now();
 
             
             waitCommMask(EV_RXCHAR);
-
-
+            cout << "I returned from the first event" << endl;
             waitCommMask(EV_RXCHAR);
+            cout << "I returned from the second event" << endl;
 
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
