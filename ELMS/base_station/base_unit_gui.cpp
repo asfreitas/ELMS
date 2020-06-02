@@ -72,7 +72,8 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		PostQuitMessage(0);
 		break;
 
-    /*Reference:https://www.cplusplus.com/forum/windows/176612/ */
+    /*Reference:https://www.cplusplus.com/forum/windows/176612/ 
+	 * What this does is color the text in the child textbox red */
 	case WM_CTLCOLORSTATIC:
 	{
 		HDC hdcStatic = (HDC)wParam; // or obtain the static handle in some other way
@@ -89,47 +90,69 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			// reset buffer and comPort
 			memset(buffer, '\0', 50);
 			memset(comPort, '\0', 50);
+
 			//get the list number that was selected
 			DWORD64 dwSel = SendMessage(hList, LB_GETCURSEL, 0, 0);
+			
+			//if the selected is the top row, then no COM port was selected
+			// because this is the instructions
 			if (dwSel == 0)
 			{
 				MessageBox(NULL, "If no COM Port detected, please exit, otherwise select a COM Port", "COM Port", MB_ICONWARNING);
 			}
+			//if the selected is greater than 0, then this means the user selected a port
 			if (dwSel > 0)
 			{
 				//retrieve the text
 				SendMessage(hList, LB_GETTEXT, dwSel, (LPARAM)(LPCSTR) buffer);
+
 				//copy it into the global string
 				strcpy_s(comPort, buffer);
+
+				//if the first character in comPort is not NULL, then a
+				//comPort was selected and we change the flag to 1
 				if (comPort[0] != 0)
 				{
 					flag = 1;
 				}
-				break;
-				
+				break;				
 			}
 			break;
 		}
+
+		//otherwise, if the Start button was pushed and the flag is now
+		// 1, then we reset the flag to 0, and send a message to the window to close. 
 		else if (LOWORD(wParam) == ID_CLOSE && flag == 1)
 		{
 			// reset flag to 0
 			flag = 0;
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL );			
 		}
+
+		// otherwise, if start was push and the flag is 0 (no port selected)
 		else if (LOWORD(wParam) == ID_CLOSE && flag == 0)
 		{
 			memset(buffer, '\0', 50);
+
+			//send a message to get what the listbox cursor is pointing to. 
 			DWORD64 dwSel1 = SendMessage(hList, LB_GETCURSEL, 0, 0);
 			SendMessage(hList, LB_GETTEXT, dwSel1, (LPARAM)(LPCSTR)buffer);
+
+			//if the text starts with an N, this means NULL so we close the window
 			if (buffer[0] == 'N')
 			{
 				SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			}
+			// if the text returned has content, then the user is prompted to
+			// make a selection. 
 			else
 			{
 				MessageBox(NULL, "Before Start, select a COM port and Click Select Port Button", "Select a COM Port", MB_ICONWARNING);
 			}
 		}
+
+		// if the button press is OKAY, close the text and button controls and reset the Window
+		// title to Select a Port
 		else if (LOWORD(wParam) == ID_OKAY)
 		{
 			DestroyWindow(settingsText3);
@@ -211,7 +234,7 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 				NULL, NULL);
 			SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
 
-
+			// creates the list box control
 			hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE |
 				WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY | WS_THICKFRAME, 430, 90, 200, 200,
 				hWnd, (HMENU)ID_LISTBOX, 0, 0);
@@ -242,12 +265,11 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 				//https://stackoverflow.com/questions/42438135/c-winapi-listbox-getting-selected-item-using-lb-getsel-lb-getcursel
 			}
 
+			//this sleep is here because in order to make sure that the text box loads on top and covers the other controls, I 
+			// put in this delay.  Once the user reads the message in the textbox, it will be closed and the underlying
+			// controls will be visible
 			Sleep(0.5);
-			//settingsText3 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"WELCOME TO ELMS!\r\n\r\n Once the program starts, if you wish to quit the program\
-           //        \r\nMake sure you are in the terminal window, press any key\r\n\r\nA window will appear to confirm you wish to exit\r\n"), WS_VISIBLE | WS_CHILD |
-				//WS_THICKFRAME | SS_CENTER, 100, 70, 555, 300, hWnd, NULL, NULL, NULL);
 			
-
 			settingsText3 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"WELCOME TO ELMS!\r\n\r\nThe next window lets you select a COM port, if available\r\nOnce the program starts, to quit, make sure you are in the terminal window\r\nPress any key, a window will appear to confirm you wish to exit\r\n"),WS_VISIBLE | WS_CHILD | WS_THICKFRAME | SS_CENTER, 100, 70, 555, 300, hWnd, NULL, NULL, NULL);
 
 			hButtonOkay = CreateWindowW(L"button", L"OKAY", WS_TABSTOP | WS_BORDER |
@@ -256,6 +278,7 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 
 			SendMessageW(hButtonOkay, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage2);
 		
+		//this while loop continues until the window clsoes
 		while (true)
 		{
 
