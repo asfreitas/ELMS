@@ -8,6 +8,7 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
+#include "vehicle.h"
 #include <fstream>
 #include <Windows.h>
 #include <string>
@@ -32,6 +33,7 @@ class FileIO
         std::string pathToAlerts;
         std::string pathToNetworkFailure;
         std::string pathToMiscErrors;
+        std::string pathToSavedVehicles;
         // current message counts need to be the same for all objects in the
         // class
         int messageCount = 1;
@@ -45,6 +47,7 @@ class FileIO
         std::string alertFile;
         std::string netFailFile;
         std::string miscErrorFile;
+        std::string savedVehiclesFile;
         // remaining variables
         std::thread writing_thread;
         std::mutex mtx_write;
@@ -63,6 +66,9 @@ class FileIO
         bool directoryExists(const std::string&);
         void lockWriteFile(string, string);
         void writeToFile(string, string);
+        void saveAllVehicles(vector<Vehicle*>);
+        vector<Vehicle*> getSavedVehicles();
+        
 
         // get functions 
         int getMessageLimit();

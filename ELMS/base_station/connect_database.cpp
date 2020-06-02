@@ -94,7 +94,7 @@ void Database::addVehicle(Vehicle* vehicle) {
     }
     catch (mongocxx::exception& e)
     {
-        std::cout << "There was an exception: " << e.what();
+        std::cout << "There was an exception in the add vehicle function: " << e.what();
     }
 }
 
@@ -214,6 +214,47 @@ void Database::updateVehicle(Vehicle* vehicle)
     }
     catch (mongocxx::exception& e)
     {
-        std::cout << "There was an exception: " << e.what();
+        std::cout << "There was an exception in the update Vehicle function: " << e.what();
     }
+}
+
+
+vector<int> Database::getAllVehicleID()
+{
+    vector<int> vehicle_id;
+
+    try
+    {
+        //establish pool connection
+        auto connection = getConnection();
+        //create a database connection
+        auto test = connection->database("test");
+        auto vehicles = test["vehicles"];
+
+        mongocxx::pipeline p{};
+        p.project(bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("vehicle_unit", 1))); // only get the vehicle_unit
+        p.project(bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("_id", 0))); // but we don't want any id numbers
+
+        auto cursor =
+            vehicles.aggregate(p, mongocxx::options::aggregate{});
+
+        for (auto doc : cursor)
+        {
+            string string;
+            string = bsoncxx::to_json(doc);
+            string[string.length()-1] = 0; // add null terminator
+            int pos = string.find(':'); // e only want the number here so we take it off at the :
+            string = string.substr(pos + 1, string.length()-1); // find number
+
+            vehicle_id.push_back(stringToInt(string));
+        }
+    }
+    catch(mongocxx::exception& e)
+    {
+        std::cout << "There was an exception in the vehicle id function: " << e.what();
+
+    }
+    return vehicle_id;
 }

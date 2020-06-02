@@ -28,6 +28,7 @@ FileIO::FileIO(std::string path, int limit)
     pathToAlerts = pathToLogs + "\\alerts\\";
     pathToNetworkFailure = pathToLogs + "\\network_failure\\";
     pathToMiscErrors = pathToLogs + "\\misc_errors\\";
+    pathToSavedVehicles = pathToLogs + "\\saved_vehicles\\";
 
     createFolders();
 }
@@ -48,6 +49,7 @@ FileIO::FileIO()
     pathToAlerts = pathToLogs + "\\alerts\\";
     pathToNetworkFailure = pathToLogs + "\\network_failure\\";
     pathToMiscErrors = pathToLogs + "\\misc_errors\\";
+    pathToSavedVehicles = pathToLogs + "\\saved_vehicles\\";
 
     createFolders();
 
@@ -341,6 +343,7 @@ void FileIO::createFolders()
     createFolder(pathToMessages);
     createFolder(pathToMiscErrors);
     createFolder(pathToNetworkFailure);
+    createFolder(pathToSavedVehicles);
 }
 /*
 =============
@@ -465,4 +468,102 @@ void FileIO::writeToFile(string filePath, string message)
     }
     inputFile.close();
     
+}
+
+/*
+=============
+saveAllVehicles
+
+Write the vehicles to a file for writing for next time the program
+is loaded
+=============
+
+*/
+void FileIO::saveAllVehicles(vector<Vehicle*> mine_vehicles)
+{
+    std::string path = pathToSavedVehicles + "vehicles.txt";
+    std::ofstream file;
+
+    file.open(path, std::ios::out | std::ios::trunc);
+
+    for (int i = 0; i < mine_vehicles.size(); i++)
+    {
+        if (file.is_open())
+        {
+            Vehicle* v = mine_vehicles[i];
+            file << "Unit Number: " << v->getUnit() << std::endl;
+            file << "Time Created: " << v->getTime() << std::endl;
+            file << "Priority: " << v->getPriorityNumber() << std::endl;
+            file << "Latitude: " << v->getLatitude() << std::endl;
+            file << "Longitude: " << v->getLongitude() << std::endl;
+            file << "Velocity: " << v->getVelocity() << std::endl;
+            file << "Bearing: " << v->getBearing() << std::endl;
+            file << "Status: " << v->getStatus() << std::endl;
+
+            file << std::endl; // add one more extra line between vehicles
+        }
+        else
+        {
+            std::cout << "Cannot write to filepath: " << path;
+        }
+    }
+    file.close();
+}
+
+/*
+=============
+getSavedVehicles
+
+Gets all vehicles that were saved for use in the program
+=============
+
+*/
+vector<Vehicle*> FileIO::getSavedVehicles()
+{
+    std::string path = pathToSavedVehicles + "vehicles.txt";
+    std::ifstream file;
+    file.open(path, std::ios::in);
+
+    vector<Vehicle*> vehicles;
+    double double_value, latitude, longitude, velocity, bearing;
+    int int_value, unit, time, priority;
+    std::string string_value, throwaway, status;
+    
+    std::cout << "Loading vehicles...\n";
+    while (file)
+    {
+        for (int int_values = 0; int_values < 3; int_values++)
+        {
+            std::getline(file, throwaway, ':');
+            file >> int_value;
+            switch (int_values)
+            {
+            case 0: unit = int_value; break;
+            case 1: time = int_value; break;
+            case 2: priority = int_value; break;
+            default: break;
+            }
+        }
+        for (int double_values = 0; double_values < 4; double_values++)
+        {
+            std::getline(file, throwaway, ':');
+            file >> double_value;
+            switch (double_values)
+            {
+            case 0: latitude = double_value; break;
+            case 1: longitude = double_value; break;
+            case 2: velocity = double_value; break;
+            case 3: bearing = double_value; break;
+            }
+        }
+        std::getline(file, throwaway, ':');
+        file >> status;
+        file >> throwaway; // move ahead a line
+
+        Vehicle* v = new Vehicle(unit, time, latitude, longitude, velocity, bearing, priority, status);
+        vehicles.push_back(v);
+        std::cout << "Loading vehicle " << unit << std::endl;
+    }
+    std::cout << "...finished loading vehicles" << std::endl;
+    return vehicles;
 }
