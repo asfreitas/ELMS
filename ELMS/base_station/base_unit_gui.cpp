@@ -15,7 +15,7 @@
 
 //These are Win32 API handlers used.
 HWND hList;
-HWND hWnd;
+//HWND hWnd;
 HWND settingsText, settingsText1, settingsText2, settingsText3, settingsText4;
 HBITMAP hLogoImage, hLogoImage1, hLogoImage2, hLogoImage3, hLogoImage4, hLogoImage5;
 HBITMAP hLogoImage6, hLogoImage7;
@@ -371,7 +371,7 @@ The title is: Stack Overflow How to convert std::string to LPCWSTR in C++
 https://stackoverflow.com/questions/27220/how-to-convert-stdstring-to-lpcwstr-in-c-unicode
 ====================
 */
-
+/*
 int possibleNetworkFailure(string str)
 {
 	std::wstring temp = stringToWString(str);
@@ -395,7 +395,7 @@ int possibleNetworkFailure(string str)
 	}
 
 	return value;
-}
+}*/
 
 /*
 ====================
@@ -405,6 +405,7 @@ This was not used but is available for use if the user prefers a Win32 pop up st
 message box. 
 ====================
 */
+/*
 int closeProgram()
 {
 	int value = -1;
@@ -424,7 +425,7 @@ int closeProgram()
 	}
 
 	return value;	
-}
+}*/
 
 /*
 ====================
@@ -631,16 +632,27 @@ BOOL confirmNetworkFailure(string str)
 	WNDCLASSW window = { 0 };
 	MSG msg = { 0 };
 
-	window.style = CS_HREDRAW | CS_VREDRAW;
-	window.lpfnWndProc = FailureHandler;
-	window.hCursor = LoadCursor(NULL, IDC_ARROW);
-	window.hInstance = hInstance;
-	//This code gives the solid blue background color
-	window.hbrBackground = CreateSolidBrush(0xFF6633);
-	window.lpszClassName = L"FailureProgram";
+	static const wchar_t* className;
 
-	if (!RegisterClassW(&window))
-		std::cout << "Failed to register" << std::endl;
+	if (nullptr == className)
+	{
+		window.style = CS_HREDRAW | CS_VREDRAW;
+		window.lpfnWndProc = FailureHandler;
+		window.hCursor = LoadCursor(NULL, IDC_ARROW);
+		window.hInstance = hInstance;
+		//This code gives the solid blue background color
+		window.hbrBackground = CreateSolidBrush(0xFF6633);
+		window.lpszClassName = L"FailureProgram";
+
+		//if (!RegisterClassW(&window))
+			//std::cout << "Failed to register" << std::endl;
+		if (0 == RegisterClassW(&window))
+		{
+			std::error_code err_code(GetLastError(), std::system_category());
+			throw std::system_error(err_code);
+		}
+		className = L"FailureProgram";
+	}
 
 	h = CreateWindowW(L"FailureProgram", L"Confirm Network Failure", WS_OVERLAPPEDWINDOW |WS_POPUP |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
