@@ -100,19 +100,14 @@ int main()
 			char command = _getch();
 			BOOL result = closeProgram();
 			if (result)
-<<<<<<< HEAD
-				return 0;
-=======
 			{
-				if (p.getNetworkFailure())
-				{
-					p.setCommMask(EV_RXFLAG);
-				}
+				//if (p.getNetworkFailure())
+				//{
+					//p.setCommMask(EV_RXFLAG);
+				//}
 				return 0;
 
 			}
-
->>>>>>> master
 		}
 
 		if (!p.isBufferEmpty())

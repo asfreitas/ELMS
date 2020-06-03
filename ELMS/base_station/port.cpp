@@ -353,12 +353,8 @@ void Port::receiveMessage()
             std::cout << displayString << std::endl;   
 
             auto start = std::chrono::system_clock::now();
-<<<<<<< HEAD
             
             waitCommMask(EV_RXCHAR);
-=======
-
->>>>>>> master
             waitCommMask(EV_RXCHAR);
 
             auto end = std::chrono::system_clock::now();
@@ -396,18 +392,13 @@ void Port::receiveMessage()
             // confirmed is appended to the log.
             if (results)
             {
-               mystring += " - Confirmed.";
+               mystring += " - Confirmed.\n";
             }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-               mystring += " - Unconfirmed.";
+               mystring += " - Unconfirmed.\n";
             }
-<<<<<<< HEAD
-=======
-            cout << mystring << endl;
-            cout << displayString << endl;
->>>>>>> master
 
             //write the message to a log file
             fileHandler->logToFile(mystring, MessageType::network_failure);
