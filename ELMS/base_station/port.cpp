@@ -89,14 +89,44 @@ and then returns the amount read.
 */
 DWORD Port::readFromSerialPort(char* buffer, int buffersize)
 {
+    bool readCompleted, waitOnRead = false;
+
+    OVERLAPPED osReader = { 0 };
     DWORD dwBytesRead = 0;
-    if (!ReadFile(hSerial, buffer, buffersize, &dwBytesRead, NULL))
+    osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    readCompleted = false;
+    if (osReader.hEvent == NULL)
+        std::cout << "error\n";
+    while(true)
     {
-        perror("ReadFile ");
-        DWORD dw = GetLastError();
-        ExitProcess(dw);
+        
+        if (!readCompleted && !ReadFile(hSerial, buffer, buffersize, NULL, &osReader))
+        {
+            if (GetLastError() != ERROR_IO_PENDING)
+            {
+                std::cout << "Error reading from port\n";
+            }
+            readCompleted = true;
+        }
+        else
+        {
+            break;
+        }
+        if (!waitOnRead)
+        {
+            DWORD dwRes = WaitForSingleObject(osReader.hEvent, INFINITE);
+            if (dwRes == WAIT_OBJECT_0)
+            {
+                break;
+            }
+        }
+
     }
+
+    
     return dwBytesRead;
+
 }
 
 
@@ -112,6 +142,41 @@ of data read
 */
 DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
 {
+    static bool waitOnRead = false;
+    OVERLAPPED osReader = { 0 };
+    DWORD dwBytesRead = 0;
+
+
+    osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    if (osReader.hEvent == NULL)
+        std::cout << "error\n";
+    while (!waitOnRead)
+    {
+        if (!WriteFile(hSerial, data, length, NULL, &osReader))
+        {
+            if (GetLastError() != ERROR_IO_PENDING)
+            {
+                std::cout << "Error reading from port\n";
+            }
+            else
+            {
+                DWORD dwRes = WaitForSingleObject(osReader.hEvent, INFINITE);
+                switch (dwRes)
+                {
+
+                }
+            }
+        }
+
+    }
+    waitOnRead = false;
+
+    
+    return dwBytesRead;
+
+    /*
+
     DWORD dwBytesRead = 0;
     if (!WriteFile(handle, data, length, &dwBytesRead, NULL))
     {
@@ -119,7 +184,7 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
         DWORD dw = GetLastError();
         ExitProcess(dw);
     }
-    return dwBytesRead;
+    return dwBytesRead;*/
 }
 
 /*
@@ -200,7 +265,7 @@ HANDLE Port::createPort(LPCSTR portname)
     DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
 
     return hSerial = CreateFileA(portname,
-        accessdirection, 0, 0, OPEN_EXISTING, 0, 0);
+        accessdirection, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
 }
 
 /*
@@ -356,7 +421,12 @@ void Port::receiveMessage()
 
             
             waitCommMask(EV_RXCHAR);
-
+            /*
+         do
+         {
+             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+         } while (networkFailure);
+         */
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
             //get the current time
@@ -540,6 +610,8 @@ bool Port::waitCommMask(DWORD mask)
 {
     DWORD status, dwEventMask;
     setCommMask(mask);
+    LPOVERLAPPED lpOverlapped;
+
     status = WaitCommEvent(hSerial, &dwEventMask, NULL);
     return dwEventMask;
 }
