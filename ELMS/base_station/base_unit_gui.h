@@ -45,11 +45,12 @@ void loadImages();
 BOOL getPort(vector<string>* v, string& name);
 BOOL getPort1(vector<string>* listOfPorts, string& name);
 
-/*These procedures use message boxes to get user input.*/
-int closeProgram();
-int possibleNetworkFailure(string name);
 std::wstring stringToWString(const std::string& s);
-BOOL closeProgram1();
+
+/*These functions and their handlers are used to create the windows to allow
+  the user to determine if they wish to quit/continue the program and
+  confirm or ignore a network failure message */
+BOOL closeProgram();
 LRESULT CALLBACK CloseHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL confirmNetworkFailure(string string);
 LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);

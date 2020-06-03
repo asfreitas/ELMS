@@ -96,7 +96,7 @@ int main()
 			// the user if they wish to quit will keep appearing. Cases were
 			// not used here because the program will accept any keystroke
 			char command = _getch();
-			BOOL result = closeProgram1();
+			BOOL result = closeProgram();
 			if (result)
 				return 0;
 		}

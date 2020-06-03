@@ -421,14 +421,19 @@ LRESULT CALLBACK CloseHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 /*
 ===============
-closeProgram1 
-This is an alternative for closing the program
-This was utilized instead of the windows standard
-close box. 
+closeProgram 
+This function opens a window that allows the user
+to click a button and decide if they wish to 
+continue or quit the program. 
+
+Reference for unregistering a class:
+https://stackoverflow.com/questions/18336605/proper-way-of-destroying-window-resources
+
+Reference for preventing a class from being registered twice
+https://stackoverflow.com/questions/37211360/class-already-exists
 ===============
 */
-
-BOOL closeProgram1()
+BOOL closeProgram()
 {
 	HINSTANCE hInstance = GetModuleHandle(0);
 	HWND h;
@@ -437,20 +442,34 @@ BOOL closeProgram1()
 	WNDCLASSW window = { 0 };
 	MSG msg = {0};
 
-	window.style = CS_HREDRAW | CS_VREDRAW;
-	window.lpfnWndProc = CloseHandler;
-	window.hCursor = LoadCursor(NULL, IDC_ARROW);
-	window.hInstance = hInstance;
-	//This code gives the solid blue background color
-	window.hbrBackground = CreateSolidBrush(0xFF6633);
-	window.lpszClassName = L"CloseProgram";
+	//we use a static name for the class and assign to a pointer
+	static const wchar_t* className1;
 
-	if (!RegisterClassW(&window))
-		std::cout << "Failed to register" << std::endl;
+	//only create the class and register it if it does not
+	// already exist. This prevents failed to register class
+	// errors. 
+	if (nullptr == className1)
+	{
+		window.style = CS_HREDRAW | CS_VREDRAW;
+		window.lpfnWndProc = CloseHandler;
+		window.hCursor = LoadCursor(NULL, IDC_ARROW);
+		window.hInstance = hInstance;
+		//This code gives the solid blue background color
+		window.hbrBackground = CreateSolidBrush(0xFF6633);
+		window.lpszClassName = L"CloseProgram";
 
+		if (!RegisterClassW(&window))
+		{
+			std::error_code err_code(GetLastError(), std::system_category());
+			throw std::system_error(err_code);
+		}
+		className1 = L"CloseProgram";
+	}
+
+	//load the bitmap images
 	loadImages();
 
-	h = CreateWindowW(L"CloseProgram", L"Quit Program", WS_OVERLAPPEDWINDOW |
+	h = CreateWindowW(L"CloseProgram", L"Quit Program", WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 400, 400, NULL, NULL, hInstance, NULL);
 
 	hButtonQuit = CreateWindowW(L"button", L"Quit", WS_TABSTOP | WS_THICKFRAME |
@@ -473,12 +492,6 @@ BOOL closeProgram1()
 
 	// Reference for unregistering a class:
 	//https://stackoverflow.com/questions/18336605/proper-way-of-destroying-window-resources
-	int ret = UnregisterClassW(L"CloseProgram", hInstance);
-	if (ret == 0)
-	{
-		cout << "There was an error unregistering the class" << endl;
-
-	}
 
 	return quit;
 }
@@ -603,7 +616,7 @@ BOOL confirmNetworkFailure(string str)
 		className = L"FailureProgram";
 	}
 
-	h = CreateWindowW(L"FailureProgram", L"Confirm Network Failure", WS_OVERLAPPEDWINDOW |WS_POPUP |
+	h = CreateWindowW(L"FailureProgram", L"Confirm Network Failure", WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX|
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
 
 	//this is the code snippet from the reference above that was used
