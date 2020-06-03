@@ -18,7 +18,7 @@ export default class OfflineVehicle extends VehicleBase{
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getActiveTime = this.getActiveTime.bind(this);
         this.state={vehicles: [], nearest_vehicle: 0}
-        this.vehicleQuery = 'http://localhost:8080/vehicles/offline'
+        this.vehicleQuery = 'https://elms-base-application.uc.r.appspot.com/vehicles/offline'
     }
 
     //automatically get vehicle list and parse by status

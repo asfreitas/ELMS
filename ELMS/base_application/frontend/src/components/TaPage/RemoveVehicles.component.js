@@ -15,7 +15,7 @@ export default class RemoveVehicles extends Component {
 
     }
     removeVehicles() {
-        axios.delete('http://localhost:8080/vehicles/deleteall')
+        axios.delete('https://elms-base-application.uc.r.appspot.com/vehicles/deleteall')
         .then(res => {
             console.log(res.data);
         })

@@ -17,7 +17,7 @@ export default class VehicleAtRisk extends VehicleBase{
         this.getActiveTime = this.getActiveTime.bind(this);
         this.getAtRiskTime = this.getAtRiskTime.bind(this);
         this.state={vehicles: []}
-        this.vehicleQuery = 'http://localhost:8080/vehicles/at_risk'
+        this.vehicleQuery = 'https://elms-base-application.uc.r.appspot.com/vehicles/at_risk'
 
     }
 

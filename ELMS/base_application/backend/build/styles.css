@@ -23,10 +23,10 @@ page-container {
 }
 
 #footer {
-    position: absolute;
-    padding-top: 30px;
-    bottom: 0px;
-    font-size: 20px;
+    position: relative;
+    padding-top: 5em;
+    bottom: 2em;
+    font-size: 1.2em;
     height: 2.5rem;
     width: 100%;
     text-align: center;
@@ -43,6 +43,25 @@ page-container {
     align-items: center;
 }
 
+.navbar-custom { 
+    background-color: #4CAF50;
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .navbar-text {
+    color: rgba(255,255,255,.8);
+}
+
+/* change the link color */
+.navbar-custom .navbar-nav .nav-link {
+    color: rgba(255,255,255,.5);
+}
+/* change the color of active or hovered links */
+.navbar-custom .nav-item.active .nav-link,
+.navbar-custom .nav-item:hover .nav-link {
+    color: rgba(255,255,255,.8);
+}
+
 ul.topnav {
     list-style-type: none;
     margin: 0;
@@ -54,7 +73,7 @@ ul.topnav li {
 }
 
 ul.topnav li a:hover:not(.active){
-    background-color: #FFC425;
+    background-color: #4CAF50;
 }
 
 ul.topnav li a {
@@ -85,10 +104,10 @@ ul.topnav li .elms {
 }
 
 .vehicle_status_rows{
-    padding-top: 30px;
+    padding-top: 2em;
     margin-left: 5%;
     margin-right: 5%;
-    padding-bottom: 30px;
+    padding-bottom: 2em;
 }
 
 .vehicle_status_rows::after {
@@ -115,28 +134,30 @@ ul.topnav li .elms {
 
 .latitude {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: .5em;
+    left: .5em;
     display: inline-block;
     vertical-align: top;
     text-align: left;
+    line-height: .5em;
 }
 
 .longitude {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: .5em;
+    right: .5em;
     display: inline-block;
     text-align: right;
     vertical-align: top;
+    line-height: .5em;
 }
 
 .unit {
     display: inline-block;
     text-align: center;
     vertical-align: top;
-    padding: 15px;
-    font-size: 25px;
+    font-size: 2em;
+    line-height: .5em;
 }
 
 .vehicle_status {
@@ -146,39 +167,63 @@ ul.topnav li .elms {
 }
 
 .at_risk_text {
-    font-size: 25px;
+    font-family: 'Open Sans', serif;
+    font-size: 2.5em;
     color: red;
     text-align: center;
     padding: 0;
+    line-height: .5em;
+}
+
+.offline_vehicles_text {
+    font-family: 'Open Sans', serif;
+    font-size: 2.5em;
+    color: gray;
+    text-align: center;
+    padding: 0;
+    line-height: .5em;
+}
+
+.offline_vehicles_line {
+    border-color: gray;
+    border-width: .3em;
+    width: 100%;
 }
 
 .at_risk_line {
-    color: red;
-    width: 90%;
+    border-color: red;
+    border-width: .3em;
+    width: 100%;
 }
 
 .active_text {
-    font-size: 25px;
+    font-family: 'Open Sans', serif;
+    font-size: 2.5em;
     color: green;
     text-align: center;
     padding: 0;
+    line-height: .5em;
 }
 
 .active_line {
-    color: green;
-    width: 90%;
+    border-color: green;
+    border-width: .3em;
+    width: 100%;
 }
 
 .inactive_text {
-    font-size: 25px;
+    font-family: 'Open Sans', serif;
+    font-size: 2.5em;
     color: blue;
     text-align: center;
     padding: 0;
+    line-height: .5em;
 }
 
 .inactive_line {
-    color: blue;
-    width: 90%;
+    border-color: blue;
+    border-width: .3em;
+    width: 100%;
 }
 
 
@@ -194,7 +239,7 @@ ul.topnav li .elms {
 }
 
 label {
-    color: #D73F09;
+    color: #4CAF50;
     text-shadow: 0 1px 0 #FFFFFF;
     font-size: 14px;
     font-weight: bold;
@@ -203,7 +248,7 @@ label {
 
 .login{
     font-size: 30px;
-    color: #D73F09;
+    color: #4CAF50;
     text-align: center;
     margin-top: -1%;
     margin-bottom: 1%;
@@ -223,30 +268,104 @@ input[type=text], input[type=password] {
 
 input[type=submit] {
     position: absolute;
-    font-size: 20px;
-    background: #D73F09;
+    font-size: 1em;
+    background: #4CAF50;
     color: white;
     font-weight: bold;
     width: 15%;
-    right: 55px;
-    bottom: 10px;
-    border-radius: 5px;
-    padding: 10px 0;
+    right: 4.5em;
+    bottom: .65em;
+    border-radius: .25em;
+    border: .15em solid #cccccc;
+    padding: .65em 0;
     outline: none;
 }
 
+.create_user {
+    position: absolute;
+    font-size: 1em;
+    text-align: center;
+    background: #4CAF50;
+    color: white;
+    font-weight: bold;
+    width: 27%;
+    left: 4.5em;
+    bottom: .65em;
+    border-radius: .25em;
+    border: .15em solid #cccccc;
+    padding: .65em 0;
+    outline: none;
+
+}
+
+.create_user:hover{
+    color: white;
+    text-decoration: none;
+}
+
 .user_name, .password{
-    font-size: 20px;
+    font-size: 2em;
 }
 
 .login_parent {
     height: 100%;
-    background-color: #D73F09;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    margin-top: -250px;
+    background-color: #4CAF50;
+    padding-top: 5em;
+    padding-bottom: 5em;
+    margin-top: -15em;
 }
 
 .form-button {
-    padding-top: 60px;
+    padding-top: 15px;
+    padding-bottom: 50px;
+    float: left;
+    
 }
+
+.deleteText{
+    padding-top: 100px;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+.deleteButton{
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.active_time {
+    margin-top: 2em;
+}
+
+#vehicles {
+    text-align: center;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    border: 3px solid #ddd;
+    width: 100%;
+  }
+  
+  #vehicles td, #vehicles th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  #vehicles tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #vehicles tr:hover {background-color: #ddd;}
+  
+  #vehicles th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  #addVehicle {
+      padding-bottom:1000px;
+  }
+
+  .deleteVehicle, .deleteText{
+    text-align: center;
+  }
