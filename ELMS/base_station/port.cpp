@@ -121,7 +121,6 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
                 break;
             }
         }
-
     }
 
     
