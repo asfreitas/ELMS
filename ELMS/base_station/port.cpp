@@ -142,49 +142,52 @@ of data read
 */
 DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
 {
-    static bool waitOnRead = false;
-    OVERLAPPED osReader = { 0 };
-    DWORD dwBytesRead = 0;
+    OVERLAPPED osWrite = { 0 };
+    DWORD dwWritten;
+    DWORD dwRes;
+    bool fRes;
 
+    osWrite.hEvent = CreateEvent(NULL, true, false, NULL);
 
-    osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (osWrite.hEvent == NULL)
+        return 0;
 
-    if (osReader.hEvent == NULL)
-        std::cout << "error\n";
-    while (!waitOnRead)
+    if (!WriteFile(handle, data, length, NULL, &osWrite))
     {
-        if (!WriteFile(hSerial, data, length, NULL, &osReader))
+        if (GetLastError() != ERROR_IO_PENDING)
         {
-            if (GetLastError() != ERROR_IO_PENDING)
+            fRes = 0;
+        }
+        else
+        {
+            dwRes = WaitForSingleObject(osWrite.hEvent, INFINITE);
+            switch (dwRes)
             {
-                std::cout << "Error reading from port\n";
-            }
-            else
-            {
-                DWORD dwRes = WaitForSingleObject(osReader.hEvent, INFINITE);
-                switch (dwRes)
-                {
+                // OVERLAPPED structure's event has been signaled. 
+            case WAIT_OBJECT_0:
+                if (!GetOverlappedResult(handle, &osWrite, &dwWritten, FALSE))
+                    fRes = FALSE;
+                else
+                    // Write operation completed successfully.
+                    fRes = TRUE;
+                break;
 
-                }
+            default:
+                // An error has occurred in WaitForSingleObject.
+                // This usually indicates a problem with the
+               // OVERLAPPED structure's event handle.
+                fRes = FALSE;
+                break;
             }
         }
-
     }
-    waitOnRead = false;
-
-    
-    return dwBytesRead;
-
-    /*
-
-    DWORD dwBytesRead = 0;
-    if (!WriteFile(handle, data, length, &dwBytesRead, NULL))
+    else
     {
-        perror("WriteFile ");
-        DWORD dw = GetLastError();
-        ExitProcess(dw);
+        fRes = false;
     }
-    return dwBytesRead;*/
+    CloseHandle(osWrite.hEvent);
+    
+    return 0;
 }
 
 /*
