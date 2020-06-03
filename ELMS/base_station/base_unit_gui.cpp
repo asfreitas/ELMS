@@ -469,7 +469,7 @@ BOOL closeProgram()
 	//load the bitmap images
 	loadImages();
 
-	h = CreateWindowW(L"CloseProgram", L"Quit Program", WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX |
+	h = CreateWindowW(L"CloseProgram", L"Quit Program", WS_SYSMENU | WS_CAPTION | WS_MAXIMIZEBOX |
 		WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 400, 400, NULL, NULL, hInstance, NULL);
 
 	hButtonQuit = CreateWindowW(L"button", L"Quit", WS_TABSTOP | WS_THICKFRAME |
