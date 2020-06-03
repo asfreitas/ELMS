@@ -43,6 +43,7 @@ time_t zuluToDate(int time);
 bool checkOffline(int time);
 bool checkOfflineSimulate(int currentMessageTime, int lastMessageReceived);
 size_t countCommas(string str);
+std::string timePadding(int timeUnit);
 
 /*This struct is used in the Base_Unit class to delete the pointers that are
  * stored in the mine_vehicles vector. The reference were I found this is below/

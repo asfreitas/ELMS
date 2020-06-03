@@ -11,6 +11,7 @@
 
 #include "fileio.h"
 #include "base_unit_gui.h"
+#include "utilities.h"
 
 #include <windows.h>
 #include <iostream>
@@ -65,6 +66,7 @@ class Port
         void netFailureCheck(int);
         void setCommMask(DWORD);
         bool waitCommMask(DWORD);
+        bool getNetworkFailure() { return networkFailure; }
         bool isPortReady() { return portReady; }
         // returns a list of possible COM ports available
         void SelectComPort(vector<string>&);

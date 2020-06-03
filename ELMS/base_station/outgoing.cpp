@@ -25,7 +25,7 @@ void outgoing_message(string & alertMessage, int unit1, int unit2, int messageTi
     string distance1 = doubleToString(distance);
     string bearing1 = doubleToString(bearing);
 	alertMessage = "$" + unit11 + "->" + unit22 + ',' + messageTime1 + ',' + velocity1 + ',' +
-            distance1 + ',' + bearing1 + "*" + "\n";
+            distance1 + ',' + bearing1 + "*\n";
 }
 
 /*
@@ -51,10 +51,8 @@ void createAlert(string & alertMessage, string & alertLogMessage, char* fileName
     // we create the outgoing message;
     outgoing_message(alertMessage, v1->getUnit(), v2->getUnit(), time, speed,
         distance, bearing);
-
     //copy the message to use to create the log file for the alert
     alertLogMessage = alertMessage;
-
     //convert the outgoing message to a char * so that it can be transmitted
     stringToCharPointer(alertMessage, fileName);
 }

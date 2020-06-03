@@ -68,6 +68,9 @@ int main()
 
 	// declare a FILEIO and Base_Unit object
 	FileIO f;
+
+	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
+	Port p(portname, &f);
 	Base_Unit b;
 
 	string fileName;
@@ -78,8 +81,7 @@ int main()
 	 //declare the vector that will contain all of the vehicles in the mine
 	vector<Vehicle*>mineVehicles;
 
-	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
-	Port p(portname, &f);
+
 
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
@@ -98,7 +100,19 @@ int main()
 			char command = _getch();
 			BOOL result = closeProgram();
 			if (result)
+<<<<<<< HEAD
 				return 0;
+=======
+			{
+				if (p.getNetworkFailure())
+				{
+					p.setCommMask(EV_RXFLAG);
+				}
+				return 0;
+
+			}
+
+>>>>>>> master
 		}
 
 		if (!p.isBufferEmpty())

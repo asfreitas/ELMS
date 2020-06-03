@@ -269,3 +269,21 @@ size_t countCommas(string str)
 	return number;
 }
 
+/*
+=============
+timePadding
+Takes in an int of time unit and converts to a string.
+Adds a '0' if it is below 10. Returns as a string.
+=============
+*/
+std::string timePadding(int timeUnit)
+{
+	std::string stringTime = "";
+	if (timeUnit < 10) {
+		stringTime = "0" + std::to_string(timeUnit);
+	}
+	else {
+		stringTime = std::to_string(timeUnit);
+	}
+	return stringTime;
+}
