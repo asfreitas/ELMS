@@ -58,13 +58,6 @@ using std::thread;
 #ifndef _OPENMP
 void printf_notice();
 #endif
-void signalHandler(int signum)
-{
-	
-	//Port::~Port();
-
-	exit(signum);
-}
 
 int main()
 {
@@ -87,12 +80,10 @@ int main()
 
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
 	Port p(portname, &f);
-	signal(SIGINT, signalHandler);
 
 	//declare a pointer to a Vehicle v
 	Vehicle* vehicle;
 
-	int count = 0;
 
 	//start an endless loop
 	while (p.isPortReady() )
@@ -107,8 +98,7 @@ int main()
 			char command = _getch();
 			BOOL result = closeProgram1();
 			if (result)
-				//return 0;
-				raise(SIGINT);
+				return 0;
 		}
 
 		if (!p.isBufferEmpty())
@@ -176,7 +166,6 @@ int main()
 		}
 		else
 		{
-			count++;
 			//cout << "The buffer is empty" << endl;
 		}
 

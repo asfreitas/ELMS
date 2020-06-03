@@ -215,6 +215,9 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
                 alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 2);
 
                 alertLogMessage1 = alertLogMessage1.substr(0, alertLogMessage1.length() - 2);
+
+                cout << alertLogMessage << endl;
+                cout << alertLogMessage1 << endl;
                 
                 //get the file path and write to the alert log
                 fileHandler.logToFile(alertLogMessage, MessageType::alert); 

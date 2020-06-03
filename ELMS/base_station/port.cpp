@@ -350,20 +350,16 @@ void Port::receiveMessage()
 
             mystring = "There was network failure from: " + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec);
 
-            std::cout << displayString << std::endl;
-
-   
+            std::cout << displayString << std::endl;   
 
             auto start = std::chrono::system_clock::now();
-
             
             waitCommMask(EV_RXCHAR);
-            cout << "I returned from the first event" << endl;
             waitCommMask(EV_RXCHAR);
-            cout << "I returned from the second event" << endl;
 
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
+
             //get the current time
             now = time(0);
 
@@ -397,16 +393,15 @@ void Port::receiveMessage()
             // confirmed is appended to the log.
             if (results)
             {
-               mystring += " - Confirmed.\n";
+               mystring += " - Confirmed.";
             }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-               mystring += " - Unconfirmed.\n";
+               mystring += " - Unconfirmed.";
             }
-            cout << "Here is mystring: " << mystring << endl;
-            cout << "Here is displayString" << displayString << endl;
 
+            //write the message to a log file
             fileHandler->logToFile(mystring, MessageType::network_failure);
 
             networkFailure = false;

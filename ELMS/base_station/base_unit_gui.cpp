@@ -359,74 +359,6 @@ void loadImages()
 	hLogoImage7 = (HBITMAP)LoadImageW(NULL, L"continue.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 }
 
-
-/*
-=====================
-possibleNetworkFailure
-
-This function uses a Win32 messageBox to alert the user to possible network failure.
-It allows them to confirm whether or not failure occurred.  
-The stack overflow reference was used to convert a string to an LPCWSTR in C++
-The title is: Stack Overflow How to convert std::string to LPCWSTR in C++
-https://stackoverflow.com/questions/27220/how-to-convert-stdstring-to-lpcwstr-in-c-unicode
-====================
-*/
-/*
-int possibleNetworkFailure(string str)
-{
-	std::wstring temp = stringToWString(str);
-	LPCWSTR newString = temp.c_str();
-	
-	int value = -1;
-
-	const int result = MessageBoxW(hWnd, newString, L"Yes to Confirm Failure, No to Ignore", MB_YESNO | MB_ICONWARNING | MB_SYSTEMMODAL);
-
-	//The meesage box return an integer based on the user clicking the yes or no button. 
-	switch (result)
-	{
-    // if the user clicked yes, then the value returned is 1
-	case IDYES:
-		value = 1;
-		break;
-	//if the user clicks no, then we return 0.
-	case IDNO:
-		value = 0;
-		break;
-	}
-
-	return value;
-}*/
-
-/*
-====================
-closeProgram
-This uses the Win32 message box to determine if the user wishes to quit the program. 
-This was not used but is available for use if the user prefers a Win32 pop up style
-message box. 
-====================
-*/
-/*
-int closeProgram()
-{
-	int value = -1;
-
-	const int result = MessageBoxW(hWnd, L"Are you sure you want to quit?", L"Exit Program Option", MB_YESNO | MB_ICONEXCLAMATION | MB_SYSTEMMODAL);
-	switch (result)
-	{
-	case IDYES:		
-		value = 1;
-		break;
-	case IDNO:
-		value = 0;
-		break;
-	default:
-		value = 1;
-		break;
-	}
-
-	return value;	
-}*/
-
 /*
 ====================
 stringToWString
@@ -538,6 +470,9 @@ BOOL closeProgram1()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 	}
+
+	// Reference for unregistering a class:
+	//https://stackoverflow.com/questions/18336605/proper-way-of-destroying-window-resources
 	int ret = UnregisterClassW(L"CloseProgram", hInstance);
 	if (ret == 0)
 	{
@@ -576,7 +511,6 @@ LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		SetBkColor(hdcStatic, RGB(250, 250, 210));
 		HBRUSH yellow = CreateSolidBrush(RGB(250, 250, 210));
 		return (LRESULT)yellow;
-		//return (LRESULT)GetStockObject(WHITE_BRUSH);
 
 	}
 	break;
@@ -616,6 +550,12 @@ Reference: In order to bring this window to the
 forefront, I used this reference and code snippet
 from stackoverflow. 
 https://stackoverflow.com/questions/916259/win32-bring-a-window-to-top/34414846
+
+References used to avoid error of class failed to register.
+These prevent the function from trying to register a class if it 
+already exists. 
+https://stackoverflow.com/questions/9761812/registering-a-window-class-in-the-win32api
+https://stackoverflow.com/questions/37211360/class-already-exists
 ==============
 */
 BOOL confirmNetworkFailure(string str)
@@ -639,8 +579,12 @@ BOOL confirmNetworkFailure(string str)
 	WNDCLASSW window = { 0 };
 	MSG msg = { 0 };
 
+	//we use a static name for the class and assign to a pointer
 	static const wchar_t* className;
 
+	//only create the class and register it if it does not
+	// already exist. This prevents failed to register class
+	// errors. 
 	 if (nullptr == className)
 	{
 		window.style = CS_HREDRAW | CS_VREDRAW;
@@ -652,8 +596,6 @@ BOOL confirmNetworkFailure(string str)
 		window.lpszClassName = L"FailureProgram";
 
 		if (!RegisterClassW(&window))
-			//std::cout << "Failed to register" << std::endl;
-		//if (0 == RegisterClassW(&window))
 		{
 			std::error_code err_code(GetLastError(), std::system_category());
 			throw std::system_error(err_code);
@@ -702,14 +644,6 @@ BOOL confirmNetworkFailure(string str)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	//if the user confirmed failure that the variable was set to true in the callback procedure,
-	// otherwise it remained false.  This value is returned.
-	//int ret = UnregisterClassW(L"FailureProgram", hInstance);
-	//if (ret == 0)
-	//{
-		//std::error_code err_code(GetLastError(), std::system_category());
-		//throw std::system_error(err_code);
-		
-	//}
+
 	return failure;
 }
