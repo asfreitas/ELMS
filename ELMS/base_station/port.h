@@ -11,6 +11,7 @@
 
 #include "fileio.h"
 #include "base_unit_gui.h"
+#include "utilities.h"
 
 #include <windows.h>
 #include <iostream>
