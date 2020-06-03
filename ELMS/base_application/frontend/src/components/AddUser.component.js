@@ -74,7 +74,7 @@ export default class AddUser extends Component {
             last_name: this.state.last_name
         }
 
-        axios.post('https:localhost:8080/users/add', user)
+        axios.post('https://elms-base-application.uc.r.appspot.com/users/add', user)
         .then(res => console.log(res.data));
         this.setState({
             username: '',

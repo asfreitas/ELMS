@@ -28,7 +28,7 @@ export default class Login extends Component{
 
     //when page renders, get list of users in mongodb
     componentDidMount(){
-        axios.get('http://localhost:8080/users')
+        axios.get('https://elms-base-application.uc.r.appspot.com/users')
             .then(res => {
                 this.setState({ users: res.data})
                 console.log(res.data);

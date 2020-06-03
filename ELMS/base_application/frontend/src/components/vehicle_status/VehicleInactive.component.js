@@ -16,7 +16,7 @@ export default class VehicleInactive extends VehicleBase{
         this.getNearestVehicle = this.getNearestVehicle.bind(this);
         this.getInactiveTime = this.getInactiveTime.bind(this);
         this.state={vehicles: []}
-        this.vehicleQuery = 'http://localhost:8080/vehicles/inactive'
+        this.vehicleQuery = 'https://elms-base-application.uc.r.appspot.com/vehicles/inactive'
     }
 
     //get list of inactive vehicles with nearest vehicle and inactive time

@@ -28,7 +28,7 @@ export class Table extends Component {
         this.state = {table: []}
     }
     componentDidMount(){
-        axios.get('http://localhost:8080/vehicles/analytics')
+        axios.get('https://elms-base-application.uc.r.appspot.com/vehicles/analytics')
         .then(res => {
             this.setState({table: res.data})
             console.log(res.data);

@@ -17,7 +17,7 @@ export default class VehicleActive extends VehicleBase{
         this.getActiveTime = this.getActiveTime.bind(this);
 
         this.state={vehicles: []}
-        this.vehicleQuery = 'http://localhost:8080/vehicles/active' // this will be used in the base class query
+        this.vehicleQuery = 'https://elms-base-application.uc.r.appspot.com/vehicles/active' // this will be used in the base class query
     }
     //return the list of active vehicles with: nearest vehicle, active time
     getActiveVehicles(){
