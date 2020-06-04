@@ -98,9 +98,9 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
     readCompleted = false;
     if (osReader.hEvent == NULL)
         std::cout << "error\n";
-    while(true)
+    while (true)
     {
-        
+
         if (!readCompleted && !ReadFile(hSerial, buffer, buffersize, NULL, &osReader))
         {
             if (GetLastError() != ERROR_IO_PENDING)
@@ -123,7 +123,7 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
         }
     }
 
-    
+
     return dwBytesRead;
 
 }
@@ -181,7 +181,7 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
         fRes = false;
     }
     CloseHandle(osWrite.hEvent);
-    
+
     return 0;
 }
 
@@ -408,15 +408,15 @@ void Port::receiveMessage()
             std::string localMin = timePadding(ltm.tm_min);
             std::string localSec = timePadding(ltm.tm_sec);
 
-            std::string displayString = "\nThere was network failure from: " + localHour + ":" + localMin +
+            std::string displayString = "There was network failure from: " + localHour + ":" + localMin +
                 ":" + localSec;
 
-            mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
+            mystring = "There was network failure from: " + hour + ":" + min + ":" + sec;
 
-            std::cout << displayString;   
+            std::cout << displayString << std::endl;
 
             auto start = std::chrono::system_clock::now();
-            
+
             waitCommMask(EV_RXCHAR);
 
             auto end = std::chrono::system_clock::now();
@@ -442,8 +442,8 @@ void Port::receiveMessage()
             mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
 
 
-            displayString = " to " + localHour + ":" + localMin +
-                ":" + localSec + "\n";
+            displayString += " to " + localHour + ":" + localMin +
+                ":" + localSec + " for " + std::to_string(diff.count()) + " seconds";
 
             std::cout << displayString << std::endl;
 
@@ -459,7 +459,7 @@ void Port::receiveMessage()
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-               mystring += " - Unconfirmed.\n";
+                mystring += " - Unconfirmed.\n";
             }
 
             //write the message to a log file
@@ -600,10 +600,9 @@ Wait for a particular mask
 bool Port::waitCommMask(DWORD mask)
 {
     DWORD status, dwEventMask;
-    LPOVERLAPPED overlap = { 0 };
     setCommMask(mask);
 
-    status = WaitCommEvent(hSerial, &dwEventMask, overlap);
+    status = WaitCommEvent(hSerial, &dwEventMask, NULL);
     return dwEventMask;
 }
 

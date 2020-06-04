@@ -13,8 +13,7 @@
 /*
 =============
 constructor
-
-Constructs a file handler that takes in a path to the 
+Constructs a file handler that takes in a path to the
 directory where it is being written to and a limit on
 the number of messages allowed per file.
 =============
@@ -36,12 +35,11 @@ FileIO::FileIO(std::string path, int limit)
 /*
 =============
 constructor (No Parameters)
-
 Sets default paths and creates folders for starting
 up the program.
 =============
 */
-FileIO::FileIO() 
+FileIO::FileIO()
 {
     messageLimit = 5;
     pathToLogs = "C:\\logs";
@@ -53,12 +51,11 @@ FileIO::FileIO()
 
     createFolders();
 
-} 
+}
 
 /*
 =============
 destructor
-
 Checks to see if the thread doing the writing has completed
 and joins it if necessary.
 =============
@@ -72,11 +69,9 @@ FileIO::~FileIO()
 /*
 =============
 checkMessageCount
-
-Returns true if the count of the message type 
+Returns true if the count of the message type
 has exceeded the limit or increments and returns false
 =============
-
 */
 bool FileIO::checkMessageCount(MessageType type)
 {
@@ -112,10 +107,8 @@ bool FileIO::checkMessageCount(MessageType type)
 /*
 =============
 getMessageCount
-
 Gets the number of messages currently written to the file
 =============
-
 */
 int& FileIO::getMessageCount(MessageType type)
 {
@@ -135,11 +128,9 @@ int& FileIO::getMessageCount(MessageType type)
 /*
 =============
 getFilePath
-
 Gets the appropriate file path dependent on
 which message type we are using.
 =============
-
 */
 string FileIO::getFilePath(MessageType type)
 {
@@ -157,10 +148,8 @@ string FileIO::getFilePath(MessageType type)
 /*
 =============
 setPathToLogs
-
 Sets a new path to the logs
 =============
-
 */
 void FileIO::setPathToLogs(string path)
 {
@@ -170,7 +159,6 @@ void FileIO::setPathToLogs(string path)
 /*
 =============
 setMessageLimit
-
 Sets a new limit for the number of messages
 per file.
 =============
@@ -183,7 +171,6 @@ void FileIO::setMessageLimit(int limit)
 /*
 =============
 logFile
-
  * This function checks the message count. If it is < MESSAGE_LIMIT, then the inputMessage
  * is written to a log file and the message count is incremented. If the
  * message count is >= MESSAGE_LIMIT, then this last message is written to the log file
@@ -219,9 +206,8 @@ void FileIO::logToFile(std::string inputMessage, MessageType type)
 /*
 =============
 lockWriteFile
-
 This function is called by the thread to
-instantiate a lock to protect the file from being 
+instantiate a lock to protect the file from being
 overwritten.
 =============
 */
@@ -238,7 +224,6 @@ void FileIO::lockWriteFile(string filePath, string inputMessage)
 /*
 =============
 setFileName
-
 Creates a new file name and updates
 the current filename.
 =============
@@ -260,7 +245,6 @@ void FileIO::setFileName(MessageType type)
 /*
 =============
 resetMessageCount
-
 Resets the current count of messages for a particular file
 =============
 */
@@ -279,11 +263,9 @@ void FileIO::resetMessageCount(MessageType type)
 /*
 =============
 createFileName
-
 Creates a new file name based on the current time stamp
 Returns a string carrying the filename
 =============
-
 */
 std::string FileIO::createFileName(MessageType type)
 {
@@ -298,9 +280,9 @@ std::string FileIO::createFileName(MessageType type)
     case MessageType::misc: type_of_message = "M"; break;
     default: break;
     }
-   // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
+    // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
 
-    //get the current time
+     //get the current time
     time_t now = time(0);
 
     //declare a time structure
@@ -329,7 +311,6 @@ std::string FileIO::createFileName(MessageType type)
 /*
 =============
 createFolders
-
 Source: https://www.youtube.com/watch?v=B999K9yztnI
 Creates all of the folders being used for the program.
 =============
@@ -348,11 +329,9 @@ void FileIO::createFolders()
 /*
 =============
 createFolder
-
 Takes in a string and then creates a new folder based on
 the name taken in.
 =============
-
 */
 bool FileIO::createFolder(const string folderName)
 {
@@ -387,7 +366,6 @@ bool FileIO::createFolder(const string folderName)
 /*
 =============
 directoryExists
-
 Checks to see if a directory exists.
  // reference
  // https://stackoverflow.com/questions/8233842/how-to-check-if-directory-exist-using-c-and-winapi
@@ -415,7 +393,6 @@ bool FileIO::directoryExists(const std::string& directoryName)
 /*
 ===============================
 getMessageLimit
-
 Returns the current message Limit
 ================================
 */
@@ -427,8 +404,7 @@ int FileIO::getMessageLimit()
 /*
 =============
 getNewFilePath
-
-Creates a new file path for the files being written to 
+Creates a new file path for the files being written to
 =============
 */
 void FileIO::getNewFilePath(MessageType type)
@@ -447,10 +423,8 @@ void FileIO::getNewFilePath(MessageType type)
 /*
 =============
 writeToFile
-
 Creates a new file or opens an existing file and appends to it
 =============
-
 */
 void FileIO::writeToFile(string filePath, string message)
 {
@@ -467,17 +441,15 @@ void FileIO::writeToFile(string filePath, string message)
         std::cout << "Cannot write to filepath: " << filePath;
     }
     inputFile.close();
-    
+
 }
 
 /*
 =============
 saveAllVehicles
-
 Write the vehicles to a file for writing for next time the program
 is loaded
 =============
-
 */
 void FileIO::saveAllVehicles(vector<Vehicle*> mine_vehicles)
 {
@@ -513,10 +485,8 @@ void FileIO::saveAllVehicles(vector<Vehicle*> mine_vehicles)
 /*
 =============
 getSavedVehicles
-
 Gets all vehicles that were saved for use in the program
 =============
-
 */
 vector<Vehicle*> FileIO::getSavedVehicles()
 {
@@ -528,7 +498,7 @@ vector<Vehicle*> FileIO::getSavedVehicles()
     double double_value, latitude, longitude, velocity, bearing;
     int int_value, unit, time, priority;
     std::string string_value, throwaway, status;
-    
+
     std::cout << "Loading vehicles...\n";
     while (file)
     {
@@ -564,6 +534,6 @@ vector<Vehicle*> FileIO::getSavedVehicles()
         vehicles.push_back(v);
         std::cout << "Loading vehicle " << unit << std::endl;
     }
-    std::cout << "...finished loading vehicles\n" << std::endl;
+    std::cout << "...finished loading vehicles" << std::endl;
     return vehicles;
 }
