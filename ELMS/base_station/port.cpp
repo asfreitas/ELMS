@@ -83,8 +83,8 @@ void Port::openSerialPort(LPCSTR portname)
 =============
 readFromSerialPort
 hSerial		File HANDLE to the serial port
-Reads the amount of data from the serial port
-and then returns the amount read.
+Asynchronously reads from the serial port
+Source: https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN
 =============
 */
 DWORD Port::readFromSerialPort(char* buffer, int buffersize)
@@ -135,8 +135,8 @@ readFromSerialPort
 hSerial		File HANDLE to the serial port
 length is for how much data is going to be written
 returns the amount of data that was written
-Reads a certain amount of data from the serial port and returns the amount
-of data read
+Asynchronously writes to the serial port.
+Source: https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN
 =============
 */
 DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
@@ -167,14 +167,10 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
                 if (!GetOverlappedResult(handle, &osWrite, &dwWritten, FALSE))
                     fRes = FALSE;
                 else
-                    // Write operation completed successfully.
                     fRes = TRUE;
                 break;
 
             default:
-                // An error has occurred in WaitForSingleObject.
-                // This usually indicates a problem with the
-               // OVERLAPPED structure's event handle.
                 fRes = FALSE;
                 break;
             }

@@ -191,7 +191,7 @@ return(nEntries++);
 
 int main(int argc, char *argv[])
 {
-system("@cls||clear");
+system("@cls||clear"); // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 DWORD bytesWritten,bytesRead,messagetick,currenttick,delay;
 FILE *script, *logp;
 char *msg;
