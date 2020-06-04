@@ -601,7 +601,6 @@ bool Port::waitCommMask(DWORD mask)
 {
     DWORD status, dwEventMask;
     setCommMask(mask);
-    LPOVERLAPPED lpOverlapped;
 
     status = WaitCommEvent(hSerial, &dwEventMask, NULL);
     return dwEventMask;

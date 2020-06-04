@@ -246,11 +246,11 @@ int i,nEntries=0;
 
 // open a log file
 
-	logp = fopen(argv[2],"a");
+	logp = fopen("mobile.log","a");
 
 // open a simulation script file
 
-	if ((script = fopen("script.txt","r")) == NULL) {
+	if ((script = fopen(argv[2],"r")) == NULL) {
 		printf("Can't open script file.\n");
 		return(0);
 	}
