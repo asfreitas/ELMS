@@ -101,12 +101,12 @@ int main()
 			BOOL result = closeProgram();
 			if (result)
 			{
-				//if (p.getNetworkFailure())
-				//{
-					//p.setCommMask(EV_RXFLAG);
-				//}
-				return 0;
+				if (p.getNetworkFailure())
+				{
+					p.setCommMask(0);
+				}
 
+				return 0;
 			}
 		}
 

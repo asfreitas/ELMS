@@ -59,7 +59,9 @@
 #include <conio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include "serialport.h"
+
 //defines
 
 
@@ -189,6 +191,7 @@ return(nEntries++);
 
 int main(int argc, char *argv[])
 {
+system("@cls||clear"); // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 DWORD bytesWritten,bytesRead,messagetick,currenttick,delay;
 FILE *script, *logp;
 char *msg;
@@ -243,7 +246,7 @@ int i,nEntries=0;
 
 // open a log file
 
-	logp = fopen("mobile.log","a");
+	logp = fopen(argv[2],"a");
 
 // open a simulation script file
 
