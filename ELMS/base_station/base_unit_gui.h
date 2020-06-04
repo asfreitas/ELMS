@@ -31,6 +31,7 @@ using std::endl;
 #define ID_QUIT 105
 #define ID_CONFIRM 106
 #define ID_UNCONFIRMED 107
+#define IDT_TIMER1 108
 
 
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);

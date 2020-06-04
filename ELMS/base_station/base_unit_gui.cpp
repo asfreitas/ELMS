@@ -516,6 +516,7 @@ LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		PostQuitMessage(0);
 		break;
 
+
 	/*Reference:https://www.cplusplus.com/forum/windows/176612/ */
 	case WM_CTLCOLORSTATIC:
 	{
@@ -544,6 +545,16 @@ LRESULT CALLBACK FailureHandler(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			break;
 		}
 
+	case WM_TIMER:
+		switch (wp)
+		{
+		case IDT_TIMER1:
+			KillTimer(hWnd, IDT_TIMER1);
+			DestroyWindow(hWnd);
+			failure = true;
+			break;
+		}
+
 		break;
 	default:
 		return DefWindowProcW(hWnd, msg, wp, lp);
@@ -569,6 +580,11 @@ These prevent the function from trying to register a class if it
 already exists. 
 https://stackoverflow.com/questions/9761812/registering-a-window-class-in-the-win32api
 https://stackoverflow.com/questions/37211360/class-already-exists
+
+The window is also on a timer.  If the user does not respond
+within 10 seconds, the window automatically closes and assumes
+that the network failure is confirmed.  The reference for this is
+https://docs.microsoft.com/en-us/windows/win32/winmsg/using-timers
 ==============
 */
 BOOL confirmNetworkFailure(string str)
@@ -648,6 +664,8 @@ BOOL confirmNetworkFailure(string str)
 		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 390, 200, 100, 60, h, (HMENU)ID_UNCONFIRMED,
 		hInstance, 0);
 	SendMessageW(hButtonIgnore, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage5);
+
+	SetTimer(h, IDT_TIMER1, 10000, (TIMERPROC) NULL);
 
 	//this while loop continues while the windows waits for input from the user 
 	//via clicking on a button
