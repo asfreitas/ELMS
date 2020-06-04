@@ -177,6 +177,7 @@ int main()
 		{
 			//cout << "The buffer is empty" << endl;
 		}
+		//b.print_vector(b.getMineVehicles());
 
 	} /* end while loop */
 
