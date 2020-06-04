@@ -11,6 +11,7 @@
 
 #include "fileio.h"
 #include "base_unit_gui.h"
+#include "utilities.h"
 
 #include <windows.h>
 #include <iostream>
@@ -69,6 +70,9 @@ class Port
         bool isPortReady() { return portReady; }
         // returns a list of possible COM ports available
         void SelectComPort(vector<string>&);
+        //void signalHandler(int signum);
+
+
 };
 
 #endif

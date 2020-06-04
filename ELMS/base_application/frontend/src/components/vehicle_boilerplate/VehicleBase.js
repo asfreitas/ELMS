@@ -37,7 +37,7 @@ export default class VehicleBase extends Component{
         this.getAtRiskTime = this.getAtRiskTime.bind(this);
         this.getInactiveTime = this.getInactiveTime.bind(this);
         this.state={vehicles: [], nearest_vehicle: 0}
-        this.vehicleQuery = 'http://localhost:8080/vehicles'
+        this.vehicleQuery = 'https://elms-base-application.uc.r.appspot.com/vehicles'
     }
     
     componentDidMount() {

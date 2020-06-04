@@ -11,7 +11,7 @@ import React from "react"
 function Footer(){
     return(
         <div>
-            <footer id="footer">Equipment Monitoring Location System - Base Unit</footer>
+            <footer id="footer">Equipment Location Monitoring System - Base Unit</footer>
         </div>
     )
 }

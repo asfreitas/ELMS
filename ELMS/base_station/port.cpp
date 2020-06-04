@@ -396,37 +396,32 @@ void Port::receiveMessage()
             gmtime_s(&gmtm, &now);
 
 
-            int hour = gmtm.tm_hour;
-            int min = gmtm.tm_min;
-            int sec = gmtm.tm_sec;
+            std::string hour = timePadding(gmtm.tm_hour);
+            std::string min = timePadding(gmtm.tm_min);
+            std::string sec = timePadding(gmtm.tm_sec);
 
             struct tm ltm;
 
             localtime_s(&ltm, &now);
 
-            int localHour = ltm.tm_hour;
-            int localMin = ltm.tm_min;
-            int localSec = ltm.tm_sec;
+            std::string localHour = timePadding(ltm.tm_hour);
+            std::string localMin = timePadding(ltm.tm_min);
+            std::string localSec = timePadding(ltm.tm_sec);
 
-            std::string displayString = "There was network failure from: " + std::to_string(localHour) + ":" + std::to_string(localMin) +
-                ":" + std::to_string(localSec);
+            std::string displayString = "There was network failure from: " + localHour + ":" + localMin +
+                ":" + localSec;
 
-            mystring = "There was network failure from: " + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec);
+            mystring = "There was network failure from: " + hour + ":" + min + ":" + sec;
 
-            std::cout << displayString << std::endl;
+            std::cout << displayString << std::endl;   
 
             auto start = std::chrono::system_clock::now();
-
             
             waitCommMask(EV_RXCHAR);
-            /*
-         do
-         {
-             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-         } while (networkFailure);
-         */
+
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> diff = end - start;
+
             //get the current time
             now = time(0);
 
@@ -434,22 +429,21 @@ void Port::receiveMessage()
             gmtime_s(&gmtm, &now);
 
 
-            hour = gmtm.tm_hour;
-            min = gmtm.tm_min;
-            sec = gmtm.tm_sec;
+            hour = timePadding(gmtm.tm_hour);
+            min = timePadding(gmtm.tm_min);
+            sec = timePadding(gmtm.tm_sec);
 
             localtime_s(&ltm, &now);
 
-            localHour = ltm.tm_hour;
-            localMin = ltm.tm_min;
-            localSec = ltm.tm_sec;
+            localHour = timePadding(ltm.tm_hour);
+            localMin = timePadding(ltm.tm_min);
+            localSec = timePadding(ltm.tm_sec);
+
+            mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
 
 
-            mystring += " to " + std::to_string(hour) + " " + std::to_string(min) + " " + std::to_string(sec) + " for " + std::to_string(diff.count()) + " seconds";
-
-
-            displayString += " to " + std::to_string(localHour) + ":" + std::to_string(localMin) +
-                ":" + std::to_string(localSec);
+            displayString += " to " + localHour + ":" + localMin +
+                ":" + localSec;
 
             std::cout << displayString << std::endl;
 
@@ -467,9 +461,8 @@ void Port::receiveMessage()
             {
                mystring += " - Unconfirmed.\n";
             }
-            cout << "Here is mystring: " << mystring << endl;
-            cout << "Here is displayString" << displayString << endl;
 
+            //write the message to a log file
             fileHandler->logToFile(mystring, MessageType::network_failure);
 
             networkFailure = false;

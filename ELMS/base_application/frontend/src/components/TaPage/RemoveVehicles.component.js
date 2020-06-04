@@ -15,7 +15,7 @@ export default class RemoveVehicles extends Component {
 
     }
     removeVehicles() {
-        axios.delete('http://localhost:8080/vehicles/deleteall')
+        axios.delete('https://elms-base-application.uc.r.appspot.com/vehicles/deleteall')
         .then(res => {
             console.log(res.data);
         })
@@ -30,13 +30,13 @@ export default class RemoveVehicles extends Component {
     //form used for creating a vehicle
     render(){
         return (
-            <div>    
+            <div className="deleteVehicle">    
                 <div>
-                <h3 class="deleteText">Delete All Vehicles</h3>
+                    <h3 className="deleteText">Delete All Vehicles</h3>
 
                 </div>
-                <div class="deleteButton">
-                    <button type="submit" onClick={this.removeVehicles} class="btn btn-danger">Delete All</button>
+                <div className="deleteButton">
+                    <button type="submit" onClick={this.removeVehicles} className="btn btn-danger">Delete All</button>
                 </div>
             </div>
 
