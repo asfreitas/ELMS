@@ -564,6 +564,6 @@ vector<Vehicle*> FileIO::getSavedVehicles()
         vehicles.push_back(v);
         std::cout << "Loading vehicle " << unit << std::endl;
     }
-    std::cout << "...finished loading vehicles" << std::endl;
+    std::cout << "...finished loading vehicles\n" << std::endl;
     return vehicles;
 }

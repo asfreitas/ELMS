@@ -408,12 +408,12 @@ void Port::receiveMessage()
             std::string localMin = timePadding(ltm.tm_min);
             std::string localSec = timePadding(ltm.tm_sec);
 
-            std::string displayString = "There was network failure from: " + localHour + ":" + localMin +
+            std::string displayString = "\nThere was network failure from: " + localHour + ":" + localMin +
                 ":" + localSec;
 
-            mystring = "There was network failure from: " + hour + ":" + min + ":" + sec;
+            mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
 
-            std::cout << displayString << std::endl;   
+            std::cout << displayString;   
 
             auto start = std::chrono::system_clock::now();
             
@@ -442,8 +442,8 @@ void Port::receiveMessage()
             mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
 
 
-            displayString += " to " + localHour + ":" + localMin +
-                ":" + localSec;
+            displayString = " to " + localHour + ":" + localMin +
+                ":" + localSec + "\n";
 
             std::cout << displayString << std::endl;
 
@@ -600,9 +600,10 @@ Wait for a particular mask
 bool Port::waitCommMask(DWORD mask)
 {
     DWORD status, dwEventMask;
+    LPOVERLAPPED overlap = { 0 };
     setCommMask(mask);
 
-    status = WaitCommEvent(hSerial, &dwEventMask, NULL);
+    status = WaitCommEvent(hSerial, &dwEventMask, overlap);
     return dwEventMask;
 }
 

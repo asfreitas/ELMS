@@ -18,8 +18,6 @@ Database::Database(std::string _uri)
 //desctructor
 Database::~Database()
 {
-    std::cout << "This can't go out of scope until the"
-        "program closes otherwise we lose the connection";
     delete pool;
 }
 
@@ -84,17 +82,15 @@ void Database::addVehicle(Vehicle* vehicle) {
         bsoncxx::document::view view = doc_view.view();
         //insert the view of the document
         bsoncxx::stdx::optional<mongocxx::result::insert_one> result = vehicles.insert_one(view);
-        if (result) {
-            std::cout << "Vehicle succuessfully created" << "\n";
+        if (!result) {
+            std::cout << "Cannot create vehicle in database. It might already exist or there is a problem connecting." << "\n";
         }
-        else {
-            std::cout << "Unsuccessful with creating" << "\n";
-        }
+
         
     }
     catch (mongocxx::exception& e)
     {
-        std::cout << "There was an exception in the add vehicle function: " << e.what();
+        std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
     }
 }
 
@@ -184,13 +180,9 @@ void Database::updateVehicle(Vehicle* vehicle)
         auto result = vehicles.update_one(
             document{} << "vehicle_unit" << vehicle->getUnit() << finalize,
             view);
-        if (result)
+        if (!result)
         {
-            std::cout << "Successfully updated vehicle\n";
-        }
-        else
-        {
-            std::cout << "There was a problem updating\n";
+            std::cout << "There was a problem updating the vehicle in the database.\n";
         }
 		//push data onto the arrays
         bsoncxx::stdx::optional<mongocxx::result::update> update_array =
@@ -204,17 +196,15 @@ void Database::updateVehicle(Vehicle* vehicle)
                 << close_document{}
                 << finalize
             );
-        if (update_array) {
-            std::cout << "Successfully pushed\n";
+        if (!update_array) {
+            std::cout << "There was a problem updating an array in the database.\n";
         }
-        else {
-            std::cout << "There was a problem pushing\n";
-        }
+
 
     }
     catch (mongocxx::exception& e)
     {
-        std::cout << "There was an exception in the update Vehicle function: " << e.what();
+        std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
     }
 }
 
@@ -253,7 +243,7 @@ vector<int> Database::getAllVehicleID()
     }
     catch(mongocxx::exception& e)
     {
-        std::cout << "There was an exception in the vehicle id function: " << e.what();
+        std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
 
     }
     return vehicle_id;

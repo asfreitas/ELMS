@@ -70,8 +70,10 @@ int main()
 	FileIO f;
 
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
-	Port p(portname, &f);
+	
 	Base_Unit b;
+
+	Port p(portname, &f);
 
 	string fileName;
 	string incomingMessage;
@@ -103,9 +105,10 @@ int main()
 			{
 				if (p.getNetworkFailure())
 				{
-					p.setCommMask(0);
+					p.setCommMask(0); // clear event if closing program
 				}
-
+				std::this_thread::sleep_for(std::chrono::microseconds(50));
+				std::cout << "\nSaving vehicles to vehicles.txt. It is now safe to close the program\n";
 				return 0;
 			}
 		}
@@ -130,7 +133,6 @@ int main()
 			{
                 #pragma omp section
 				{
-					cout << incomingMessage << endl;
 					
 					b.logToFile(incomingMessage, MessageType::incoming);
 				}
