@@ -400,7 +400,7 @@ void Port::receiveMessage()
 
             // declare a time structure used for local time
             struct tm ltm;
-            
+
             // there was a delay of 5 seconds before the timer started so we need to
             // subtract this off of the current time
             auto start = std::chrono::system_clock::now() - std::chrono::seconds(5);
@@ -467,12 +467,12 @@ void Port::receiveMessage()
             // confirmed is appended to the log.
             if (results)
             {
-               mystring += " - Confirmed.\n";
+                mystring += " - Confirmed.\n";
             }
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-               mystring += " - Unconfirmed.\n";
+                mystring += " - Unconfirmed.\n";
             }
 
             //write the message to a log file
