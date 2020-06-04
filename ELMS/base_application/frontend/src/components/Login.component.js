@@ -79,7 +79,7 @@ export default class Login extends Component{
         }
         */
 
-        axios.post('http://localhost:8080/users/auth', login_info)
+        axios.post('https://elms-base-application.uc.r.appspot.com/users/auth', login_info)
         .then((res) => {
             console.log(res.data);
             window.location.href = "/VehicleStatus"
