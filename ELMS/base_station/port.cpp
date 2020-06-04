@@ -383,69 +383,82 @@ void Port::receiveMessage()
         }
         if (networkFailure)
         {
+            /* *References: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
+              https://stackoverflow.com/questions/1859201/add-seconds-to-a-date
+              http://www.cplusplus.com/reference/chrono/system_clock/to_time_t/
+            */
+
             std::string mystring;
-            // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
 
-            //get the current time
-            time_t now = time(0);
+            //declare 2 time_t variables that we will use for both Zulu and 
+            //local time
+            time_t now;
+            time_t now1;
 
-            //declare a time structure
+            //declare a time structure used for Zulu time
             struct tm gmtm;
 
-            //use a thread safe call to get the current UTC time
-            gmtime_s(&gmtm, &now);
+            // declare a time structure used for local time
+            struct tm ltm;
+            
+            // there was a delay of 5 seconds before the timer started so we need to
+            // subtract this off of the current time
+            auto start = std::chrono::system_clock::now() - std::chrono::seconds(5);
 
+            //wait for the message to be processed
+            waitCommMask(EV_RXCHAR);
+
+            //stop the time so we can get the time differential. 
+            auto end = std::chrono::system_clock::now();
+
+            //calculate the time difference. 
+            std::chrono::duration<double> diff = end - start;
+
+            //convert the start and end time to time_t so that we can use the time struct
+            // to get the hour/min/seconds when the network failure started and ended. 
+            now = system_clock::to_time_t(start);
+            now1 = system_clock::to_time_t(end);
+
+            //use the converted now time to get hour,min,sec
+            gmtime_s(&gmtm, &now);
 
             std::string hour = timePadding(gmtm.tm_hour);
             std::string min = timePadding(gmtm.tm_min);
             std::string sec = timePadding(gmtm.tm_sec);
 
-            struct tm ltm;
+            //Start building the string on when the network failure started. This is in Zulu time
+            mystring = "There was network failure from: " + hour + ":" + min + ":" + sec;
 
+            //do the same thing to build the display string which contains local time
             localtime_s(&ltm, &now);
 
             std::string localHour = timePadding(ltm.tm_hour);
             std::string localMin = timePadding(ltm.tm_min);
             std::string localSec = timePadding(ltm.tm_sec);
 
+            //start building the display string.
             std::string displayString = "There was network failure from: " + localHour + ":" + localMin +
                 ":" + localSec;
 
-            mystring = "There was network failure from: " + hour + ":" + min + ":" + sec;
-
-            std::cout << displayString << std::endl;
-
-            auto start = std::chrono::system_clock::now();
-
-            waitCommMask(EV_RXCHAR);
-
-            auto end = std::chrono::system_clock::now();
-            std::chrono::duration<double> diff = end - start;
-
-            //get the current time
-            now = time(0);
-
-            //use a thread safe call to get the current UTC time
-            gmtime_s(&gmtm, &now);
-
+            // now build when the network failure ended. 
+            gmtime_s(&gmtm, &now1);
 
             hour = timePadding(gmtm.tm_hour);
             min = timePadding(gmtm.tm_min);
             sec = timePadding(gmtm.tm_sec);
 
-            localtime_s(&ltm, &now);
+            // add the ending times to the string and the length of the network delay. 
+            mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
+
+            localtime_s(&ltm, &now1);
 
             localHour = timePadding(ltm.tm_hour);
             localMin = timePadding(ltm.tm_min);
             localSec = timePadding(ltm.tm_sec);
 
-            mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
-
-
+            // build the display string with the same information only use local. 
             displayString += " to " + localHour + ":" + localMin +
-                ":" + localSec + " for " + std::to_string(diff.count()) + " seconds";
-
-            std::cout << displayString << std::endl;
+                ":" + localSec + " for " + std::to_string(int(diff.count())) + " seconds";
 
             //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
             BOOL results = confirmNetworkFailure(displayString);
@@ -459,7 +472,7 @@ void Port::receiveMessage()
             // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
             else
             {
-                mystring += " - Unconfirmed.\n";
+               mystring += " - Unconfirmed.\n";
             }
 
             //write the message to a log file

@@ -21,7 +21,10 @@
 #include <mutex>
 #include <chrono>
 #include <vector>
+#include <time.h>
+#include <ctime>
 
+using namespace std::chrono;
 using std::vector;
 using std::string;
 
