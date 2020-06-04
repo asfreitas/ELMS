@@ -35,8 +35,8 @@ export default class RemoveVehicles extends Component {
                     <h3 className="deleteText">Delete All Vehicles</h3>
 
                 </div>
-                <div class="deleteButton">
-                    <button type="submit" onClick={this.removeVehicles} class="btn btn-danger">Delete All</button>
+                <div className="deleteButton">
+                    <button type="submit" onClick={this.removeVehicles} className="btn btn-danger">Delete All</button>
                 </div>
             </div>
 
