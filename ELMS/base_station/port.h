@@ -41,6 +41,7 @@ class Port
         bool networkFailure = false;
         bool portReady = false;
         FileIO* fileHandler;
+        bool closing = false;
         
 
     public:
@@ -70,6 +71,7 @@ class Port
         bool isPortReady() { return portReady; }
         // returns a list of possible COM ports available
         void SelectComPort(vector<string>&);
+        void setClosing(bool _closing) { closing = _closing; }
         //void signalHandler(int signum);
 
 

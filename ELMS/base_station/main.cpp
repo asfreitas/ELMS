@@ -103,12 +103,8 @@ int main()
 			BOOL result = closeProgram();
 			if (result)
 			{
-				if (p.getNetworkFailure())
-				{
-					p.setCommMask(0); // clear event if closing program
-				}
-				std::this_thread::sleep_for(std::chrono::microseconds(50));
-				std::cout << "\nSaving vehicles to vehicles.txt. It is now safe to close the program\n";
+				p.setClosing(true); // tell the port that it's closing so there is no network failure
+				p.setCommMask(0); // clear event if closing program
 				return 0;
 			}
 		}

@@ -413,8 +413,6 @@ void Port::receiveMessage()
 
             mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
 
-            std::cout << displayString;   
-
             auto start = std::chrono::system_clock::now();
             
             waitCommMask(EV_RXCHAR);
@@ -442,28 +440,36 @@ void Port::receiveMessage()
             mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
 
 
-            displayString = " to " + localHour + ":" + localMin +
+            displayString += " to " + localHour + ":" + localMin +
                 ":" + localSec + "\n";
 
-            std::cout << displayString << std::endl;
 
-            //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
-            BOOL results = confirmNetworkFailure(displayString);
 
-            //either way, the event will be logged. If results = 1, then the user confirmed event.
-            // confirmed is appended to the log.
-            if (results)
+            if (!closing)
             {
-               mystring += " - Confirmed.\n";
-            }
-            // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
-            else
-            {
-               mystring += " - Unconfirmed.\n";
+                //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
+                BOOL results = confirmNetworkFailure(displayString);
+
+                //either way, the event will be logged. If results = 1, then the user confirmed event.
+                // confirmed is appended to the log.
+                if (results)
+                {
+                    mystring += " - Confirmed.\n";
+                    displayString += " - Confirmed.\n";
+                }
+                // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
+                else
+                {
+                    mystring += " - Unconfirmed.\n";
+                    displayString += " - Unconfirmed.\n";
+                }
+                std::cout << displayString << std::endl;
+
+                //write the message to a log file
+                fileHandler->logToFile(mystring, MessageType::network_failure);
+
             }
 
-            //write the message to a log file
-            fileHandler->logToFile(mystring, MessageType::network_failure);
 
             networkFailure = false;
         }
