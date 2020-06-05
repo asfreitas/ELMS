@@ -462,7 +462,7 @@ void Port::receiveMessage()
 
             //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
             BOOL results = confirmNetworkFailure(displayString);
-
+ 
             //either way, the event will be logged. If results = 1, then the user confirmed event.
             // confirmed is appended to the log.
             if (results)
