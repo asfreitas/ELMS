@@ -33,8 +33,8 @@ void Port::openSerialPort(LPCSTR portname)
 {
     const int BYTE_SIZE = 8;
     const int READ_INTERVAL_TIMEOUT = 0; // TODO: figure out what values work best for the program
-    const int READ_MULTIPLIER = 10;
-    const int READ_CONSTANT = 50;
+    const int READ_MULTIPLIER = 0;
+    const int READ_CONSTANT = 0;
     const int WRITE_MULTIPLIER = 10;
     const int WRITE_CONSTANT = 50;
     const int baudrate = 9600;
@@ -79,6 +79,99 @@ void Port::openSerialPort(LPCSTR portname)
     }
 }
 
+void Port::handleNetworkFailure()
+{
+
+    networkFailure = true;
+    std::string mystring;
+    // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
+
+    //get the current time
+    time_t now = time(0);
+
+    //declare a time structure
+    struct tm gmtm;
+
+    //use a thread safe call to get the current UTC time
+    gmtime_s(&gmtm, &now);
+
+
+    std::string hour = timePadding(gmtm.tm_hour);
+    std::string min = timePadding(gmtm.tm_min);
+    std::string sec = timePadding(gmtm.tm_sec);
+
+    struct tm ltm;
+
+    localtime_s(&ltm, &now);
+
+    std::string localHour = timePadding(ltm.tm_hour);
+    std::string localMin = timePadding(ltm.tm_min);
+    std::string localSec = timePadding(ltm.tm_sec);
+
+    std::string displayString = "\nThere was network failure from: " + localHour + ":" + localMin +
+        ":" + localSec;
+
+    mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
+
+    auto start = std::chrono::system_clock::now();
+
+    waitCommMask(EV_RXCHAR);
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end - start;
+
+    //get the current time
+    now = time(0);
+
+    //use a thread safe call to get the current UTC time
+    gmtime_s(&gmtm, &now);
+
+
+    hour = timePadding(gmtm.tm_hour);
+    min = timePadding(gmtm.tm_min);
+    sec = timePadding(gmtm.tm_sec);
+
+    localtime_s(&ltm, &now);
+
+    localHour = timePadding(ltm.tm_hour);
+    localMin = timePadding(ltm.tm_min);
+    localSec = timePadding(ltm.tm_sec);
+
+    mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
+
+
+    displayString += " to " + localHour + ":" + localMin +
+        ":" + localSec + "\n";
+
+
+
+    if (!closing)
+    {
+        //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
+        BOOL results = confirmNetworkFailure(displayString);
+
+        //either way, the event will be logged. If results = 1, then the user confirmed event.
+        // confirmed is appended to the log.
+        if (results)
+        {
+            mystring += " - Confirmed.\n";
+            displayString += " - Confirmed.\n";
+        }
+        // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
+        else
+        {
+            mystring += " - Unconfirmed.\n";
+            displayString += " - Unconfirmed.\n";
+        }
+        std::cout << displayString << std::endl;
+
+        //write the message to a log file
+        fileHandler->logToFile(mystring, MessageType::network_failure);
+
+    }
+
+    networkFailure = false;
+}
 /*
 =============
 readFromSerialPort
@@ -87,18 +180,22 @@ Asynchronously reads from the serial port
 Source: https://docs.microsoft.com/en-us/previous-versions/ff802693(v=msdn.10)?redirectedfrom=MSDN
 =============
 */
-DWORD Port::readFromSerialPort(char* buffer, int buffersize)
+bool Port::readFromSerialPort(char* buffer, int buffersize)
 {
     bool readCompleted, waitOnRead = false;
 
     OVERLAPPED osReader = { 0 };
     DWORD dwBytesRead = 0;
     osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-
+    bool gotResult = false;
     readCompleted = false;
+    int waitTime = 30000;
+    bool netFailure = false;
+    int checks = 0;
+
     if (osReader.hEvent == NULL)
         std::cout << "error\n";
-    while(true)
+    while(!gotResult)
     {
         
         if (!readCompleted && !ReadFile(hSerial, buffer, buffersize, NULL, &osReader))
@@ -111,19 +208,34 @@ DWORD Port::readFromSerialPort(char* buffer, int buffersize)
         }
         else
         {
+            gotResult = true;
+
             break;
         }
-        if (!waitOnRead)
+        while (stillReceiving && !gotResult)
         {
-            DWORD dwRes = WaitForSingleObject(osReader.hEvent, INFINITE);
-            if (dwRes == WAIT_OBJECT_0)
+
+            DWORD dwRes = WaitForSingleObject(osReader.hEvent, waitTime / 10);
+            switch (dwRes)
             {
-                break;
+                case WAIT_TIMEOUT:
+                {
+                    checks++;
+                    break;
+                }
+                case WAIT_OBJECT_0:
+                {
+                    gotResult = true;
+                    break;
+                }
+            }
+            if (checks >= 10)
+            {
+                handleNetworkFailure();
+                checks = 0;
             }
         }
     }
-
-    
     return dwBytesRead;
 
 }
@@ -276,7 +388,7 @@ Port::Port(FileIO* _f)
 {
     openSerialPort(NULL);
     startPortThread();
-    startTimer(5);
+  //  startTimer(10);
 
     fileHandler = _f;
 
@@ -295,7 +407,7 @@ Port::Port(LPCSTR portname, FileIO* _f)
     if (waitCommMask(EV_RXCHAR))
         portReady = true;
     startPortThread();
-    startTimer(5);
+  //  startTimer(10);
 }
 
 /*
@@ -334,6 +446,7 @@ addToMessageBuffer
 void Port::addToMessageBuffer(std::string message)
 {
     std::lock_guard<std::mutex> receiveLock(mutex); // lock data for when it is being put into buffer
+    std::cout << message << "\n";
     buffer.push(message);
 }
 
@@ -366,12 +479,14 @@ void Port::receiveMessage()
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
+        std::string finalMessage;
 
-        readFromSerialPort(newMessage, messageSize - 15); // read in most of the message to ensure we don't bleed into next message
-        std::string finalMessage(newMessage);
+        
+        bool readValue = readFromSerialPort(newMessage, messageSize - 15); // read in most of the message to ensure we don't bleed into next message
+        finalMessage += newMessage;
         if (finalMessage.size() > 1)
         {
-            while (finalMessage[finalMessage.size() - 1] != '*') // finish combining the message
+            while (stillReceiving && finalMessage[finalMessage.size() - 1] != '*') // finish combining the message
             {
                 memset(extra, 0, 2);
                 readFromSerialPort(extra, 1);
@@ -382,96 +497,10 @@ void Port::receiveMessage()
         }
         if (networkFailure)
         {
-            std::string mystring;
-            // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
-
-            //get the current time
-            time_t now = time(0);
-
-            //declare a time structure
-            struct tm gmtm;
-
-            //use a thread safe call to get the current UTC time
-            gmtime_s(&gmtm, &now);
-
-
-            std::string hour = timePadding(gmtm.tm_hour);
-            std::string min = timePadding(gmtm.tm_min);
-            std::string sec = timePadding(gmtm.tm_sec);
-
-            struct tm ltm;
-
-            localtime_s(&ltm, &now);
-
-            std::string localHour = timePadding(ltm.tm_hour);
-            std::string localMin = timePadding(ltm.tm_min);
-            std::string localSec = timePadding(ltm.tm_sec);
-
-            std::string displayString = "\nThere was network failure from: " + localHour + ":" + localMin +
-                ":" + localSec;
-
-            mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
-
-            auto start = std::chrono::system_clock::now();
-            
-            waitCommMask(EV_RXCHAR);
-
-            auto end = std::chrono::system_clock::now();
-            std::chrono::duration<double> diff = end - start;
-
-            //get the current time
-            now = time(0);
-
-            //use a thread safe call to get the current UTC time
-            gmtime_s(&gmtm, &now);
-
-
-            hour = timePadding(gmtm.tm_hour);
-            min = timePadding(gmtm.tm_min);
-            sec = timePadding(gmtm.tm_sec);
-
-            localtime_s(&ltm, &now);
-
-            localHour = timePadding(ltm.tm_hour);
-            localMin = timePadding(ltm.tm_min);
-            localSec = timePadding(ltm.tm_sec);
-
-            mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
-
-
-            displayString += " to " + localHour + ":" + localMin +
-                ":" + localSec + "\n";
-
-
-
-            if (!closing)
-            {
-                //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
-                BOOL results = confirmNetworkFailure(displayString);
-
-                //either way, the event will be logged. If results = 1, then the user confirmed event.
-                // confirmed is appended to the log.
-                if (results)
-                {
-                    mystring += " - Confirmed.\n";
-                    displayString += " - Confirmed.\n";
-                }
-                // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
-                else
-                {
-                    mystring += " - Unconfirmed.\n";
-                    displayString += " - Unconfirmed.\n";
-                }
-                std::cout << displayString << std::endl;
-
-                //write the message to a log file
-                fileHandler->logToFile(mystring, MessageType::network_failure);
-
-            }
-
-
-            networkFailure = false;
+           // handleNetworkFailure();
         }
+
+
     }
 
 }
@@ -534,6 +563,7 @@ void Port::netFailureCheck(int numSeconds)
 {
     bool timesUp;
     bool currentNetworkFailure;
+    networkFailure = false;
     while (stillReceiving)
     {
         if (!networkFailure)
