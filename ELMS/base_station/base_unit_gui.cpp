@@ -16,10 +16,10 @@
 //These are Win32 API handlers used.
 HWND hList;
 //HWND hWnd;
-HWND settingsText, settingsText1, settingsText2, settingsText3, settingsText4;
-HBITMAP hLogoImage, hLogoImage1, hLogoImage2, hLogoImage3, hLogoImage4, hLogoImage5;
+HWND settingsText, settingsText1, settingsText2, settingsText4;
+HBITMAP hLogoImage, hLogoImage1, hLogoImage3, hLogoImage4, hLogoImage5;
 HBITMAP hLogoImage6, hLogoImage7;
-HWND hLogo, hLogo1, hButtonOkay;
+HWND hLogo, hLogo1;
 //This char array holds the COM port. 
 char comPort[50];
 BOOL quit = false;
@@ -151,14 +151,6 @@ LRESULT CALLBACK MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 		}
 
-		// if the button press is OKAY, close the text and button controls and reset the Window
-		// title to Select a Port
-		else if (LOWORD(wParam) == ID_OKAY)
-		{
-			DestroyWindow(settingsText3);
-			DestroyWindow(hButtonOkay);
-			SetWindowTextW(hWnd, L"SELECT A PORT");
-		}
 		break;
 
 	}
@@ -220,7 +212,7 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 		  */
 
 			hButton = CreateWindowW(L"button", NULL, WS_TABSTOP | WS_THICKFRAME |
-				WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON |BS_BITMAP, 407, 300, 118, 60, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
+				WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON |BS_BITMAP, 412, 300, 118, 60, hWnd, (HMENU)ID_SELF_DESTROY_BUTTON,
 				hInstance, 0);
 
 			// send a message to the button to put the image map on its face
@@ -230,13 +222,13 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 			has been selected */
 			hButtonClose = CreateWindowW(L"button", NULL
 				, WS_VISIBLE | WS_CHILD | BS_BITMAP | WS_THICKFRAME |
-				WS_TABSTOP | BS_DEFPUSHBUTTON, 540, 300, 115, 60, hWnd, (HMENU)ID_CLOSE,
+				WS_TABSTOP | BS_DEFPUSHBUTTON, 545, 300, 115, 60, hWnd, (HMENU)ID_CLOSE,
 				NULL, NULL);
 			SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage);
 
 			// creates the list box control
 			hList = CreateWindowEx(WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_VISIBLE |
-				WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY | WS_THICKFRAME, 430, 90, 200, 200,
+				WS_VSCROLL | ES_AUTOVSCROLL | LBS_EXTENDEDSEL | LBS_NOTIFY | WS_THICKFRAME, 435, 90, 200, 200,
 				hWnd, (HMENU)ID_LISTBOX, 0, 0);
 
 			//Build the contents of the list box
@@ -244,6 +236,7 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 			if (listOfPorts->empty())
 			{
 				AddText_NoSerial(hWnd, hButtonClose);
+				SetWindowTextW(hWnd, L"NO PORTS DETECTED!");
 				SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)"NO PORTS DETECTED!!");
 			}
 
@@ -264,19 +257,6 @@ BOOL getPort1(vector<string>* listOfPorts, string& name)
 				}
 				//https://stackoverflow.com/questions/42438135/c-winapi-listbox-getting-selected-item-using-lb-getsel-lb-getcursel
 			}
-
-			//this sleep is here because in order to make sure that the text box loads on top and covers the other controls, I 
-			// put in this delay.  Once the user reads the message in the textbox, it will be closed and the underlying
-			// controls will be visible
-			Sleep(0.5);
-			
-			settingsText3 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"WELCOME TO ELMS!\r\n\r\nThe next window lets you select a COM port, if available\r\nOnce the program starts, to quit, make sure you are in the terminal window\r\nPress any key, a window will appear to confirm you wish to exit\r\n"),WS_VISIBLE | WS_CHILD | WS_THICKFRAME | SS_CENTER, 100, 70, 555, 300, hWnd, NULL, NULL, NULL);
-
-			hButtonOkay = CreateWindowW(L"button", L"OKAY", WS_TABSTOP | WS_BORDER |
-				WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_BITMAP, 325, 260, 100, 50, hWnd, (HMENU)ID_OKAY,
-				hInstance, 0);
-
-			SendMessageW(hButtonOkay, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage2);
 		
 		//this while loop continues until the window clsoes
 		while (true)
@@ -318,7 +298,7 @@ void AddText_NoSerial(HWND hWnd, HWND hButtonClose)
 {
 	settingsText = CreateWindowW(TEXT(L"STATIC"), TEXT(L"                        INSTRUCTIONS\r\n\r\n(1) Sorry, no COM ports were detected\
      \r\n(2) Click on the \"EXIT\" Button\r\n(3) The program will exit with an error."), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
-		100, 90, 300, 100, hWnd, NULL, NULL, NULL);
+		75, 90, 300, 100, hWnd, NULL, NULL, NULL);
 	HDC hdcStatic = GetDC(settingsText);
 	SendMessageW(hButtonClose, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hLogoImage3);
 	
@@ -333,8 +313,8 @@ Adds instructions if serial ports are detected
 void AddText_Serial(HWND hWnd)
 {
 	settingsText1 = CreateWindowW(TEXT(L"STATIC"), TEXT(L"                      INSTRUCTIONS\r\n\r\n(1) Click on a COM Port to Highlight it\
-     \r\n(2) Click \"Select Port\" Button\r\n(3) Click \"Start\" Button"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
-		100, 90, 300, 100, hWnd, NULL, NULL, NULL);
+     \r\n(2) Click \"Select Port\" Button\r\n(3) Click \"Start\" Button\r\n(4) After start, press any key to quit"), WS_VISIBLE | WS_CHILD | WS_THICKFRAME,
+		75, 90, 300, 125, hWnd, NULL, NULL, NULL);
 	//HDC hdcStatic = GetDC(settingsText);
 }
 
@@ -351,7 +331,6 @@ void loadImages()
 {
 	hLogoImage = (HBITMAP)LoadImageW(NULL, L"start.bmp", IMAGE_BITMAP, 205, 100, LR_LOADFROMFILE);
 	hLogoImage1 = (HBITMAP)LoadImageW(NULL, L"selectionPort1.bmp", IMAGE_BITMAP, 205, 100, LR_LOADFROMFILE);
-	hLogoImage2 = (HBITMAP)LoadImageW(NULL, L"okay3.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 	hLogoImage3 = (HBITMAP)LoadImageW(NULL, L"exit.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 	hLogoImage4 = (HBITMAP)LoadImageW(NULL, L"confirm.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);
 	hLogoImage5 = (HBITMAP)LoadImageW(NULL, L"ignore.bmp", IMAGE_BITMAP, 200, 100, LR_LOADFROMFILE);

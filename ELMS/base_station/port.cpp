@@ -237,6 +237,8 @@ HANDLE Port::setupPort(LPCSTR portname)
         }
         else
             cout << "Waiting for data from mobile unit..." << endl;
+        //_kbhit returns a non-zero value if a key stroke was made
+
         //we have a portname, so we call createPort
         hSerial = createPort(portname);
     }
@@ -362,7 +364,6 @@ void Port::receiveMessage()
 {
     while (stillReceiving)
     {
-
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
