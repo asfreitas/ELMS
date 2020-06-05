@@ -112,6 +112,7 @@ int main()
 
 			//make a copy of message that we will use to parse
 			data = incomingMessage;
+			cout << incomingMessage << endl;
 
 			// this variable checks to see if the incoming message is properly separated
 			// by commas.  

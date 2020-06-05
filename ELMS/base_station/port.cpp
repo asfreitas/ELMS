@@ -334,7 +334,6 @@ addToMessageBuffer
 void Port::addToMessageBuffer(std::string message)
 {
     std::lock_guard<std::mutex> receiveLock(mutex); // lock data for when it is being put into buffer
-
     buffer.push(message);
 }
 
@@ -537,24 +536,28 @@ void Port::netFailureCheck(int numSeconds)
     bool currentNetworkFailure;
     while (stillReceiving)
     {
-        auto start = std::chrono::system_clock::now();
-        timesUp = false;
-        currentNetworkFailure = true;
-        while (!timesUp && currentNetworkFailure)
+        if (!networkFailure)
         {
-            auto end = std::chrono::system_clock::now();
-            std::chrono::duration<double> diff = end - start;
-
-            if (diff.count() > numSeconds)
+            auto start = std::chrono::system_clock::now();
+            timesUp = false;
+            currentNetworkFailure = true;
+            while (!timesUp && currentNetworkFailure)
             {
-                //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                networkFailure = true;
-                timesUp = true;
-            }
+                auto end = std::chrono::system_clock::now();
+                std::chrono::duration<double> diff = end - start;
 
-            if (!isBufferEmpty())
-            {
-                currentNetworkFailure = false;
+                if (diff.count() > numSeconds)
+                {
+                    networkFailure = true;
+                    timesUp = true;
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                }
+
+                if (!isBufferEmpty())
+                {
+                    currentNetworkFailure = false;
+                }
             }
         }
 
