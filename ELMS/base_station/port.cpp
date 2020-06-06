@@ -451,7 +451,6 @@ addToMessageBuffer
 void Port::addToMessageBuffer(std::string message)
 {
     std::lock_guard<std::mutex> receiveLock(mutex); // lock data for when it is being put into buffer
-    std::cout << message << "\n";
     buffer.push(message);
 }
 
