@@ -55,13 +55,18 @@ using std::thread;
 void printf_notice();
 #endif
 
+
+void shut( Port&);
+bool ready,exitEarly; // used to help cancel if shutdown is called
+
 int main()
 {
+		exitEarly = false;
+		ready = false;
 		//used to check for memory leak. When the program exists, it will dump all
 		// any memory leaks that are present.  You must run in debug to see them. 
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 		//_kbhit returns a non-zero value if a key stroke was made
-
 		// declare a FILEIO and Base_Unit object
 		FileIO f;
 
@@ -70,6 +75,7 @@ int main()
 		Base_Unit b;
 
 		Port p(portname, &f);
+		std::thread t(shut, std::ref(p)); // startup thread to check if the user is canceling 
 
 		string fileName;
 		string incomingMessage;
@@ -81,8 +87,13 @@ int main()
 
 		//declare a pointer to a Vehicle v
 		Vehicle* vehicle;
-		
+				
+		if (p.waitCommMask(EV_RXCHAR))
+			ready = true;
+		t.join(); // finished with thread
 		//start an endless loop
+		if (exitEarly)
+			return 0;
 		while (p.isPortReady())
 		{
 			//_kbhit returns a non-zero value if a key stroke was made
@@ -183,4 +194,30 @@ int main()
 void printf_notice()
 {
 	fprintf(stderr, "OpenMP is not supported \n");
+}
+
+// This function is used in a thread so we can cancel the 
+// port's waiting for data if the user cancels before vehicles arrive
+void shut(Port& p)
+{
+
+	while (!ready)
+	{
+		if (_kbhit())
+		{
+			//define a char to capture the ASCII for the keystroke entered
+			//if is important to keep this line in or else the pop-up asking
+			// the user if they wish to quit will keep appearing. Cases were
+			// not used here because the program will accept any keystroke
+			char command = _getch();
+			BOOL result = closeProgram();
+			if (result)
+			{
+				p.setClosing(true); // tell the port that it's closing so there is no network failure
+				p.setCommMask(0); // clear event if closing program
+				exitEarly = true;
+				break;
+			}
+		}
+	}
 }

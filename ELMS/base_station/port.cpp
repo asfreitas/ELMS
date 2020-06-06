@@ -409,7 +409,7 @@ Port::Port(LPCSTR portname, FileIO* _f)
 {
     fileHandler = _f;
     openSerialPort(portname);
-    if (waitCommMask(EV_RXCHAR))
+   // if (waitCommMask(EV_RXCHAR))
         portReady = true;
     startPortThread();
     //  startTimer(10);
