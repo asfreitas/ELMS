@@ -33,7 +33,7 @@ export default class RemoveVehicles extends Component {
             <div className="deleteVehicle">    
                 <div>
                     <h3 className="deleteText">Delete All Vehicles</h3>
-
+                    <p className="taReminder">*Remember to delete vehicles.txt from C:\logs\saved_vehicles</p>
                 </div>
                 <div className="deleteButton">
                     <button type="submit" onClick={this.removeVehicles} className="btn btn-danger">Delete All</button>

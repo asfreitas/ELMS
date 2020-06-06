@@ -365,6 +365,6 @@ input[type=submit] {
       padding-bottom:1000px;
   }
 
-  .deleteVehicle, .deleteText{
+  .deleteVehicle, .deleteText, .taReminder{
     text-align: center;
   }
