@@ -70,8 +70,10 @@ int main()
 	FileIO f;
 
 	LPCSTR portname = NULL;//"COM3";                /*Ports will vary for each computer */
-	Port p(portname, &f);
+	
 	Base_Unit b;
+
+	Port p(portname, &f);
 
 	string fileName;
 	string incomingMessage;
@@ -101,11 +103,8 @@ int main()
 			BOOL result = closeProgram();
 			if (result)
 			{
-				if (p.getNetworkFailure())
-				{
-					p.setCommMask(0);
-				}
-
+				p.setClosing(true); // tell the port that it's closing so there is no network failure
+				p.setCommMask(0); // clear event if closing program
 				return 0;
 			}
 		}
@@ -130,7 +129,6 @@ int main()
 			{
                 #pragma omp section
 				{
-					cout << incomingMessage << endl;
 					
 					b.logToFile(incomingMessage, MessageType::incoming);
 				}

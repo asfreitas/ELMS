@@ -507,6 +507,7 @@ void FileIO::saveAllVehicles(vector<Vehicle*> mine_vehicles)
             std::cout << "Cannot write to filepath: " << path;
         }
     }
+    std::cout << "\nSaving vehicles to vehicles.txt. It is now safe to close the program\n";
     file.close();
 }
 
@@ -564,6 +565,6 @@ vector<Vehicle*> FileIO::getSavedVehicles()
         vehicles.push_back(v);
         std::cout << "Loading vehicle " << unit << std::endl;
     }
-    std::cout << "...finished loading vehicles" << std::endl;
+    std::cout << "...finished loading vehicles\n" << std::endl;
     return vehicles;
 }

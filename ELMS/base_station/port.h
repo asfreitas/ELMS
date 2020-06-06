@@ -41,6 +41,7 @@ class Port
         bool networkFailure = false;
         bool portReady = false;
         FileIO* fileHandler;
+        bool closing = false;
         
 
     public:
@@ -49,7 +50,7 @@ class Port
         Port() {};
         ~Port();
         void openSerialPort(LPCSTR); 
-        DWORD readFromSerialPort(char*, int);
+        bool readFromSerialPort(char*, int);
         DWORD writeToSerialPort(char*, int, HANDLE);
         void closeSerialPort(HANDLE);
         HANDLE setupPort(LPCSTR);
@@ -70,6 +71,8 @@ class Port
         bool isPortReady() { return portReady; }
         // returns a list of possible COM ports available
         void SelectComPort(vector<string>&);
+        void setClosing(bool _closing) { closing = _closing; }
+        void handleNetworkFailure();
         //void signalHandler(int signum);
 
 

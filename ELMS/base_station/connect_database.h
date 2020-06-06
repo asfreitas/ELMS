@@ -89,18 +89,14 @@ public:
                 = vehicles.update_one(document{} << "vehicle_unit" << unit << finalize,
                     document{} << "$set" << open_document{} <<
                     queryType << value << close_document{} << finalize);
-            if (result)
+            if (!result)
             {
-                std::cout << "Successfully updated\n";
-            }
-            else
-            {
-                std::cout << "There was a problem updating\n";
+                std::cout << "There was a problem updating the database.\n";
             }
         }
         catch (mongocxx::exception& e)
         {
-            std::cout << "There was an exception: " << e.what();
+            std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
         }
 
     }
@@ -135,16 +131,14 @@ public:
                     << close_document{}
                     << finalize
                 );
-            if (update_array) {
-                std::cout << "Successfully pushed\n";
+            if (!update_array) {
+                std::cout << "There was a problem updating an array in the database.\n";
             }
-            else {
-                std::cout << "There was a problem pushing\n";
-            }
+
         }
         catch (mongocxx::exception& e)
         {
-            std::cout << "There was an exception: " << e.what();
+            std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
         }
     }
 
@@ -188,7 +182,7 @@ public:
         }
         catch (mongocxx::exception& e)
         {
-            std::cout << "There was an exception: " << e.what();
+            std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
         }
     }
 
@@ -211,15 +205,12 @@ public:
                     document{} << "$set" << open_document{} <<
                     queryType << eleView << close_document{} << finalize);
             if (result) {
-                std::cout << "Successfully updated\n";
-            }
-            else {
-                std::cout << "There was a problem updating\n";
+                std::cout << "There was a problem updating the database.\n";
             }
         }
         catch (mongocxx::exception& e)
         {
-            std::cout << "There was an exception: " << e.what();
+            std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
         }
     }
 
@@ -235,16 +226,14 @@ public:
             bsoncxx::stdx::optional<bsoncxx::document::value> result
                 = vehicles.find_one(document{} << queryType << value << finalize);
 
-            if (result) {
-                std::cout << bsoncxx::to_json(*result) << "\n";
+            if (!result) {
+                std::cout << "There was a problem querying the database\n";
             }
-            else {
-                std::cout << "Cannot find document";
-            }
+
         }
         catch (mongocxx::exception& e)
         {
-            std::cout << "There was an exception: " << e.what();
+            std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
         }
     }
 };

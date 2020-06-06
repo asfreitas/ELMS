@@ -212,14 +212,10 @@ void Base_Unit::input_data(int indice, struct message* ptr, Port& p, HANDLE& h)
 
                 //we also need to create the alert log message
                 // remove the \n from the end of the message
-                alertLogMessage = alertLogMessage.substr(0, alertLogMessage.length() - 1);
 
-                alertLogMessage1 = alertLogMessage1.substr(0, alertLogMessage1.length() - 2);
 
-                cout << alertLogMessage << endl;
-                cout << alertLogMessage1 << endl;
-                alertLogMessage1 = alertLogMessage1.substr(0, alertLogMessage1.length() - 1);
-                
+                cout << endl << "Sending this message to vehicle #" << mine_vehicles.at(index)->getVehicleID() << ": " << alertLogMessage << endl;
+                cout << "Sending this message to vehicle #" << v1->getVehicleID() << ": " << alertLogMessage1 << endl << endl;
                 //get the file path and write to the alert log
                 fileHandler.logToFile(alertLogMessage, MessageType::alert); 
 
