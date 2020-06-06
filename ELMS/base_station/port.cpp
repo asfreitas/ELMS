@@ -195,9 +195,11 @@ bool Port::readFromSerialPort(char* buffer, int buffersize)
 
     if (osReader.hEvent == NULL)
         std::cout << "error\n";
+
     while(!gotResult)
+
     {
-        
+
         if (!readCompleted && !ReadFile(hSerial, buffer, buffersize, NULL, &osReader))
         {
             if (GetLastError() != ERROR_IO_PENDING)
@@ -236,6 +238,7 @@ bool Port::readFromSerialPort(char* buffer, int buffersize)
             }
         }
     }
+
     return dwBytesRead;
 
 }
@@ -293,7 +296,7 @@ DWORD Port::writeToSerialPort(char* data, int length, HANDLE handle)
         fRes = false;
     }
     CloseHandle(osWrite.hEvent);
-    
+
     return 0;
 }
 
@@ -349,6 +352,8 @@ HANDLE Port::setupPort(LPCSTR portname)
         }
         else
             cout << "Waiting for data from mobile unit..." << endl;
+        //_kbhit returns a non-zero value if a key stroke was made
+
         //we have a portname, so we call createPort
         hSerial = createPort(portname);
     }
@@ -475,7 +480,6 @@ void Port::receiveMessage()
 {
     while (stillReceiving)
     {
-
         char newMessage[messageSize];
         memset(newMessage, 0, messageSize);
         char extra[2];
@@ -497,9 +501,96 @@ void Port::receiveMessage()
         }
         if (networkFailure)
         {
+
+            std::string mystring;
+            // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
+
+            //get the current time
+            time_t now = time(0);
+
+            //declare a time structure
+            struct tm gmtm;
+
+            //use a thread safe call to get the current UTC time
+            gmtime_s(&gmtm, &now);
+
+
+            std::string hour = timePadding(gmtm.tm_hour);
+            std::string min = timePadding(gmtm.tm_min);
+            std::string sec = timePadding(gmtm.tm_sec);
+
+            struct tm ltm;
+
+            localtime_s(&ltm, &now);
+
+            std::string localHour = timePadding(ltm.tm_hour);
+            std::string localMin = timePadding(ltm.tm_min);
+            std::string localSec = timePadding(ltm.tm_sec);
+
+            std::string displayString = "\nThere was network failure from: " + localHour + ":" + localMin +
+                ":" + localSec;
+
+            mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
+
+            auto start = std::chrono::system_clock::now();
+
+            waitCommMask(EV_RXCHAR);
+
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> diff = end - start;
+
+            //get the current time
+            now = time(0);
+
+            //use a thread safe call to get the current UTC time
+            gmtime_s(&gmtm, &now);
+
+
+            hour = timePadding(gmtm.tm_hour);
+            min = timePadding(gmtm.tm_min);
+            sec = timePadding(gmtm.tm_sec);
+
+            localtime_s(&ltm, &now);
+
+            localHour = timePadding(ltm.tm_hour);
+            localMin = timePadding(ltm.tm_min);
+            localSec = timePadding(ltm.tm_sec);
+
+            mystring += " to " + hour + ":" + min + ":" + sec + " for " + std::to_string(diff.count()) + " seconds";
+
+
+            displayString += " to " + localHour + ":" + localMin +
+                ":" + localSec + "\n";
+
+
+
+            if (!closing)
+            {
+                //call gui to report possible network failure.  This allows the user to confirm or ignore event. 
+                BOOL results = confirmNetworkFailure(displayString);
+
+                //either way, the event will be logged. If results = 1, then the user confirmed event.
+                // confirmed is appended to the log.
+                if (results)
+                {
+                    mystring += " - Confirmed.\n";
+                    displayString += " - Confirmed.\n";
+                }
+                // otherwise, the user did not confirm the event and unconfirmed is appended to the event. 
+                else
+                {
+                    mystring += " - Unconfirmed.\n";
+                    displayString += " - Unconfirmed.\n";
+                }
+                std::cout << displayString << std::endl;
+
+                //write the message to a log file
+                fileHandler->logToFile(mystring, MessageType::network_failure);
+
+            }
+
            // handleNetworkFailure();
         }
-
 
     }
 

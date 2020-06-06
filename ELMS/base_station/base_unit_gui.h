@@ -26,7 +26,6 @@ using std::endl;
 #define ID_SELF_DESTROY_BUTTON 100
 #define ID_LISTBOX 101
 #define ID_CLOSE 102
-#define ID_OKAY 103
 #define ID_CONTINUE 104
 #define ID_QUIT 105
 #define ID_CONFIRM 106
