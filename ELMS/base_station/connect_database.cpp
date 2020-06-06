@@ -55,7 +55,7 @@ void Database::addVehicle(Vehicle* vehicle) {
                 << "distance" << element.second
                 << close_document{};
         }
-		//fill in remaining data to be stored into mongodb
+        //fill in remaining data to be stored into mongodb
         auto after_array = sub_array << close_array;
         after_array
             << "vehicle_unit" << vehicle->getUnit()
@@ -76,7 +76,7 @@ void Database::addVehicle(Vehicle* vehicle) {
             << "new_bearing" << vehicle->getBearing()
             << "status" << vehicle->getStatus()
             << "priority" << vehicle->getPriorityNumber();
-            bsoncxx::document::value doc_view = after_array << finalize;
+        bsoncxx::document::value doc_view = after_array << finalize;
 
         //obtain view of document to insert it
         bsoncxx::document::view view = doc_view.view();
@@ -86,7 +86,7 @@ void Database::addVehicle(Vehicle* vehicle) {
             std::cout << "Cannot create vehicle in database. It might already exist or there is a problem connecting." << "\n";
         }
 
-        
+
     }
     catch (mongocxx::exception& e)
     {
@@ -118,7 +118,7 @@ void Database::updateVehicle(Vehicle* vehicle)
         time_t lastDateTime = zuluToDate(lastTime);
         milliseconds last_message_time = milliseconds(lastDateTime * 1000);
 
-		//If vehicle status now offline, set startup_time to null
+        //If vehicle status now offline, set startup_time to null
         if (vehicle->getStatus() == "offline") {
             bsoncxx::stdx::optional<mongocxx::result::update> update_startup =
                 vehicles.update_one(document{}
@@ -133,7 +133,7 @@ void Database::updateVehicle(Vehicle* vehicle)
             vehicle->setStartupTime(NULL);
         }
         //else if status is not "offline" and the startup time is 0, reset startup time
-        else if(vehicle->getStartupTime() == NULL){
+        else if (vehicle->getStartupTime() == NULL) {
             bsoncxx::stdx::optional<mongocxx::result::update> update_startup =
                 vehicles.update_one(document{}
                     << "vehicle_unit" << vehicle->getUnit()
@@ -152,7 +152,7 @@ void Database::updateVehicle(Vehicle* vehicle)
 
         bsoncxx::builder::stream::document builder{};
         //first, build distance_to_vehicles array with objects of other vehicles
-        auto sub_array = builder << "$set" << open_document{} 
+        auto sub_array = builder << "$set" << open_document{}
         << "distance_to_vehicles" << open_array;
         for (pair<int, double> element : *mapVehicles) {
             sub_array = sub_array << open_document{}
@@ -160,7 +160,7 @@ void Database::updateVehicle(Vehicle* vehicle)
                 << "distance" << element.second
                 << close_document{};
         }
-		//fill in remaining data to be set into mongodb
+        //fill in remaining data to be set into mongodb
         auto after_array = sub_array << close_array;
         after_array
             << "vehicle_unit" << vehicle->getUnit()
@@ -176,7 +176,7 @@ void Database::updateVehicle(Vehicle* vehicle)
             << "priority" << vehicle->getPriorityNumber();
         bsoncxx::document::value doc_view = after_array << close_document{} << finalize;
         bsoncxx::document::view view = doc_view.view();
-		//update the vehicle
+        //update the vehicle
         auto result = vehicles.update_one(
             document{} << "vehicle_unit" << vehicle->getUnit() << finalize,
             view);
@@ -184,15 +184,15 @@ void Database::updateVehicle(Vehicle* vehicle)
         {
             std::cout << "There was a problem updating the vehicle in the database.\n";
         }
-		//push data onto the arrays
+        //push data onto the arrays
         bsoncxx::stdx::optional<mongocxx::result::update> update_array =
             vehicles.update_one(document{}
                 << "vehicle_unit" << vehicle->getUnit()
                 << finalize,
                 document{}
                 << "$push" << open_document{}
-                    << "past_velocity" << vehicle->getVelocity()
-                    << "past_bearing" << vehicle->getBearing()
+                << "past_velocity" << vehicle->getVelocity()
+                << "past_bearing" << vehicle->getBearing()
                 << close_document{}
                 << finalize
             );
@@ -234,14 +234,14 @@ vector<int> Database::getAllVehicleID()
         {
             string string;
             string = bsoncxx::to_json(doc);
-            string[string.length()-1] = 0; // add null terminator
+            string[string.length() - 1] = 0; // add null terminator
             int pos = string.find(':'); // e only want the number here so we take it off at the :
-            string = string.substr(pos + 1, string.length()-1); // find number
+            string = string.substr(pos + 1, string.length() - 1); // find number
 
             vehicle_id.push_back(stringToInt(string));
         }
     }
-    catch(mongocxx::exception& e)
+    catch (mongocxx::exception& e)
     {
         std::cout << "There was an internal problem with the database. Error Message:" << e.what() << std::endl;
 

@@ -1,6 +1,6 @@
 /*
 * ELMS - Trevor Frame, Andrew Freitas, Deborah Kretzschmar
-* 
+*
 * This file contains the headers for port handling.
 */
 
@@ -21,6 +21,10 @@
 #include <mutex>
 #include <chrono>
 #include <vector>
+#include <time.h>
+#include <ctime>
+
+using namespace std::chrono;
 
 using std::vector;
 using std::string;
@@ -30,19 +34,20 @@ static vector<string> listOfPorts;
 
 class Port
 {
-    private:
-        static const int messageSize = 50;
-        HANDLE hSerial;
-        std::queue<std::string> buffer;
-        std::mutex mutex;
-        std::thread portThread;
-        std::thread messageThread;
-        bool stillReceiving = true;
-        bool networkFailure = false;
-        bool portReady = false;
-        FileIO* fileHandler;
-        bool closing = false;
-        
+private:
+    static const int messageSize = 50;
+    HANDLE hSerial;
+    std::queue<std::string> buffer;
+    std::mutex mutex;
+    std::thread portThread;
+    std::thread messageThread;
+    bool stillReceiving = true;
+    bool networkFailure = false;
+    bool portReady = false;
+    FileIO* fileHandler;
+    bool closing = false;
+
+
 
     public:
         Port(LPCSTR portname, FileIO*);
@@ -74,6 +79,7 @@ class Port
         void setClosing(bool _closing) { closing = _closing; }
         void handleNetworkFailure();
         //void signalHandler(int signum);
+
 
 
 };
