@@ -5,7 +5,7 @@
 */
 #include "port.h"
 using std::wcout;
-
+const int failure_timer = 30;
 
 /* Reference for this code and serialport.hpp is https://github.com/waynix/SPinGW */
 /********************************************************************************
@@ -87,7 +87,7 @@ void Port::handleNetworkFailure()
     // *Reference: https://www.daniweb.com/programming/software-development/threads/476954/convert-from-localtime-to-localtime-s
 
     //get the current time
-    time_t now = time(0);
+    time_t now = time(0) - failure_timer;
 
     //declare a time structure
     struct tm gmtm;
@@ -113,7 +113,7 @@ void Port::handleNetworkFailure()
 
     mystring = "\nThere was network failure from: " + hour + ":" + min + ":" + sec;
 
-    auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::system_clock::now() - std::chrono::seconds(failure_timer);
 
     waitCommMask(EV_RXCHAR);
 
