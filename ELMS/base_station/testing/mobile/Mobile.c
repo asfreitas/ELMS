@@ -197,7 +197,6 @@ FILE *script, *logp;
 char *msg;
 char readbuffer[100];	 // buffer for serial incoming data
 char messagebuffer[100]; // buffer for scrolling message area
-char image[50]; // workspace for outgoing script messages
 char info[20];
 char c,command;
 int field,b,n;	// which data field are we reading?
@@ -213,7 +212,10 @@ int fieldnext[5]; 	// points to next empty spot in field buffer
 char label[5][12]={"Unit No.: "," Time: "," Speed: "," Distance: "," Bearing: "};
 int data_to_send=FALSE;
 
-
+char* line = NULL;
+size_t line_size = 0;
+int outDelay;
+char* image;
 COORD setcoords;
 int i,nEntries=0;
 
@@ -344,18 +346,24 @@ int i,nEntries=0;
 // Third priority.
 // time to send simulated script message?
 // ======================================================
-
-	if (data_to_send == FALSE) {
-
-//
-	if (fscanf(script,"%5d %s",&delay,image) != EOF ) {
-	   currenttick=GetTickCount();
-            data_to_send=TRUE; } }
-//
+	if(data_to_send == FALSE)
+	{
+	if (getline(&line, &line_size, script) != -1)
+		{
+			outDelay = atoi(strtok(line, " "));
+			image = strtok(NULL, " ");
+			currenttick=GetTickCount();
+			data_to_send=TRUE;
+		} 
+	}
+		
+	//	}
 //	// get data from simulation script
   if (data_to_send == TRUE) {
 	messagetick= GetTickCount();
-    if (messagetick-currenttick>delay) {
+
+	int diff = messagetick - currenttick;
+    if (messagetick-currenttick>outDelay) {
  	// send this out to Base
 	strcat(image,"\r\0");
 	b=strlen( image);
