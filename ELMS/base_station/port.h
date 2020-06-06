@@ -48,7 +48,6 @@ private:
     bool closing = false;
 
 
-
 public:
     Port(LPCSTR portname, FileIO*);
     Port(FileIO*);
@@ -79,7 +78,6 @@ public:
     void setClosing(bool _closing) { closing = _closing; }
     void handleNetworkFailure();
     //void signalHandler(int signum);
-
 
 
 };
