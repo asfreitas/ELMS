@@ -1,7 +1,7 @@
 `ELMS - Electronic Location Monitoring System`
 
 
-`ELMS` is both an application written entirely in C/C++ and a React App. It takes in GPS data from giant mining vehicles and processes it. In doing so it has two effects: updating a database for viewing vehicles and their statuses as well as sending messages via the serial port to vehicles that are in danger.
+`ELMS` is both an application written entirely in C/C++ and a React App. It takes in GPS data from giant mining vehicles and processes it. In doing so it has two effects: updating a database for viewing vehicles and their statuses as well as sending messages via the serial port to vehicles that are in danger. It was created with three team members, Andrew Freitas, Trevor Frame, and Deborah Kretzschmar as a part of the Capstone course taken for Oregon State University. It was also made in conjunction with mechanical engineering students at University of Wyoming. 
 
 ![Vehicle homepage](https://media2.giphy.com/media/o5ob87IrmDxNyynaK2/giphy.gif?cid=790b76111dfedde5b0afca0999f06d8dfa5521d2c62cbbe3&rid=giphy.gif&ct=g)
 
